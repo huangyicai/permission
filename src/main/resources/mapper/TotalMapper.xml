@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.TotalMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.Total">
+        <id column="total_id" property="totalId" />
+        <result column="name" property="name" />
+        <result column="total_time" property="totalTime" />
+        <result column="total_number" property="totalNumber" />
+        <result column="total_weight" property="totalWeight" />
+        <result column="total_cost" property="totalCost" />
+        <result column="total_offer" property="totalOffer" />
+        <result column="total_paid" property="totalPaid" />
+        <result column="total_url" property="totalUrl" />
+        <result column="total_state" property="totalState" />
+        <result column="create_time" property="createTime" />
+        <result column="create_ip" property="createIp" />
+        <result column="update_time" property="updateTime" />
+        <result column="update_ip" property="updateIp" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        total_id, name, total_time, total_number, total_weight, total_cost, total_offer, total_paid, total_url, total_state, create_time, create_ip, update_time, update_ip
+    </sql>
+
+    <!--添加账单-->
+    <insert id="insertTotal" parameterType="com.mmall.model.Total" useGeneratedKeys="true" keyProperty="totalId">
+      insert into total(`name`,total_time,total_number,total_weight,create_time) value (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime})
+    </insert>
+</mapper>

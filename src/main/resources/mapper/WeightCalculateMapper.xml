@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.WeightCalculateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.WeightCalculate">
+        <id column="weight_id" property="weightId" />
+        <result column="total_id" property="totalId" />
+        <result column="zero" property="zero" />
+        <result column="one" property="one" />
+        <result column="two" property="two" />
+        <result column="three" property="three" />
+        <result column="four" property="four" />
+        <result column="five" property="five" />
+        <result column="six" property="six" />
+        <result column="seven" property="seven" />
+        <result column="eight" property="eight" />
+        <result column="nine" property="nine" />
+        <result column="ten" property="ten" />
+        <result column="eleven" property="eleven" />
+        <result column="twelve" property="twelve" />
+        <result column="thirteen" property="thirteen" />
+        <result column="fourteen" property="fourteen" />
+        <result column="fifteen" property="fifteen" />
+        <result column="sixteen" property="sixteen" />
+        <result column="seventeen" property="seventeen" />
+        <result column="eighteen" property="eighteen" />
+        <result column="nineteen" property="nineteen" />
+        <result column="twenty" property="twenty" />
+        <result column="twenty_one" property="twentyOne" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        weight_id, total_id, zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty_one
+    </sql>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.SysUserInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.SysUserInfo">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="platform_id" property="platformId"/>
+        <result column="company_name" property="companyName"/>
+        <result column="email" property="email"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, platform_id, name, email, status, create_time, update_time
+    </sql>
+
+    <select id="findUserByusername" parameterType="String" resultMap="BaseResultMap">
+        SELECT
+        i.id,i.platform_id,i.company_name,i.email,i.level,i.status
+        FROM
+            sys_user s
+        INNER JOIN sys_user_info i ON s.id = i.user_id
+        INNER JOIN platform p ON p.id = i.platform_id
+        WHERE
+            s.username =#{username}
+    </select>
+
+    <select id="findUserByid" parameterType="String" resultType="com.mmall.model.SysUserInfo">
+          SELECT
+			distinct s.*
+        FROM
+            sys_user_info s
+        WHERE
+            s.`level` LIKE #{id} and s.status=1 and s.platform_id in (3,-1)
+		ORDER BY s.id
+    </select>
+
+
+</mapper>

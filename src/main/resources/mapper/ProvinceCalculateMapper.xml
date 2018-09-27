@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.ProvinceCalculateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.ProvinceCalculate">
+        <id column="province_id" property="provinceId" />
+        <result column="total_id" property="totalId" />
+        <result column="beijing" property="beijing" />
+        <result column="tianjing" property="tianjing" />
+        <result column="hebei" property="hebei" />
+        <result column="shanxi" property="shanxi" />
+        <result column="neimenggu" property="neimenggu" />
+        <result column="liaoning" property="liaoning" />
+        <result column="jiling" property="jiling" />
+        <result column="heilongjiang" property="heilongjiang" />
+        <result column="shanghai" property="shanghai" />
+        <result column="jiangsu" property="jiangsu" />
+        <result column="zhejaing" property="zhejaing" />
+        <result column="anhui" property="anhui" />
+        <result column="fujian" property="fujian" />
+        <result column="jaingxi" property="jaingxi" />
+        <result column="shandong" property="shandong" />
+        <result column="henan" property="henan" />
+        <result column="hubei" property="hubei" />
+        <result column="hunan" property="hunan" />
+        <result column="guangdong" property="guangdong" />
+        <result column="guangxi" property="guangxi" />
+        <result column="hainan" property="hainan" />
+        <result column="chongqing" property="chongqing" />
+        <result column="sichuan" property="sichuan" />
+        <result column="guizhou" property="guizhou" />
+        <result column="yunnan" property="yunnan" />
+        <result column="xizang" property="xizang" />
+        <result column="shaanxi" property="shaanxi" />
+        <result column="gansu" property="gansu" />
+        <result column="qinghai" property="qinghai" />
+        <result column="ningxia" property="ningxia" />
+        <result column="xinjang" property="xinjang" />
+        <result column="taiwan" property="taiwan" />
+        <result column="xianggang" property="xianggang" />
+        <result column="aomen" property="aomen" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        province_id, total_id, beijing, tianjing, hebei, shanxi, neimenggu, liaoning, jiling, heilongjiang, shanghai, jiangsu, zhejaing, anhui, fujian, jaingxi, shandong, henan, hubei, hunan, guangdong, guangxi, hainan, chongqing, sichuan, guizhou, yunnan, xizang, shaanxi, gansu, qinghai, ningxia, xinjang, taiwan, xianggang, aomen
+    </sql>
+
+</mapper>
