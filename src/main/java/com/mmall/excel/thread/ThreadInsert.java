@@ -43,6 +43,7 @@ public class ThreadInsert implements Callable<String> {
      */
     public String call() throws Exception {
 
+        //获取相应的bean
         TotalMapper totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
         WeightCalculateMapper weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);
         ProvinceCalculateMapper provinceCalculateMapper = ApplicationContextHelper.getBeanClass(ProvinceCalculateMapper.class);
@@ -50,6 +51,7 @@ public class ThreadInsert implements Callable<String> {
 
         String path="E:/GDW/"+key+".xlsx";
 
+        //初始化数据
         Total total=new Total();
         WeightCalculate weightCalculate=new WeightCalculate();
         ProvinceCalculate provinceCalculate=new ProvinceCalculate();
