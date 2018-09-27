@@ -35,7 +35,6 @@ public class BillKeyword implements Serializable {
      * id
      */
     @ApiModelProperty(value = "id")
-    @TableField("id")
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**

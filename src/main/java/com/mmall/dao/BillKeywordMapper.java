@@ -2,6 +2,9 @@ package com.mmall.dao;
 
 import com.mmall.model.BillKeyword;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2018-09-26
  */
 public interface BillKeywordMapper extends BaseMapper<BillKeyword> {
-
+    List<BillKeyword> getBillKeyword(@Param("nameStr") String nameStr);
 }

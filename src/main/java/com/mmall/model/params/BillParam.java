@@ -10,8 +10,8 @@ import org.hibernate.validator.constraints.NotBlank;
 public class BillParam {
 
     @ApiModelProperty(value = "用户名")
-    @NotBlank(message = "用户名不可以为空")
-    private String name;
+    @NotBlank(message = "用户名id不可以为空")
+    private String id;
 
     @ApiModelProperty(value = "时间")
     @NotBlank(message = "时间不可以为空")

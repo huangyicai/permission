@@ -6,12 +6,13 @@ import com.mmall.dao.BillKeywordMapper;
 import com.mmall.dao.ProvinceCalculateMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dao.WeightCalculateMapper;
+import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.thread.ThreadImport;
-import com.mmall.excel.thread.ThreadInsert;
 import com.mmall.model.BillKeyword;
 import com.mmall.model.SysUserInfo;
 import com.mmall.service.SysUserInfoService;
+import com.mmall.util.LevelUtil;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -24,6 +25,7 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +70,6 @@ public class XlsxProcessAbstract {
     private BillKeywordMapper billKeywordMapper;
 
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
-
     private final int minColumns = 0; //开始读取行数从第0行开始计算
     private final StringBuffer rowStrs = new StringBuffer();
 
@@ -191,10 +192,25 @@ public class XlsxProcessAbstract {
      */
     public Map<String,String> processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
 
-        //獲取姓名集合
-        List<BillKeyword> list = billKeywordMapper.selectList(new QueryWrapper<BillKeyword>().select("keyword","user_id"));
+        //获取用户信息
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
+        List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
+                .like("level", s)
+                .eq("platform_id", 3)
+                .select("id"));
 
-        Integer id=0;
+        String nameStr="";
+        for(SysUserInfo sysUserInfo: list1){
+            nameStr+=sysUserInfo.getId()+",";
+        }
+
+        nameStr=nameStr.substring(0,nameStr.length()-1);
+
+        //獲取姓名集合
+        List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
+
+        int id=0;
 
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -220,6 +236,9 @@ public class XlsxProcessAbstract {
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
         Map<String,String> urlMap=new HashMap<String,String>();
         for (String key:map.keySet()) {
+
+            Integer total=0;//总单量
+            BigDecimal weightOne=BigDecimal.ZERO;//总重
             String path="E:/GDW/"+key+".xlsx";
 
             //判斷是否存在該用戶
@@ -230,13 +249,14 @@ public class XlsxProcessAbstract {
                 }
             }
 
-            ThreadImport threadImport=new ThreadImport(path,map.get(key),key);
-            threadPool.submit(threadImport);
-
             //分离数据
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
+
+                //计算每个月份的单量，总重量
+                total+=1;
+                weightOne=weightOne.add(bill.getWeight());
             }
 
             //根据重量分离数据
@@ -255,9 +275,19 @@ public class XlsxProcessAbstract {
                 md.put(str,destination.get(str).size());
             }
 
-            //启动线程，向数据库插入数据
-            ThreadInsert threadInsert=new ThreadInsert(key,mw,md,time,processTransDetailData.total,processTransDetailData.weight,id);
-            threadPool.submit(threadInsert);
+            ThreadDto threadDto=new ThreadDto();
+            threadDto.setId(id);
+            threadDto.setKey(key);
+            threadDto.setList(map.get(key));
+            threadDto.setMd(md);
+            threadDto.setMw(mw);
+            threadDto.setPath(path);
+            threadDto.setTime(time);
+            threadDto.setTotalNum(total);
+            threadDto.setWeight(weightOne);
+
+            ThreadImport threadImport=new ThreadImport(threadDto);
+            threadPool.submit(threadImport);
 
             destination.clear();
             weightMap.clear();
@@ -273,9 +303,6 @@ public class XlsxProcessAbstract {
             }
             Thread.sleep(200);
         }
-
-        urlMap.put("total",processTransDetailData.total.toString());
-        urlMap.put("weight",processTransDetailData.weight.toString());
         return urlMap;
     }
 
