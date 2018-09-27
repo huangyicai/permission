@@ -12,5 +12,5 @@ import com.mmall.model.Total;
  * @since 2018-09-25
  */
 public interface TotalMapper extends BaseMapper<Total> {
-    void insertTotal(Total total);
+    Integer insertTotal(Total total);
 }

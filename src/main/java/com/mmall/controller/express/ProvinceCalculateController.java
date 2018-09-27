@@ -30,7 +30,7 @@ import java.math.RoundingMode;
  */
 @Api(value = "ProvinceCalculateController", description = "省计表管理")
 @RestController
-@RequestMapping("/express//provinceCalculate")
+@RequestMapping("/express/provinceCalculate")
 public class ProvinceCalculateController {
 
     @Autowired

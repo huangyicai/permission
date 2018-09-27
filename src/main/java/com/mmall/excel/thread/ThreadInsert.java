@@ -1,5 +1,6 @@
 package com.mmall.excel.thread;
 
+import com.mmall.component.ApplicationContextHelper;
 import com.mmall.dao.ProvinceCalculateMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dao.WeightCalculateMapper;
@@ -15,12 +16,6 @@ import java.util.concurrent.Callable;
 
 @Transactional
 public class ThreadInsert implements Callable<String> {
-
-    private TotalMapper totalService;
-
-    private WeightCalculateMapper weightCalculateMapper;
-
-    private ProvinceCalculateMapper provinceCalculateMapper;
 
     private String key;//账单名
     private Map<Integer,BigDecimal> mw;//重量
@@ -48,6 +43,12 @@ public class ThreadInsert implements Callable<String> {
      */
     public String call() throws Exception {
 
+        TotalMapper totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
+        WeightCalculateMapper weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);
+        ProvinceCalculateMapper provinceCalculateMapper = ApplicationContextHelper.getBeanClass(ProvinceCalculateMapper.class);
+
+
+        String path="E:/GDW/"+key+".xlsx";
 
         Total total=new Total();
         WeightCalculate weightCalculate=new WeightCalculate();
@@ -59,8 +60,9 @@ public class ThreadInsert implements Callable<String> {
         total.setTotalTime(time);
         total.setTotalNumber(totalNum);
         total.setTotalWeight(weight);
+        total.setTotalUrl(path);
         total.setCreateTime(new Date());
-        totalService.insertTotal(total);
+        totalMapper.insertTotal(total);
 
         //添加重量区间数据
         weightCalculate.setTotalId(total.getTotalId());
@@ -128,27 +130,4 @@ public class ThreadInsert implements Callable<String> {
         return "ok";
     }
 
-    public TotalMapper getTotalService() {
-        return totalService;
-    }
-
-    public void setTotalService(TotalMapper totalService) {
-        this.totalService = totalService;
-    }
-
-    public WeightCalculateMapper getWeightCalculateMapper() {
-        return weightCalculateMapper;
-    }
-
-    public void setWeightCalculateMapper(WeightCalculateMapper weightCalculateMapper) {
-        this.weightCalculateMapper = weightCalculateMapper;
-    }
-
-    public ProvinceCalculateMapper getProvinceCalculateMapper() {
-        return provinceCalculateMapper;
-    }
-
-    public void setProvinceCalculateMapper(ProvinceCalculateMapper provinceCalculateMapper) {
-        this.provinceCalculateMapper = provinceCalculateMapper;
-    }
 }

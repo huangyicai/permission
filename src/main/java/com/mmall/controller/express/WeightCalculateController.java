@@ -30,7 +30,7 @@ import java.math.RoundingMode;
  */
 @Api(value = "WeightCalculateController", description = "重量区间计算表管理")
 @RestController
-@RequestMapping("/express//weightCalculate")
+@RequestMapping("/express/weightCalculate")
 public class WeightCalculateController {
 
     @Autowired

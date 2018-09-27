@@ -5,6 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mmall.model.Total">
         <id column="total_id" property="totalId" />
+        <result column="user_id" property="userId" />
         <result column="name" property="name" />
         <result column="total_time" property="totalTime" />
         <result column="total_number" property="totalNumber" />
@@ -22,11 +23,11 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        total_id, name, total_time, total_number, total_weight, total_cost, total_offer, total_paid, total_url, total_state, create_time, create_ip, update_time, update_ip
+        total_id, user_id as userId, name, total_time, total_number, total_weight, total_cost, total_offer, total_paid, total_url, total_state, create_time, create_ip, update_time, update_ip
     </sql>
 
     <!--添加账单-->
-    <insert id="insertTotal" parameterType="com.mmall.model.Total" useGeneratedKeys="true" keyProperty="totalId">
-      insert into total(`name`,total_time,total_number,total_weight,create_time) value (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime})
+    <insert id="insertTotal" parameterType="com.mmall.model.Total"  useGeneratedKeys="true" keyProperty="totalId">
+      insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl})
     </insert>
 </mapper>
