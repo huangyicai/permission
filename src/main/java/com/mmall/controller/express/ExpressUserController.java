@@ -26,6 +26,9 @@ import java.util.List;
 @RequestMapping("/express")
 @Slf4j
 public class ExpressUserController {
+    /**
+     * 快递公司注册  哈哈哈
+     */
 
     @Autowired
     private ExpressUserService expressUserService;
