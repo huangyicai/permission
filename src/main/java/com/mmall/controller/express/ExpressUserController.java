@@ -7,15 +7,12 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.service.ExpressUserService;
-import com.mmall.service.SysUserService;
-import com.mmall.util.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +23,6 @@ import java.util.List;
 @RequestMapping("/express")
 @Slf4j
 public class ExpressUserController {
-    /**
-     * 快递公司注册  哈哈哈
-     */
 
     @Autowired
     private ExpressUserService expressUserService;
@@ -44,7 +38,6 @@ public class ExpressUserController {
 
     @ApiOperation(value = "获取用户信息",  notes="需要Authorization")
     @GetMapping(value = "/cusmoters/{id}",produces = {"application/json;charest=Utf-8"})
-    @JsonView(SysUserInfoDto.UserInfoView.class)
     public Result<SysUserInfo> getCusmotersInfo(@PathVariable Integer id){
         return expressUserService.getCusmotersInfo(id);
     }
@@ -91,6 +84,11 @@ public class ExpressUserController {
     @DeleteMapping(value = "/keyword/{keyId}",produces = {"application/json;charest=Utf-8"})
     public Result deleteKeywordBykeyId(@PathVariable Integer keyId){
         return expressUserService.deleteKeywordBykeyId(keyId);
+    }
+
+    public static void main(String[] args) {
+        double b = 51%2;
+        System.out.println(b);
     }
 
 

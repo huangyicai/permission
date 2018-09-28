@@ -69,4 +69,10 @@ public interface SysUserService extends IService<SysUser> {
      */
     Result updateExpress(UserInfoServiceParm user);
 
+    /**
+     *
+     * @param phone
+     * @return
+     */
+    Result getCode(String phone);
 }

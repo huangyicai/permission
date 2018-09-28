@@ -15,4 +15,8 @@
         id, keyword, user_id, status
     </sql>
 
+    <insert id="insertBillKeyword" parameterType="com.mmall.model.BillKeyword"  keyProperty="id" useGeneratedKeys="true">
+        insert into bill_keyword(keyword,user_id) value (#{keyword},#{userId})
+    </insert>
+
 </mapper>

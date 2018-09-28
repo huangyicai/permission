@@ -1,5 +1,6 @@
 package com.mmall.service.serviceImpl;
 
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
@@ -18,6 +19,7 @@ import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoServiceParm;
 import com.mmall.service.SysUserService;
 import com.mmall.util.LevelUtil;
+import com.mmall.util.SmsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.shiro.SecurityUtils;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 
@@ -258,6 +261,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         sysUserInfo.setPersonInCharge(user.getPersonInCharge());
         sysUserInfoMapper.updateById(sysUserInfo);
         return Result.ok();
+    }
+
+    public Result getCode(String phone) {
+
+        return null;
     }
 
 }

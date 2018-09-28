@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface BillKeywordMapper extends BaseMapper<BillKeyword> {
 
+    Integer insertBillKeyword(BillKeyword billKeyword);
+
 }

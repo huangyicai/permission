@@ -56,7 +56,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         Integer id = user.getId();
         //List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
-                .like("level","%"+id+"%").eq("status",1).in("platform_id",-1,3));
+                .like("level","%"+id+"%").in("status",1,0).in("platform_id",-1,3));
         String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
         List<SysUserInfoDto> dtoList = Lists.newArrayList();
         for (SysUserInfo sysUserInfo : sysUserInfos) {
@@ -105,8 +105,8 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     }
 
     public Result saveKeyword(BillKeyword billKeywords) {
-        billKeywordMapper.insert(billKeywords);
-        return Result.ok();
+        Integer id = billKeywordMapper.insertBillKeyword(billKeywords);
+        return Result.ok(billKeywords);
     }
 
     public Result<List<BillKeyword>> findAllKeywordById(Integer id) {

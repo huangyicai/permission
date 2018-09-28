@@ -1,6 +1,7 @@
 package com.mmall.controller;
 
 
+import com.aliyuncs.exceptions.ClientException;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.model.Response.Result;
@@ -8,10 +9,7 @@ import com.mmall.model.*;
 import com.mmall.model.params.SysUserParam;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
@@ -48,6 +46,14 @@ public class SysUserController {
         SysUserInfo user = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
         return sysUserService.findAllMenuByUser(user,platId);
     }
+
+    @ApiOperation(value = "获取验证码", httpMethod = "POST")
+    @PostMapping(value = "/getCode/{phone}",produces = {"application/json;charest=Utf-8"})
+    public Result getCode(@PathVariable("phone") String phone) {
+        return sysUserService.getCode(phone);
+
+    }
+
     @ApiOperation(value = "登录",  notes="不需要Authorization")
     @PostMapping(value = "/login",produces = {"application/json;charest=Utf-8"})
     public Result<AuthInfo<SysUserInfo>> login(@RequestBody SysUserParam user){
