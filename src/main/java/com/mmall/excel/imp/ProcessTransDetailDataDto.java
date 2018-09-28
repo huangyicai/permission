@@ -16,8 +16,7 @@ public class ProcessTransDetailDataDto {
 
     private int readRowTitleIndex = 0; //读取标题汇总行
     public String time;//时间
-    public Integer total=0;//总单量
-    public BigDecimal weight=BigDecimal.ZERO;//总重
+
 
     //根据店铺分离数据
     public ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
@@ -34,9 +33,7 @@ public class ProcessTransDetailDataDto {
 
         // 读取第二行汇总行
         if (currentRowNumber != readRowTitleIndex) {
-
             String nameStr=cellStrs[0];
-
 
             //分表--为相应表格添加数据
             Bill bill=new Bill();
@@ -46,19 +43,12 @@ public class ProcessTransDetailDataDto {
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
 
-            //计算每个月份的单量，总重量
-            total+=1;
-            weight=weight.add(new BigDecimal(cellStrs[4]));
-
-
             //目的地是否合法
             boolean province = province(cellStrs[3]);
             if(!province){
                 nameStr="未识别地址账单";
             }
-
             map.put(nameStr,bill);
-
         }
     }
 

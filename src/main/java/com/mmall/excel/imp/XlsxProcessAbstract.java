@@ -2,14 +2,17 @@ package com.mmall.excel.imp;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.ArrayListMultimap;
+import com.mmall.dao.BillKeywordMapper;
 import com.mmall.dao.ProvinceCalculateMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dao.WeightCalculateMapper;
+import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.thread.ThreadImport;
-import com.mmall.excel.thread.ThreadInsert;
+import com.mmall.model.BillKeyword;
 import com.mmall.model.SysUserInfo;
 import com.mmall.service.SysUserInfoService;
+import com.mmall.util.LevelUtil;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -22,6 +25,7 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +66,10 @@ public class XlsxProcessAbstract {
     @Autowired
     private ProvinceCalculateMapper provinceCalculateMapper;
 
-    private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
+    @Autowired
+    private BillKeywordMapper billKeywordMapper;
 
+    private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
     private final int minColumns = 0; //开始读取行数从第0行开始计算
     private final StringBuffer rowStrs = new StringBuffer();
 
@@ -77,106 +83,105 @@ public class XlsxProcessAbstract {
 
 
 
-    /**
-     * 支持遍历同一个excle文件下多个sheet的解析
-     * excel记录行操作方法，以行索引和行元素列表为参数，对一行元素进行操作，元素为String类型
-     * @param filename
-     * @return
-     * @throws Exception
-     */
-    public Map<String,String> processAllSheet(String filename,String time) throws Exception {
-
-        //獲取姓名集合
-        List<SysUserInfo> list = sysUserInfoService.list(new QueryWrapper<SysUserInfo>().select("name"));
-
-        //判斷用戶是否存在的字段
-        Integer type=1;
-
-        OPCPackage pkg = OPCPackage.open(filename, PackageAccess.READ);
-        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
-        XSSFReader xssfReader = new XSSFReader(pkg);
-        StylesTable styles = xssfReader.getStylesTable();
-        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
-        InputStream stream = null;
-        while (iter.hasNext()) {
-            try {
-                stream = iter.next();
-                parserSheetXml(styles, strings, new SheetToCSV(), stream);
-            } catch (Exception e) {
-            } finally {
-                stream.close();
-            }
-        }
-
-        //创建线程池
-        ExecutorService threadPool = Executors.newFixedThreadPool(10);
-
-        //根据用户分表
-        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
-        Map<String,String> urlMap=new HashMap<String,String>();
-        for (String key:map.keySet()) {
-            String path="E:/EDW/"+key+".xlsx";
-
-            //判斷是否存在該用戶
-            for(SysUserInfo name:list){
-                if(key.equals(name.getName())){
-                    path="E:/GDW/"+key+".xlsx";
-                    type=2;
-                    break;
-                }
-            }
-
-            ThreadImport threadImport=new ThreadImport(path,map.get(key),key);
-            threadPool.submit(threadImport);
-
-            //分离数据
-            for (Bill bill:map.get(key)) {
-                weightInterval(bill.getWeight());
-                province(bill.getDestination());
-            }
-
-            //根据重量分离数据
-            Map<Integer,BigDecimal> mw=new HashMap<Integer, BigDecimal>();
-            for (Integer integer:weightMap.keySet()) {
-                BigDecimal weight=BigDecimal.ZERO;
-                for (BigDecimal bigDecimal:weightMap.get(integer)){
-                    weight=weight.add(bigDecimal);
-                }
-                mw.put(integer,weight);
-            }
-
-            //根据省份分离数据
-            Map<String,Integer> md=new HashMap<String,Integer>();
-            for(String str:destination.keySet()){
-                md.put(str,destination.get(str).size());
-            }
-
-            //启动线程，向数据库插入数据
-            ThreadInsert threadInsert=new ThreadInsert(key,mw,md,time,processTransDetailData.total,processTransDetailData.weight,type);
-            threadInsert.setTotalService(totalService);
-            threadInsert.setProvinceCalculateMapper(provinceCalculateMapper);
-            threadInsert.setWeightCalculateMapper(weightCalculateMapper);
-            threadPool.submit(threadInsert);
-
-            destination.clear();
-            weightMap.clear();
-            urlMap.put(key,path);
-        }
-
-        //判断线程是否执行完毕
-        threadPool.shutdown();
-        while (true){
-            if (threadPool.isTerminated()) {
-                logger.info("线程已执行完毕");
-                break;
-            }
-            Thread.sleep(200);
-        }
-
-        urlMap.put("total",processTransDetailData.total.toString());
-        urlMap.put("weight",processTransDetailData.weight.toString());
-        return urlMap;
-    }
+//    /**
+//     * 支持遍历同一个excle文件下多个sheet的解析
+//     * excel记录行操作方法，以行索引和行元素列表为参数，对一行元素进行操作，元素为String类型
+//     * @param filename
+//     * @return
+//     * @throws Exception
+//     */
+//    public Map<String,String> processAllSheet(String filename,String time) throws Exception {
+//
+//        //獲取姓名集合
+//        List<BillKeyword> list = billKeywordMapper.selectList(new QueryWrapper<BillKeyword>().select("keyword","user_id"));
+//
+//        Integer id=0;
+//
+//        OPCPackage pkg = OPCPackage.open(filename, PackageAccess.READ);
+//        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
+//        XSSFReader xssfReader = new XSSFReader(pkg);
+//        StylesTable styles = xssfReader.getStylesTable();
+//        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+//        InputStream stream = null;
+//        while (iter.hasNext()) {
+//            try {
+//                stream = iter.next();
+//                parserSheetXml(styles, strings, new SheetToCSV(), stream);
+//            } catch (Exception e) {
+//            } finally {
+//                stream.close();
+//            }
+//        }
+//
+//        //创建线程池
+//        ExecutorService threadPool = Executors.newFixedThreadPool(10);
+//
+//        //根据用户分表
+//        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
+//        Map<String,String> urlMap=new HashMap<String,String>();
+//        for (String key:map.keySet()) {
+//            String path="E:/EDW/"+key+".xlsx";
+//
+//            //判斷是否存在該用戶
+//            for(BillKeyword name:list){
+//                if(key.equals(name.getKeyword())){
+//                    path="E:/GDW/"+key+".xlsx";
+//                    id=name.getUserId();
+//                    break;
+//                }
+//            }
+//
+//            ThreadImport threadImport=new ThreadImport(path,map.get(key),key);
+//            threadPool.submit(threadImport);
+//
+//            //分离数据
+//            for (Bill bill:map.get(key)) {
+//                weightInterval(bill.getWeight());
+//                province(bill.getDestination());
+//            }
+//
+//            //根据重量分离数据
+//            Map<Integer,BigDecimal> mw=new HashMap<Integer, BigDecimal>();
+//            for (Integer integer:weightMap.keySet()) {
+//                BigDecimal weight=BigDecimal.ZERO;
+//                for (BigDecimal bigDecimal:weightMap.get(integer)){
+//                    weight=weight.add(bigDecimal);
+//                }
+//                mw.put(integer,weight);
+//            }
+//
+//            //根据省份分离数据
+//            Map<String,Integer> md=new HashMap<String,Integer>();
+//            for(String str:destination.keySet()){
+//                md.put(str,destination.get(str).size());
+//            }
+//
+//            //启动线程，向数据库插入数据
+//            ThreadInsert threadInsert=new ThreadInsert(key,mw,md,time,processTransDetailData.total,processTransDetailData.weight,id);
+//            threadInsert.setTotalService(totalService);
+//            threadInsert.setProvinceCalculateMapper(provinceCalculateMapper);
+//            threadInsert.setWeightCalculateMapper(weightCalculateMapper);
+//            threadPool.submit(threadInsert);
+//
+//            destination.clear();
+//            weightMap.clear();
+//            urlMap.put(key,path);
+//        }
+//
+//        //判断线程是否执行完毕
+//        threadPool.shutdown();
+//        while (true){
+//            if (threadPool.isTerminated()) {
+//                logger.info("线程已执行完毕");
+//                break;
+//            }
+//            Thread.sleep(200);
+//        }
+//
+//        urlMap.put("total",processTransDetailData.total.toString());
+//        urlMap.put("weight",processTransDetailData.weight.toString());
+//        return urlMap;
+//    }
 
     /**
      * 支持遍历同一个excle文件下多个sheet的解析
@@ -187,10 +192,25 @@ public class XlsxProcessAbstract {
      */
     public Map<String,String> processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
 
-        //獲取姓名集合
-        List<SysUserInfo> list = sysUserInfoService.list(new QueryWrapper<SysUserInfo>().select("name"));
+        //获取用户信息
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
+        List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
+                .like("level", s)
+                .eq("platform_id", 3)
+                .select("id"));
 
-        Integer id=0;
+        String nameStr="";
+        for(SysUserInfo sysUserInfo: list1){
+            nameStr+=sysUserInfo.getId()+",";
+        }
+
+        nameStr=nameStr.substring(0,nameStr.length()-1);
+
+        //獲取姓名集合
+        List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
+
+        int id=0;
 
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -216,23 +236,27 @@ public class XlsxProcessAbstract {
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
         Map<String,String> urlMap=new HashMap<String,String>();
         for (String key:map.keySet()) {
+
+            Integer total=0;//总单量
+            BigDecimal weightOne=BigDecimal.ZERO;//总重
             String path="E:/GDW/"+key+".xlsx";
 
             //判斷是否存在該用戶
-            for(SysUserInfo name:list){
-                if(key.equals(name.getName())){
-                    id=2;
+            for(BillKeyword name:list){
+                if(key.equals(name.getKeyword())){
+                    id=name.getUserId();
                     break;
                 }
             }
-
-            ThreadImport threadImport=new ThreadImport(path,map.get(key),key);
-            threadPool.submit(threadImport);
 
             //分离数据
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
+
+                //计算每个月份的单量，总重量
+                total+=1;
+                weightOne=weightOne.add(bill.getWeight());
             }
 
             //根据重量分离数据
@@ -251,12 +275,19 @@ public class XlsxProcessAbstract {
                 md.put(str,destination.get(str).size());
             }
 
-            //启动线程，向数据库插入数据
-            ThreadInsert threadInsert=new ThreadInsert(key,mw,md,time,processTransDetailData.total,processTransDetailData.weight,id);
-            threadInsert.setTotalService(totalService);
-            threadInsert.setProvinceCalculateMapper(provinceCalculateMapper);
-            threadInsert.setWeightCalculateMapper(weightCalculateMapper);
-            threadPool.submit(threadInsert);
+            ThreadDto threadDto=new ThreadDto();
+            threadDto.setId(id);
+            threadDto.setKey(key);
+            threadDto.setList(map.get(key));
+            threadDto.setMd(md);
+            threadDto.setMw(mw);
+            threadDto.setPath(path);
+            threadDto.setTime(time);
+            threadDto.setTotalNum(total);
+            threadDto.setWeight(weightOne);
+
+            ThreadImport threadImport=new ThreadImport(threadDto);
+            threadPool.submit(threadImport);
 
             destination.clear();
             weightMap.clear();
@@ -272,9 +303,6 @@ public class XlsxProcessAbstract {
             }
             Thread.sleep(200);
         }
-
-        urlMap.put("total",processTransDetailData.total.toString());
-        urlMap.put("weight",processTransDetailData.weight.toString());
         return urlMap;
     }
 

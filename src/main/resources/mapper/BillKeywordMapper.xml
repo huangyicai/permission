@@ -19,4 +19,8 @@
         insert into bill_keyword(keyword,user_id) value (#{keyword},#{userId})
     </insert>
 
+    <!--获取用户id:select * from bill_keyword  WHERE user_id in(${nameStr})-->
+    <select id="getBillKeyword" resultMap="BaseResultMap">
+        select * from bill_keyword  WHERE FIND_IN_SET(user_id,#{nameStr})
+    </select>
 </mapper>

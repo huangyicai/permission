@@ -30,7 +30,7 @@ import java.math.RoundingMode;
  */
 @Api(value = "WeightCalculateController", description = "重量区间计算表管理")
 @RestController
-@RequestMapping("/express//weightCalculate")
+@RequestMapping("/express/weightCalculate")
 public class WeightCalculateController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class WeightCalculateController {
     @ApiOperation(value = "获取重量区间占比",  notes="需要Authorization")
     @PostMapping(value = "/getWeightCalculate")
     public Result<WeightCalculate> getWeightCalculate(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("name", billParam.getName()));
+        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
         WeightCalculate weightCalculate = weightCalculateService.getOne(new QueryWrapper<WeightCalculate>().eq("total_id", one.getTotalId()));
 
         weightCalculate.setZero(weightCalculate.getZero().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));

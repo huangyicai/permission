@@ -22,7 +22,7 @@ import ${superControllerClassPackage};
  */
 @Api(value = "${table.controllerName}", description = "${table.comment}管理")
 @RestController
-@RequestMapping("/express/#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
+@RequestMapping("/express#if(${package.ModuleName})/${package.ModuleName}#end/#if(${controllerMappingHyphenStyle})${controllerMappingHyphen}#else${table.entityPath}#end")
 public class ${table.controllerName} {
 
 

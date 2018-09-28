@@ -30,7 +30,7 @@ import java.math.RoundingMode;
  */
 @Api(value = "ProvinceCalculateController", description = "省计表管理")
 @RestController
-@RequestMapping("/express//provinceCalculate")
+@RequestMapping("/express/provinceCalculate")
 public class ProvinceCalculateController {
 
     @Autowired
@@ -42,7 +42,7 @@ public class ProvinceCalculateController {
     @ApiOperation(value = "获取客户省计数据",  notes="需要Authorization")
     @PostMapping(value = "/getProvinceCalculate")
     public Result<ProvinceCalculate> getProvinceCalculate(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("name", billParam.getName()));
+        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
         ProvinceCalculate totalId =null;
         if(one!=null){
             totalId=provinceCalculateService.getOne(new QueryWrapper<ProvinceCalculate>().eq("total_id", one.getTotalId()));
