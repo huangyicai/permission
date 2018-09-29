@@ -9,6 +9,7 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.service.PricingGroupService;
+import com.mmall.util.BeanValidator;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,17 @@ public class PricingGroupController {
     @ApiOperation(value = "获取省份",  notes="需要Authorization")
     @GetMapping(value = "/cityList",produces = {"application/json;charest=Utf-8"})
     public Result<List<City>> getCusmotersInfo(){
-        return Result.ok(cityMapper.selectList(new QueryWrapper<City>()));
+        //Result allPricingGroups = pricingGroupService.getAllPricingGroups(userId);
+        List<City> cities = cityMapper.selectList(new QueryWrapper<City>());
+       /* List<City> data = (List<City>)allPricingGroups.getData();
+        for(City city :cities){
+            for(City city1:data){
+                if(city.getId().equals(city1.getId())||city.getId()==city1.getId()){
+
+                }
+            }
+        }*/
+        return Result.ok(cities);
     }
 
     @ApiOperation(value = "获取省份定价",  notes="需要Authorization")
@@ -50,14 +61,18 @@ public class PricingGroupController {
     public Result savePricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,
                                    @PathVariable("userId")Integer userId,
                                    @PathVariable() Integer cityId){
+        for(PricingGroupParam pgp :pricingGroups){
+            BeanValidator.check(pgp);
+        }
         return pricingGroupService.savePricingGroup(pricingGroups,userId,cityId);
     }
 
-    @ApiOperation(value = "获取已上传的定价组",  notes="需要Authorization")
-    @GetMapping(value = "/{userId}",produces = {"application/json;charest=Utf-8"})
+    @ApiOperation(value = "获取已上传的省份定价组",  notes="需要Authorization")
+    @GetMapping(value = "/upload/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result getAllPricingGroups(@PathVariable("userId")Integer userId){
         return pricingGroupService.getAllPricingGroups(userId);
     }
+
 
 }
 

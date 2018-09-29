@@ -19,9 +19,9 @@ import java.math.BigDecimal;
  * </p>
  *
  * @author hyc
- * @since 2018-09-28
+ * @since 2018-09-29
  */
-@ApiModel(value = "PricingGroup", description = "定价组")
+@ApiModel(value = "PricingGroup", description = "")
 @TableName("pricing_group")
 @Builder
 @NoArgsConstructor
@@ -54,25 +54,25 @@ public class PricingGroup implements Serializable {
      */
     @ApiModelProperty(value = "开始区间")
     @TableField("area_begin")
-    private Integer areaBegin;
+    private Double areaBegin;
     /**
      * 结束区间
      */
     @ApiModelProperty(value = "结束区间")
     @TableField("area_end")
-    private Integer areaEnd;
+    private Double areaEnd;
     /**
      * 重量标准
      */
     @ApiModelProperty(value = "重量标准")
     @TableField("weight_standard")
-    private Integer weightStandard;
+    private Double weightStandard;
     /**
      * 价格
      */
     @ApiModelProperty(value = "价格")
     @TableField("price")
-    private Integer price;
+    private Double price;
     /**
      * 1=首重，2=续重
      */
@@ -105,35 +105,35 @@ public class PricingGroup implements Serializable {
         this.cityId = cityId;
     }
 
-    public Integer getAreaBegin() {
+    public Double getAreaBegin() {
         return areaBegin;
     }
 
-    public void setAreaBegin(Integer areaBegin) {
+    public void setAreaBegin(Double areaBegin) {
         this.areaBegin = areaBegin;
     }
 
-    public Integer getAreaEnd() {
+    public Double getAreaEnd() {
         return areaEnd;
     }
 
-    public void setAreaEnd(Integer areaEnd) {
+    public void setAreaEnd(Double areaEnd) {
         this.areaEnd = areaEnd;
     }
 
-    public Integer getWeightStandard() {
+    public Double getWeightStandard() {
         return weightStandard;
     }
 
-    public void setWeightStandard(Integer weightStandard) {
+    public void setWeightStandard(Double weightStandard) {
         this.weightStandard = weightStandard;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

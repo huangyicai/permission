@@ -10,6 +10,7 @@ import com.mmall.dto.SysMenuDto;
 import com.mmall.model.City;
 import com.mmall.model.PricingGroup;
 import com.mmall.dao.PricingGroupMapper;
+import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
@@ -49,12 +50,26 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             weightMap.put(pg.getFirstOrContinued()==1?firstWeight:continuedWeight,pg);
         }
         Map<String,List<PricingGroup>> map = Maps.newHashMap();
-        map.put(firstWeight, (List<PricingGroup>) weightMap.get(firstWeight));
-        map.put(continuedWeight, (List<PricingGroup>) weightMap.get(continuedWeight));
+        //首重集合
+        List<PricingGroup> firstWeightList = (List<PricingGroup>) weightMap.get(firstWeight);
+        //续重集合
+        List<PricingGroup> continuedWeightList = (List<PricingGroup>) weightMap.get(continuedWeight);
+
+        map.put(firstWeight,firstWeightList);
+        map.put(continuedWeight,continuedWeightList);
         return Result.ok(map);
     }
     @Transactional
     public Result savePricingGroup(List<PricingGroupParam> pricingGroups,Integer userId,Integer cityId) {
+        boolean firstWeight = true;
+        boolean continuedWeight = true;
+        for(PricingGroupParam pg:pricingGroups){
+            if(pg.getFirstOrContinued()==1)firstWeight=false;
+            if(pg.getFirstOrContinued()==2)continuedWeight=false;
+        }
+        if(firstWeight||continuedWeight) return Result.error(InfoEnums.WEIGHT_NOT_WRITE);
+
+
         pricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",userId).eq("city_id",cityId));
         List<PricingGroup> pricingGroupList = Lists.newArrayList();
         for(PricingGroupParam prp : pricingGroups){
@@ -79,7 +94,6 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             return Result.ok(allCityId);
         }
         String ids = "";
-        if(allCityId.isEmpty()){}
         for(Integer i : allCityId){
             ids += ","+i;
         }

@@ -10,7 +10,11 @@ public enum InfoEnums {
 	USER_NOT_FROZEN(10006,"账号被冻结"),
 	SignIn(10008,"请先登录！"),
 	UNAUTHORIZATION(10009,"暂无无权限"),
-
+	WEIGHT_NOT_WRITE(10010,"首重或续重未填写"),
+	PHONE_ERROR(10011,"号码错误,请重新输入"),
+	VERIFY_FAIL(10012, "验证码错误,请重新尝试"),
+	PASSWORD_ATYPISM(10013, "两次密码不一致！"),
+	PASSWORD_INCORRECT(10014, "密码不正确！"),
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),
 

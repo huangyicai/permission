@@ -3,6 +3,7 @@ package com.mmall.service.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mmall.dao.BillKeywordMapper;
 import com.mmall.dao.SysMenuMapper;
@@ -12,6 +13,7 @@ import com.mmall.dto.SysUserInfoDto;
 import com.mmall.model.BillKeyword;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SysUser;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.service.ExpressUserService;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExpressUserServicelmpl implements ExpressUserService {
@@ -32,6 +35,8 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     private SysUserServiceImpl sysUserService;
     @Autowired
     private BillKeywordMapper billKeywordMapper;
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     public Result expressRegister(UserInfoExpressParm user, SysUserInfo parent,Integer id,Integer level) {
         if(id!=0) parent= sysUserInfoMapper.selectById(id);;
@@ -125,6 +130,8 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(id);
         return Result.ok(sysUserInfo);
     }
+
+
 
     public  void transformUserInfoTree(List<SysUserInfoDto> dtoList, String level, Multimap<String, SysUserInfoDto> levelMap) {
         for (int i = 0; i < dtoList.size(); i++) {

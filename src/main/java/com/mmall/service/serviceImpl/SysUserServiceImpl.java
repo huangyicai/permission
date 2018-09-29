@@ -1,22 +1,22 @@
 package com.mmall.service.serviceImpl;
 
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mmall.dao.SysMenuMapper;
-import com.mmall.dao.SysUserInfoMapper;
-import com.mmall.dao.SysUserRoleMapper;
+import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.dto.SysUserInfoDto;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.*;
-import com.mmall.dao.SysUserMapper;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoServiceParm;
+import com.mmall.model.params.UserPasswordParam;
 import com.mmall.service.SysUserService;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.SmsUtil;
@@ -34,10 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -59,6 +56,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserInfoMapper sysUserInfoMapper;
     @Autowired
     private SysUserRoleMapper sysUserRoleMapper;
+    @Autowired
+    private CodeRecordMapper codeRecordMapper;
 
     public Comparator<SysMenuDto> menusSeqComparator = new Comparator<SysMenuDto>() {
         public int compare(SysMenuDto o1, SysMenuDto o2) {
@@ -139,11 +138,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 authInfo.setToken( subject.getSession().getId().toString());
                 authInfo.setAuth(sysUserInfo);
             } catch (IncorrectCredentialsException e) {
-                return Result.error(InfoEnums.ERROR,"1");
+                return Result.error(InfoEnums.PASSWORD_INCORRECT);
             } catch (LockedAccountException e) {
-                return Result.error(InfoEnums.ERROR,"2");
+                return Result.error(InfoEnums.ERROR);
             } catch (AuthenticationException e) {
-                return Result.error(InfoEnums.ERROR,"3");
+                return Result.error(InfoEnums.ERROR);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -263,9 +262,55 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return Result.ok();
     }
 
-    public Result getCode(String phone) {
+    public Result<Map<String,Object>> getUserInfo(SysUserInfo user) {
+        user = sysUserInfoMapper.selectById(user.getId());
+        SysUser sysUser = sysUserMapper.selectById(user.getUserId());
+        sysUser.setPassword("***********");
+        user = sysUserInfoMapper.findUserInfoByid(user.getId());
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("user",sysUser);
+        map.put("userInfo",user);
+        return Result.ok(map);
+    }
 
-        return null;
+    public Result getCode(String phone) throws ClientException {
+        Long today = new Date().getTime();
+        String code = new StringBuilder(today.toString()).reverse().substring(0, 6);
+        SendSmsResponse sendSmsResponse = SmsUtil.sendSms(phone, code);
+        if("OK".equalsIgnoreCase(sendSmsResponse.getCode())){
+            CodeRecord codeRecord = new CodeRecord();
+            codeRecord.setCode(code);
+            codeRecord.setPhone(phone);
+            int insert = codeRecordMapper.insert(codeRecord);
+            if(insert>0){
+                return  Result.ok();
+            }
+            return  Result.error(InfoEnums.ERROR);
+        }
+        return Result.error(InfoEnums.PHONE_ERROR);
+    }
+
+    public Result updateUserPassword(SysUserInfo user, String code, UserPasswordParam userPasswordParam) {
+        user = sysUserInfoMapper.selectById(user.getId());
+        List<CodeRecord> allByPhone = codeRecordMapper.selectList(new QueryWrapper<CodeRecord>()
+                .eq("phone",user.getTelephone())
+                .orderByDesc("create_time"));
+        if (allByPhone == null || allByPhone.size() == 0 || !allByPhone.get(0).getCode().equals(code)) {
+            return Result.error(InfoEnums.VERIFY_FAIL);
+        }
+        if(!userPasswordParam.getOnePassword().equals(userPasswordParam.getTwoPassword())){
+            return Result.error(InfoEnums.PASSWORD_ATYPISM);
+        }
+        SysUser sysUser = sysUserMapper.selectById(user.getUserId());
+        Md5Hash md = new Md5Hash(userPasswordParam.getOnePassword(),sysUser.getUsername(),1024);
+        sysUser.setPassword(md.toString());
+        sysUserMapper.updateById(sysUser);
+        return Result.ok();
+    }
+
+    public static void main(String[] args) {
+        Md5Hash md = new Md5Hash("string","root",1024);
+        System.out.println(md.toString());
     }
 
 }

@@ -42,6 +42,15 @@ public class City implements Serializable {
     @TableField("province_name")
     private String provinceName;
 
+    /*private Integer status=0;
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }*/
 
     public Integer getId() {
         return id;

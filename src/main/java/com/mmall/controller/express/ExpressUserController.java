@@ -86,10 +86,5 @@ public class ExpressUserController {
         return expressUserService.deleteKeywordBykeyId(keyId);
     }
 
-    public static void main(String[] args) {
-        double b = 51%2;
-        System.out.println(b);
-    }
-
 
 }

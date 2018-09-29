@@ -109,19 +109,19 @@ public class MybatisPlus {
                 //.setXml("mapper")
         );
 
-        FileOutConfig mapperConfig = getMapperConfig();
+        //FileOutConfig mapperConfig = getMapperConfig();
         FileOutConfig entityConfig = getEntityConfig();
-        FileOutConfig serviceConfig = getServiceConfig();
-        FileOutConfig serviceImplConfig = getServiceImplConfig();
-        FileOutConfig contolConfig = getContolConfig();
-        FileOutConfig daoConfig = getDaoConfig();
+        //FileOutConfig serviceConfig = getServiceConfig();
+        //FileOutConfig serviceImplConfig = getServiceImplConfig();
+        //FileOutConfig contolConfig = getContolConfig();
+        //FileOutConfig daoConfig = getDaoConfig();
         List<FileOutConfig> fileOutConfigs = new ArrayList<FileOutConfig>();
-        fileOutConfigs.add(mapperConfig);
+        //fileOutConfigs.add(mapperConfig);
         fileOutConfigs.add(entityConfig);
-        fileOutConfigs.add(serviceConfig);
-        fileOutConfigs.add(serviceImplConfig);
-        fileOutConfigs.add(contolConfig);
-        fileOutConfigs.add(daoConfig);
+        //fileOutConfigs.add(serviceConfig);
+        //fileOutConfigs.add(serviceImplConfig);
+        //fileOutConfigs.add(contolConfig);
+        //fileOutConfigs.add(daoConfig);
         mpg.setCfg(
                 // 注入自定义配置，可以在 VM 中使用 cfg.abc 设置的值
                 new InjectionConfig() {

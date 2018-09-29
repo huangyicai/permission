@@ -1,5 +1,6 @@
 package com.mmall.service;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.dto.SysUserInfoDto;
@@ -7,8 +8,10 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.*;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoServiceParm;
+import com.mmall.model.params.UserPasswordParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -70,9 +73,24 @@ public interface SysUserService extends IService<SysUser> {
     Result updateExpress(UserInfoServiceParm user);
 
     /**
-     *
+     * 获取自己的个人信息
+     * @param user
+     * @return
+     */
+    Result<Map<String,Object>> getUserInfo(SysUserInfo user);
+
+    /**
+     *获取验证码
      * @param phone
      * @return
      */
-    Result getCode(String phone);
+    Result getCode(String phone) throws ClientException;
+
+    /**
+     * 验证码修改密码
+     * @param user
+     * @param code
+     * @return
+     */
+    Result updateUserPassword(SysUserInfo user, String code, UserPasswordParam userPasswordParam);
 }

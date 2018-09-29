@@ -16,7 +16,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, user_id, platform_id, name, email, status, create_time, update_time
+        id, name, email, company_name,province,city,area,address,telephone,person_in_charge,create_time
     </sql>
 
     <select id="findUserByusername" parameterType="String" resultMap="BaseResultMap">
@@ -30,14 +30,13 @@
             s.username =#{username}
     </select>
 
-    <select id="findUserByid" parameterType="String" resultType="com.mmall.model.SysUserInfo">
+    <select id="findUserInfoByid" parameterType="int" resultType="com.mmall.model.SysUserInfo">
           SELECT
-			distinct s.*
+			<include refid="Base_Column_List"/>
         FROM
             sys_user_info s
         WHERE
-            s.`level` LIKE #{id} and s.status=1 and s.platform_id in (3,-1)
-		ORDER BY s.id
+            s.id = #{id}
     </select>
 
 

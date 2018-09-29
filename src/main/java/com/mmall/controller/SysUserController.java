@@ -7,6 +7,7 @@ import com.mmall.dto.SysMenuDto;
 import com.mmall.model.Response.Result;
 import com.mmall.model.*;
 import com.mmall.model.params.SysUserParam;
+import com.mmall.model.params.UserPasswordParam;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
 import io.swagger.annotations.*;
@@ -47,9 +48,24 @@ public class SysUserController {
         return sysUserService.findAllMenuByUser(user,platId);
     }
 
+    @ApiOperation(value = "获取个人信息",  notes="需要Authorization")
+    @GetMapping(value = "/user",produces = {"application/json;charest=Utf-8"})
+    public Result<Map<String,Object>> getUserInfo(){
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        return sysUserService.getUserInfo(user);
+    }
+    @ApiOperation(value = "修改密码",  notes="需要Authorization")
+    @PutMapping(value = "/user/password/{code}",produces = {"application/json;charest=Utf-8"})
+    public Result updateUserPassword(@RequestBody UserPasswordParam userPasswordParam,
+                                                         @PathVariable("code") String code){
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        return sysUserService.updateUserPassword(user,code,userPasswordParam);
+    }
+
+
     @ApiOperation(value = "获取验证码", httpMethod = "POST")
     @PostMapping(value = "/getCode/{phone}",produces = {"application/json;charest=Utf-8"})
-    public Result getCode(@PathVariable("phone") String phone) {
+    public Result getCode(@PathVariable("phone") String phone) throws ClientException {
         return sysUserService.getCode(phone);
 
     }

@@ -7,6 +7,7 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ExpressUserService {
 
@@ -65,4 +66,6 @@ public interface ExpressUserService {
      * @return
      */
     Result<SysUserInfo> getCusmotersInfo(Integer id);
+
+
 }
