@@ -30,4 +30,15 @@
     <insert id="insertTotal" parameterType="com.mmall.model.Total"  useGeneratedKeys="true" keyProperty="totalId">
       insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl})
     </insert>
+
+    <!--获取月计数据-->
+    <select id="getToal"  resultType="com.mmall.model.Total">
+      select total_time as totalTime,
+      SUM(total_number) as totalNumber,
+      SUM(total_weight) as totalWeight,
+      SUM(total_offer) as totalOffer,
+      SUM(total_paid) as totalPaid,
+      SUM(total_cost) as totalCost
+      from total where user_id=#{userId} and total_time=#{totalTime}
+    </select>
 </mapper>

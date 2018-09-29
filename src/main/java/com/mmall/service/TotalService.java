@@ -12,5 +12,5 @@ import com.mmall.model.Total;
  * @since 2018-09-25
  */
 public interface TotalService extends IService<Total> {
-
+    Total getToal(String totalTime,String userId);
 }

@@ -4,6 +4,7 @@ package com.mmall.controller.express;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.dto.BillDto;
 import com.mmall.model.ProvinceCalculate;
+import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.model.params.BillParam;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * <p>
@@ -42,12 +44,17 @@ public class ProvinceCalculateController {
     @ApiOperation(value = "获取客户省计数据",  notes="需要Authorization")
     @PostMapping(value = "/getProvinceCalculate")
     public Result<ProvinceCalculate> getProvinceCalculate(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
-        ProvinceCalculate totalId =null;
-        if(one!=null){
-            totalId=provinceCalculateService.getOne(new QueryWrapper<ProvinceCalculate>().eq("total_id", one.getTotalId()));
-
+        List<Total> one = totalService.list(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
+        if(one.size()<=0){
+            return Result.error(InfoEnums.DATA_IS_NULL);
         }
+        String totalIdStr="";
+
+        for(Total total:one){
+            totalIdStr+=total.getTotalId()+",";
+        }
+        totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
+        ProvinceCalculate totalId =provinceCalculateService.getProvinceCalculate(totalIdStr);
         return Result.ok(totalId);
     }
 

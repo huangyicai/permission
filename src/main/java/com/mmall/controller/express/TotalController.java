@@ -9,6 +9,7 @@ import com.mmall.dto.ProfitsDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
+import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.BillParam;
 import com.mmall.service.SysUserInfoService;
@@ -113,7 +114,10 @@ public class TotalController {
     @ApiOperation(value = "获取账单月份总计",  notes="需要Authorization")
     @PostMapping(value = "/getBillData")
     public Result<BillDto> getBillData(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
+        Total one = totalService.getToal( billParam.getDate(), billParam.getId());
+        if(one==null){
+           return Result.error(InfoEnums.DATA_IS_NULL);
+        }
         BillDto billDto=new BillDto();
         billDto.setTotalNumber(one.getTotalNumber());
         billDto.setTotalWeight(one.getTotalWeight());
@@ -164,7 +168,12 @@ public class TotalController {
     @ApiOperation(value = "利润分析",  notes="需要Authorization")
     @PostMapping(value = "/getProfits")
     public Result<ProfitsDto> getProfits(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("name", billParam.getId()));
+        Total one = totalService.getToal( billParam.getDate(), billParam.getId());
+
+        if(one==null){
+            return Result.error(InfoEnums.DATA_IS_NULL);
+        }
+
         ProfitsDto billDto=new ProfitsDto();
         billDto.setTotalNumber(one.getTotalNumber());
         billDto.setTotalWeight(one.getTotalWeight());

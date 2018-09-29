@@ -69,9 +69,14 @@ public class XlsxProcessAbstract {
     private BillKeywordMapper billKeywordMapper;
 
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
-    private final int minColumns = 0; //开始读取行数从第0行开始计算
+
+    //开始读取行数从第0行开始计算
+    private final int minColumns = 0;
+
+    //储存每一行数据
     private final StringBuffer rowStrs = new StringBuffer();
 
+    //获取Excel每一行的执行类
     ProcessTransDetailDataDto processTransDetailData = new ProcessTransDetailDataDto();
 
     //根据重量分离
@@ -80,6 +85,8 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
+    //设置导出路径
+    private static String path="E:/GDW/";
 
 
 //    /**
@@ -189,7 +196,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public Map<String,String> processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
+    public void processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
 
         //获取用户信息
         SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
@@ -233,14 +240,12 @@ public class XlsxProcessAbstract {
 
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
-        Map<String,String> urlMap=new HashMap<String,String>();
         for (String key:map.keySet()) {
 
             Integer total=0;//总单量
             BigDecimal weightOne=BigDecimal.ZERO;//总重
 
-
-            String path="E:/GDW/"+key+".xlsx";
+            String ompPath=path+key+".xlsx";
 
             //判斷是否存在該用戶
             for(BillKeyword name:list){
@@ -282,7 +287,8 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPath(path);
+            threadDto.setPath(ompPath);
+            threadDto.setPathHead(path);
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
@@ -292,7 +298,6 @@ public class XlsxProcessAbstract {
 
             destination.clear();
             weightMap.clear();
-            urlMap.put(key,path);
         }
 
         //判断线程是否执行完毕
@@ -304,7 +309,7 @@ public class XlsxProcessAbstract {
             }
             Thread.sleep(200);
         }
-        return urlMap;
+        map.clear();
     }
 
     /**

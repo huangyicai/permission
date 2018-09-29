@@ -25,8 +25,6 @@ import java.math.BigDecimal;
 @ApiModel(value = "BillKeyword", description = "")
 @TableName("bill_keyword")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class BillKeyword implements Serializable {
 
     private static final long serialVersionUID = 1L;

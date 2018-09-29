@@ -55,4 +55,9 @@ public class ThreadDto {
      * 导出的集合
      */
     private List<Bill> list;
+
+    /**
+     * 本地地址头
+     */
+    private String pathHead;
 }

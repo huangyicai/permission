@@ -12,5 +12,5 @@ import com.mmall.model.ProvinceCalculate;
  * @since 2018-09-25
  */
 public interface ProvinceCalculateService extends IService<ProvinceCalculate> {
-
+    ProvinceCalculate getProvinceCalculate(String totalId);
 }

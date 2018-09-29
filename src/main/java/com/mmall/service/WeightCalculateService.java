@@ -12,5 +12,5 @@ import com.mmall.model.WeightCalculate;
  * @since 2018-09-25
  */
 public interface WeightCalculateService extends IService<WeightCalculate> {
-
+    WeightCalculate getWeightCalculate(String totalId);
 }

@@ -26,8 +26,6 @@ import java.util.Date;
 @ApiModel(value = "Total", description = "月计表(客户账单)")
 @TableName("total")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Total implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -260,5 +258,26 @@ public class Total implements Serializable {
         ", updateTime=" + updateTime +
         ", updateIp=" + updateIp +
         "}";
+    }
+
+    public Total() {
+    }
+
+    public Total(Integer totalId, Integer userId, String name, String totalTime, Integer totalNumber, BigDecimal totalWeight, BigDecimal totalCost, BigDecimal totalOffer, BigDecimal totalPaid, String totalUrl, Integer totalState, Date createTime, String createIp, Date updateTime, String updateIp) {
+        this.totalId = totalId;
+        this.userId = userId;
+        this.name = name;
+        this.totalTime = totalTime;
+        this.totalNumber = totalNumber;
+        this.totalWeight = totalWeight;
+        this.totalCost = totalCost;
+        this.totalOffer = totalOffer;
+        this.totalPaid = totalPaid;
+        this.totalUrl = totalUrl;
+        this.totalState = totalState;
+        this.createTime = createTime;
+        this.createIp = createIp;
+        this.updateTime = updateTime;
+        this.updateIp = updateIp;
     }
 }

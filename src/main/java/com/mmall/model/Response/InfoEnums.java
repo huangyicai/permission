@@ -15,6 +15,8 @@ public enum InfoEnums {
 	VERIFY_FAIL(10012, "验证码错误,请重新尝试"),
 	PASSWORD_ATYPISM(10013, "两次密码不一致！"),
 	PASSWORD_INCORRECT(10014, "密码不正确！"),
+	DATA_IS_NULL(10010,"没有数据"),
+
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),
 

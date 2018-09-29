@@ -2,6 +2,7 @@ package com.mmall.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mmall.model.WeightCalculate;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +13,5 @@ import com.mmall.model.WeightCalculate;
  * @since 2018-09-25
  */
 public interface WeightCalculateMapper extends BaseMapper<WeightCalculate> {
-
+    WeightCalculate getWeightCalculate(@Param("totalId") String totalId);
 }
