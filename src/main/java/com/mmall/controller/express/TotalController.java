@@ -65,12 +65,16 @@ public class TotalController {
     private  XlsxProcessAbstract xlsxProcessAbstract;
 
     @ApiOperation(value = "获取客户账单",  notes="需要Authorization")
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "state", value = "状态：1-未发送，2-待确认，3-已付款（未确认，这里不做展示），4-已收款", required = false, dataType = "Integer", paramType = "query")
+    )
     @PostMapping(value = "/getList")
-    public Result<IPage<Total>> getList(Page page, BillParam billParam) throws ParseException {
+    public Result<IPage<Total>> getList(Page page, BillParam billParam,Integer state) throws ParseException {
         QueryWrapper<Total> queryWrapper = new QueryWrapper<Total>();
         queryWrapper
                 .eq("total_time", billParam.getDate())
                 .eq("user_id",billParam.getId())
+                .eq(state!=0,"total_state",state)
                 .orderByAsc(false, "total_state")
                 .orderByAsc(false,"total_time");
         IPage<Total> page1 = totalService.page(page, queryWrapper);

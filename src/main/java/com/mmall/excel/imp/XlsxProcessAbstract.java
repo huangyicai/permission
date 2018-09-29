@@ -15,7 +15,6 @@ import com.mmall.service.SysUserInfoService;
 import com.mmall.util.LevelUtil;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
@@ -239,6 +238,8 @@ public class XlsxProcessAbstract {
 
             Integer total=0;//总单量
             BigDecimal weightOne=BigDecimal.ZERO;//总重
+
+
             String path="E:/GDW/"+key+".xlsx";
 
             //判斷是否存在該用戶

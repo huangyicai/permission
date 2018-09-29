@@ -11,6 +11,9 @@ public enum InfoEnums {
 	SignIn(10008,"请先登录！"),
 	UNAUTHORIZATION(10009,"暂无无权限"),
 
+	//oss相关
+	FILE_ERRO(100000,"文件不合法"),
+
 	;
 
 	private Integer code;
