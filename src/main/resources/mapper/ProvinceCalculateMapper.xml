@@ -47,4 +47,43 @@
         province_id, total_id, beijing, tianjing, hebei, shanxi, neimenggu, liaoning, jiling, heilongjiang, shanghai, jiangsu, zhejaing, anhui, fujian, jaingxi, shandong, henan, hubei, hunan, guangdong, guangxi, hainan, chongqing, sichuan, guizhou, yunnan, xizang, shaanxi, gansu, qinghai, ningxia, xinjang, taiwan, xianggang, aomen
     </sql>
 
+    <!--省计数据分析-->
+    <select id="getProvinceCalculate" resultType="com.mmall.model.ProvinceCalculate">
+        select province_id as provinceId,total_id as totalId,
+        SUM(beijing) as beijing,
+        SUM(tianjing) as tianjing,
+        SUM(hebei) as hebei,
+        SUM(shanxi) as shanxi,
+        SUM(neimenggu) as neimenggu,
+        SUM(liaoning) as liaoning,
+        SUM(heilongjiang) as heilongjiang,
+        SUM(shanghai) as shanghai,
+        SUM(jiangsu) as jiangsu,
+        SUM(zhejaing) as zhejaing,
+        SUM(anhui) as anhui,
+        SUM(jaingxi) as jaingxi,
+        SUM(shandong) as shandong,
+        SUM(henan) as henan,
+        SUM(hubei) as hubei,
+        SUM(hunan) as hunan	,
+        SUM(guangdong) as guangdong,
+        SUM(guangxi) as guangxi,
+        SUM(hainan) as hainan,
+        SUM(chongqing) as chongqing,
+        SUM(sichuan) as sichuan,
+        SUM(guizhou) as guizhou,
+        SUM(yunnan) as yunnan,
+        SUM(xizang) as xizang,
+        SUM(shaanxi) as shaanxi,
+        SUM(gansu) as gansu,
+        SUM(qinghai) as qinghai,
+        SUM(ningxia) as ningxia,
+        SUM(xinjang) as xinjang,
+        SUM(taiwan) as taiwan,
+        SUM(xianggang) as xianggang,
+        SUM(aomen) as aomen,
+        SUM(jiling) as jiling,
+        SUM(fujian) as fujian
+        from province_calculate where total_id in (${totalId})
+    </select>
 </mapper>

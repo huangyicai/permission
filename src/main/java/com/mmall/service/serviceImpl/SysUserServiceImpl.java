@@ -1,6 +1,5 @@
 package com.mmall.service.serviceImpl;
 
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;

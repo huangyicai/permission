@@ -10,6 +10,7 @@ public enum InfoEnums {
 	USER_NOT_FROZEN(10006,"账号被冻结"),
 	SignIn(10008,"请先登录！"),
 	UNAUTHORIZATION(10009,"暂无无权限"),
+	DATA_IS_NULL(10010,"没有数据"),
 
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),

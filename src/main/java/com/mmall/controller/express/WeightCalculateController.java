@@ -3,6 +3,7 @@ package com.mmall.controller.express;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.dto.BillDto;
+import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * <p>
@@ -42,31 +44,19 @@ public class WeightCalculateController {
     @ApiOperation(value = "获取重量区间占比",  notes="需要Authorization")
     @PostMapping(value = "/getWeightCalculate")
     public Result<WeightCalculate> getWeightCalculate(BillParam billParam){
-        Total one = totalService.getOne(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
-        WeightCalculate weightCalculate = weightCalculateService.getOne(new QueryWrapper<WeightCalculate>().eq("total_id", one.getTotalId()));
+        List<Total> list = totalService.list(new QueryWrapper<Total>().eq("total_time", billParam.getDate()).eq("user_id", billParam.getId()));
+        if(list.size()<=0){
+            return Result.error(InfoEnums.DATA_IS_NULL);
+        }
 
-        weightCalculate.setZero(weightCalculate.getZero().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setOne(weightCalculate.getOne().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setTwo(weightCalculate.getTwo().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setThree(weightCalculate.getThree().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setFour(weightCalculate.getFour().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setFive(weightCalculate.getFive().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setSix(weightCalculate.getSix().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setSeven(weightCalculate.getSeven().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setEight(weightCalculate.getEight().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setNine(weightCalculate.getNine().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setTen(weightCalculate.getTen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setEleven(weightCalculate.getEleven().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setTwelve(weightCalculate.getTwelve().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setThirteen(weightCalculate.getThirteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setFourteen(weightCalculate.getFourteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setFifteen(weightCalculate.getFifteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setSixteen(weightCalculate.getSixteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setSeventeen(weightCalculate.getSeventeen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setEighteen(weightCalculate.getEighteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setNineteen(weightCalculate.getNineteen().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setTwenty(weightCalculate.getTwenty().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
-        weightCalculate.setTwentyOne(weightCalculate.getTwentyOne().divide(one.getTotalWeight(),2, RoundingMode.DOWN).multiply(new BigDecimal(100)));
+        String totalIdStr="";
+
+        for(Total total:list){
+            totalIdStr+=total.getTotalId()+",";
+        }
+
+        totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
+        WeightCalculate weightCalculate = weightCalculateService.getWeightCalculate(totalIdStr);
         return Result.ok(weightCalculate);
     }
 }

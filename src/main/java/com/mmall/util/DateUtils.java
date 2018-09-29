@@ -32,11 +32,8 @@ public class DateUtils{
         Integer year=0;
         Integer month=0;
 
-        String month1 = new SimpleDateFormat("MM").format(date);
-        String year1 = new SimpleDateFormat("yyyy").format(date);
-
-        month=Integer.parseInt(month1);
-        year=Integer.parseInt(year1);
+        month=Integer.parseInt(date.split("-")[1]);
+        year=Integer.parseInt(date.split("-")[0]);
 
         int days;
         int FebDay = 28;

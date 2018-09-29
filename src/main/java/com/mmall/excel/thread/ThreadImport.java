@@ -50,6 +50,8 @@ public class ThreadImport implements Callable<String> {
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
                 outputStream = new FileOutputStream(threadDto.getPath());
                 workbook.write(outputStream);
+                outputStream.close();
+                workbook.close();
                 record(threadDto);
             }
 

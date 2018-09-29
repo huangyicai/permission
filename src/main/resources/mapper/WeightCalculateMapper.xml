@@ -35,4 +35,31 @@
         weight_id, total_id, zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty, twenty_one
     </sql>
 
+    <!--获取重量区间统计-->
+    <select id="getWeightCalculate" resultType="com.mmall.model.WeightCalculate">
+        select weight_id as weightId,total_id as totalId,
+        SUM(zero) as zero,
+        SUM(one) as one,
+        SUM(two) as two,
+        SUM(three) as three,
+        SUM(four) as four,
+        SUM(five) as five,
+        SUM(six) as six,
+        SUM(seven) as seven,
+        SUM(eight) as eight,
+        SUM(nine) as nine,
+        SUM(ten) as ten,
+        SUM(eleven) as eleven,
+        SUM(twelve) as twelve,
+        SUM(thirteen) as thirteen,
+        SUM(fourteen) as fourteen,
+        SUM(fifteen) as fifteen	,
+        SUM(sixteen) as sixteen,
+        SUM(seventeen) as seventeen,
+        SUM(eighteen) as eighteen,
+        SUM(nineteen) as nineteen,
+        SUM(twenty) as twenty,
+        SUM(twenty_one) as twentyOne
+        from weight_calculate where total_id in (${totalId})
+    </select>
 </mapper>

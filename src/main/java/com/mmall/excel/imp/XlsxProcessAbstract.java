@@ -304,6 +304,8 @@ public class XlsxProcessAbstract {
             }
             Thread.sleep(200);
         }
+        map.clear();
+        System.out.println("-------------------------------"+xlsxFile.getSize());
         return urlMap;
     }
 

@@ -7,9 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 #end
@@ -32,8 +30,6 @@ import java.math.BigDecimal;
 @ApiModel(value = "${entity}", description = "${table.comment}")
 @TableName("${table.name}")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 #end
 public class ${entity} implements Serializable {
 
