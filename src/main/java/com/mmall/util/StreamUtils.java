@@ -1,6 +1,14 @@
 package com.mmall.util;
 
 import com.mmall.excel.Bill;
+import com.mmall.excel.export.DataSheetExecute;
+import com.mmall.excel.export.ExcelExportExecutor;
+import net.sf.json.JSONArray;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -8,13 +16,62 @@ import java.io.*;
 import java.net.*;
 
 
+@RestController
+@RequestMapping(value = "/excel")
 public class StreamUtils{
 
-    public static void main(String[] args) throws Exception {
+
+    /**
+     * 百万级数据导出
+     * @param num
+     */
+    @RequestMapping(value = "/getExcel")
+    public void get(Integer num){
 
         //制造数据
+        List<Bill> data = new ArrayList<Bill>();
+        for (int i = 0; i < num; i++) {
+            data.add(new Bill("金XX111"
+                    , "2018-9-20" + i
+                    , "男:" + i
+                    , "137****2152:" + i
+                    ,  new BigDecimal(i)));
+        }
+
+        //todo 直接导出
+        final String path="E:/GDW"+ File.separator + "百万级数据导出.xlsx";
+        String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
+        DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
+
+            public void execute(Row row, Bill personUser) {
+                row.createCell(0).setCellValue(personUser.getBillName());
+                row.createCell(1).setCellValue(personUser.getSweepTime());
+                row.createCell(2).setCellValue(personUser.getSerialNumber());
+                row.createCell(3).setCellValue(personUser.getDestination());
+                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//                row.createCell(5).setCellValue(personUser.getWeight().toString());
+            }
+
+            public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
+                outputStream = new FileOutputStream(path);
+                workbook.write(outputStream);
+            }
+
+            public void listen(Row row, int rows) {
+//                System.out.println("执行到了：<" + rows + "> 这一行");
+            }
+        };
+
+
+        new ExcelExportExecutor<Bill>(strings, data, dataSheetExecute, true).execute();
+
+    }
+
+    @PostMapping(value = "/get1")
+    public void get1(Integer num) throws Exception {
+        //制造数据
         List<Bill> packagesArray = new ArrayList<Bill>();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < num; i++) {
             packagesArray.add(new Bill("金XX111"
                     , "2018-9-20" + i
                     , "男:" + i
@@ -22,6 +79,11 @@ public class StreamUtils{
                     ,  new BigDecimal(i)));
         }
 
+        String[] strings = new String[packagesArray.size()];
+
+        packagesArray.toArray(strings);
+
+        JSONArray.fromObject(packagesArray);
 
         // 将一个对象序列化为一个字符串
         String str = SerializeObjectToString(packagesArray);
@@ -33,7 +95,9 @@ public class StreamUtils{
         // 将一个字符串反序化为一个对象
         packagesArray = (List<Bill>) UnserializeStringToObject(str);
 
-        System.out.println(packagesArray);
+//        for (Bill bill:packagesArray){
+//            System.out.println(bill.getBillName()+"---"+bill.getDestination()+"---"+bill.getSerialNumber());
+//        }
     }
 
     public static String SerializeObjectToString(Object object) throws Exception{

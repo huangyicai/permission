@@ -1,8 +1,9 @@
 package com.mmall.excel;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Bill {
+public class Bill implements Serializable {
     /**
      * 商家名称
      */
