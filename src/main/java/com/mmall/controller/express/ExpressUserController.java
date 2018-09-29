@@ -1,6 +1,7 @@
 package com.mmall.controller.express;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.dto.SysUserInfoDto;
 import com.mmall.model.BillKeyword;
 import com.mmall.model.Response.Result;
@@ -32,7 +33,7 @@ public class ExpressUserController {
     public Result expressRegister(@RequestBody UserInfoExpressParm user,
                                   @PathVariable("id") Integer id,
                                   @PathVariable("level") Integer level){
-        SysUserInfo parent = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        SysUserInfo parent = UserInfoConfig.getUserInfo();
         return expressUserService.expressRegister(user,parent,id,level);
     }
 
@@ -41,11 +42,11 @@ public class ExpressUserController {
     public Result<SysUserInfo> getCusmotersInfo(@PathVariable Integer id){
         return expressUserService.getCusmotersInfo(id);
     }
-    @ApiOperation(value = "获取用户列表",  notes="需要Authorization")
+    @ApiOperation(value = "获取用户列表", notes="需要Authorization")
     @GetMapping(value = "/cusmoters",produces = {"application/json;charest=Utf-8"})
     @JsonView(SysUserInfoDto.UserInfoView.class)
     public Result<List<SysUserInfoDto>> getCusmoters(){
-        SysUserInfo user = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
+        SysUserInfo user = UserInfoConfig.getUserInfo();
         return expressUserService.getCusmoters(user);
     }
 

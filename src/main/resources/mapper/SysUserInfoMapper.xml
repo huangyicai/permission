@@ -16,16 +16,22 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, email, company_name,province,city,area,address,telephone,person_in_charge,create_time
+        id, name, email, company_name as companyName,province,city,area,address,telephone,person_in_charge,create_time
     </sql>
 
-    <select id="findUserByusername" parameterType="String" resultMap="BaseResultMap">
+    <select id="findUserByusername" parameterType="String" resultType="com.mmall.model.SysUserInfo">
         SELECT
-        i.id,i.platform_id,i.company_name,i.email,i.level,i.status
+        i.id,
+        i.name,
+        i.company_name as companyName,
+        i.user_id as userId,
+        i.platform_id as platformId,
+        i.level ,
+        i.parent_id as  parentId,
+        i.status
         FROM
             sys_user s
         INNER JOIN sys_user_info i ON s.id = i.user_id
-        INNER JOIN platform p ON p.id = i.platform_id
         WHERE
             s.username =#{username}
     </select>

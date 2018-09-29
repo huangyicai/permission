@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
 
     <!--****shiro配置**********-->
+    <bean id="customRolesAuthorizationFilter" class="com.mmall.shiro.CustomRolesAuthorizationFilter"/>
+
      <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
          <property name="securityManager" ref="securityManager"/>
          <property name="loginUrl" value="/public/403"/>
          <property name="unauthorizedUrl" value="/public/403"/>
+
+         <property name="filters">
+             <util:map>
+                 <entry key="roles" value-ref="customRolesAuthorizationFilter"/>
+             </util:map>
+         </property>
+
          <property name="filterChainDefinitions">
              <value>
 
@@ -21,8 +30,8 @@
                  /public/register = anon
                  /public/403 = anon
                  /fn/** = roles[SUPER]
-                 /express/** = roles[ADMIN]
-                 /express/total/** = roles[ADMIN]
+                 /express/** = roles["ADMIN,OPERATE"]
+                 /express/total/** = roles["ADMIN,OPERATE"]
                  /** = authc
              </value>
          </property>

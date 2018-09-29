@@ -8,6 +8,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.dto.SysUserInfoDto;
@@ -152,7 +153,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
     @Transactional
     public Result fnRegister(UserInfoExpressParm user,SysUserInfo parent) {
-        return register(user,parent,2,2);
+        return register(user,parent, LevelConstants.EXPRESS,2);
     }
 
 
@@ -263,10 +264,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     public Result<Map<String,Object>> getUserInfo(SysUserInfo user) {
-        user = sysUserInfoMapper.selectById(user.getId());
         SysUser sysUser = sysUserMapper.selectById(user.getUserId());
         sysUser.setPassword("***********");
-        user = sysUserInfoMapper.findUserInfoByid(user.getId());
+        user = sysUserInfoMapper.selectById(user.getId());
         Map<String,Object> map = Maps.newHashMap();
         map.put("user",sysUser);
         map.put("userInfo",user);
@@ -291,7 +291,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     public Result updateUserPassword(SysUserInfo user, String code, UserPasswordParam userPasswordParam) {
-        user = sysUserInfoMapper.selectById(user.getId());
         List<CodeRecord> allByPhone = codeRecordMapper.selectList(new QueryWrapper<CodeRecord>()
                 .eq("phone",user.getTelephone())
                 .orderByDesc("create_time"));
@@ -308,9 +307,5 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return Result.ok();
     }
 
-    public static void main(String[] args) {
-        Md5Hash md = new Md5Hash("string","root",1024);
-        System.out.println(md.toString());
-    }
 
 }

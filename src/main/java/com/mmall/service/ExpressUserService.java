@@ -5,6 +5,7 @@ import com.mmall.model.BillKeyword;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
+import com.mmall.model.params.UserInfoOperateParam;
 
 import java.util.List;
 import java.util.Map;
@@ -67,5 +68,18 @@ public interface ExpressUserService {
      */
     Result<SysUserInfo> getCusmotersInfo(Integer id);
 
+    /**
+     * 快递公司注册(1=运营号,2=客服)
+     * @param user
+     * @param level
+     * @return
+     */
+    Result registerOperate(UserInfoOperateParam user, Integer level, SysUserInfo parent);
 
+    /**
+     * 获取快递公司=运营号/客服号)
+     * @param userInfo
+     * @return
+     */
+    Result getAllOperate(SysUserInfo userInfo);
 }

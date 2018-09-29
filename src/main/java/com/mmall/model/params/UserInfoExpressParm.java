@@ -1,6 +1,7 @@
 package com.mmall.model.params;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
@@ -8,7 +9,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @Setter
 @Getter
 public class UserInfoExpressParm  extends SysUserParam{
-
 
     private Integer id = 0;
     @ApiModelProperty(value = "昵称")

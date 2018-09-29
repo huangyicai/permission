@@ -3,6 +3,7 @@ package com.mmall.controller;
 
 import com.aliyuncs.exceptions.ClientException;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.model.Response.Result;
 import com.mmall.model.*;
@@ -44,7 +45,7 @@ public class SysUserController {
     @GetMapping(value = "/menus",produces = {"application/json;charest=Utf-8"})
     @JsonView(Result.ResultMenus.class)
     public  Result<List<SysMenuDto>> findAllMenuByUser(@RequestParam(name = "platId",required = false,defaultValue = "0") Integer platId){
-        SysUserInfo user = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         return sysUserService.findAllMenuByUser(user,platId);
     }
 
@@ -61,7 +62,6 @@ public class SysUserController {
         SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         return sysUserService.updateUserPassword(user,code,userPasswordParam);
     }
-
 
     @ApiOperation(value = "获取验证码", httpMethod = "POST")
     @PostMapping(value = "/getCode/{phone}",produces = {"application/json;charest=Utf-8"})

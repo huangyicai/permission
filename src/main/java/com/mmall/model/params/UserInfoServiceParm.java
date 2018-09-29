@@ -7,15 +7,10 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 @Setter
 @Getter
-public class UserInfoServiceParm {
+public class UserInfoServiceParm  {
 
 
     private Integer id = 0;
-    @ApiModelProperty(value = "昵称")
-    @NotBlank(message = "昵称不可以为空")
-    private String name;
-    @ApiModelProperty(value = "用户邮箱")
-    private String email;
     @ApiModelProperty(value = "公司名")
     @NotBlank(message = "公司名不可以为空")
     private String companyName;
@@ -31,6 +26,11 @@ public class UserInfoServiceParm {
     @ApiModelProperty(value = "详细地址")
     @NotBlank(message = "详细地址不可以为空")
     private String address;
+    @ApiModelProperty(value = "昵称")
+    @NotBlank(message = "昵称不可以为空")
+    private String name;
+    @ApiModelProperty(value = "用户邮箱")
+    private String email;
     @ApiModelProperty(value = "联系电话/手机")
     @NotBlank(message = "昵联系电话不可以为空")
     private String telephone;

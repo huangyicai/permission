@@ -27,8 +27,6 @@ import com.baomidou.mybatisplus.annotation.TableId;
  * @since 2018-09-20
  */
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @TableName("sys_user_info")
 @ApiModel(value = "")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -227,6 +225,29 @@ public class SysUserInfo extends Model<SysUserInfo> {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public SysUserInfo() {
+    }
+
+    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, String createTime, String updateTime, String level, Integer parentId, Integer platformId) {
+        this.id = id;
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.companyName = companyName;
+        this.province = province;
+        this.city = city;
+        this.area = area;
+        this.address = address;
+        this.telephone = telephone;
+        this.personInCharge = personInCharge;
+        this.status = status;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.level = level;
+        this.parentId = parentId;
+        this.platformId = platformId;
     }
 
     @Override

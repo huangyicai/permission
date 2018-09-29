@@ -20,7 +20,8 @@
 				p.*
         FROM
             sys_user s
-        INNER JOIN sys_user_role r ON s.id = r.user_id
+        INNER JOIN sys_user_info i ON s.id = i.user_id
+        INNER JOIN sys_user_role r ON i.id = r.user_id
         INNER JOIN sys_role p ON r.role_id = p.id
         WHERE
             s.username =#{username}

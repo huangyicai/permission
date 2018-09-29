@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.mmall.model.City">
         <id column="id" property="id" />
         <result column="province_name" property="provinceName" />
+        <result column="province_key" property="provinceKey" />
     </resultMap>
 
     <!-- 通用查询结果列 -->

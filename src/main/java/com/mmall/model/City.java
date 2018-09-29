@@ -42,6 +42,16 @@ public class City implements Serializable {
     @TableField("province_name")
     private String provinceName;
 
+    @TableField("province_key")
+    private String provinceKey;
+
+    public String getProvinceKey() {
+        return provinceKey;
+    }
+
+    public void setProvinceKey(String provinceKey) {
+        this.provinceKey = provinceKey;
+    }
     /*private Integer status=0;
 
     public Integer getStatus() {

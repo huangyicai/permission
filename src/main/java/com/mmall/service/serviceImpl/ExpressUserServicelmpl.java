@@ -5,17 +5,14 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mmall.dao.BillKeywordMapper;
-import com.mmall.dao.SysMenuMapper;
-import com.mmall.dao.SysUserInfoMapper;
-import com.mmall.dao.SysUserMapper;
+import com.mmall.constants.LevelConstants;
+import com.mmall.dao.*;
 import com.mmall.dto.SysUserInfoDto;
-import com.mmall.model.BillKeyword;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUser;
-import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
+import com.mmall.model.params.UserInfoOperateParam;
 import com.mmall.service.ExpressUserService;
 import com.mmall.util.BeanValidator;
 import com.mmall.util.LevelUtil;
@@ -37,13 +34,15 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     private BillKeywordMapper billKeywordMapper;
     @Autowired
     private SysUserMapper sysUserMapper;
+    @Autowired
+    private SysUserRoleMapper sysUserRoleMapper;
 
     public Result expressRegister(UserInfoExpressParm user, SysUserInfo parent,Integer id,Integer level) {
         if(id!=0) parent= sysUserInfoMapper.selectById(id);;
 
         if(level==1){
             BeanValidator.check(user);
-           return sysUserService.register(user,parent,3,5);
+           return sysUserService.register(user,parent, LevelConstants.SERVICE,5);
         }
         SysUserInfo userInfo = SysUserInfo.builder()
                 .parentId(parent.getId())
@@ -61,7 +60,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         Integer id = user.getId();
         //List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
-                .like("level","%"+id+"%").in("status",1,0).in("platform_id",-1,3));
+                .like("level","%"+id+"%").in("status",1,0).in("platform_id",LevelConstants.BRANCH,LevelConstants.SERVICE));
         String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
         List<SysUserInfoDto> dtoList = Lists.newArrayList();
         for (SysUserInfo sysUserInfo : sysUserInfos) {
@@ -131,6 +130,49 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         return Result.ok(sysUserInfo);
     }
 
+    public Result registerOperate(UserInfoOperateParam user, Integer level, SysUserInfo parent) {
+        UserInfoExpressParm userExpress = new UserInfoExpressParm();
+        userExpress.setUsername(user.getUsername());
+        userExpress.setPassword(user.getPassword());
+        userExpress.setName(user.getName());
+        userExpress.setEmail(user.getEmail());
+        userExpress.setTelephone(user.getTelephone());
+        userExpress.setPersonInCharge(user.getPersonInCharge());
+
+        userExpress.setProvince(parent.getProvince());
+        userExpress.setCity(parent.getCity());
+        userExpress.setArea(parent.getArea());
+        userExpress.setAddress(parent.getAddress());
+        userExpress.setCompanyName(parent.getCompanyName());
+
+        return sysUserService.register(
+                userExpress,
+                parent,
+                LevelConstants.EXPRESS,
+                level==1?LevelConstants.OPERATE:LevelConstants.SERVICE_PHONE);
+    }
+
+    public Result getAllOperate(SysUserInfo userInfo) {
+        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .eq("parent_id", userInfo.getId())
+                .eq("platform_id",LevelConstants.EXPRESS));
+        Multimap<String, SysUserInfo> userMap = ArrayListMultimap.create();
+        String userService = "userService";//客服
+        String userOperate = "userOperate";//运营
+        for (SysUserInfo sui:sysUserInfos){
+            SysUserRole sysUserRole = sysUserRoleMapper.selectOne(new QueryWrapper<SysUserRole>().eq("user_id", sui.getId()));
+            userMap.put(sysUserRole.getRoleId()==2?userOperate:userService,sui);
+        }
+        Map<String,List<SysUserInfo>> map = Maps.newHashMap();
+        //客服集合
+        List<SysUserInfo> userServiceList = (List<SysUserInfo>) userMap.get(userService);
+        //运营集合
+        List<SysUserInfo> userOperateList = (List<SysUserInfo>) userMap.get(userOperate);
+
+        map.put(userService,userServiceList);
+        map.put(userOperate,userOperateList);
+        return Result.ok(map);
+    }
 
 
     public  void transformUserInfoTree(List<SysUserInfoDto> dtoList, String level, Multimap<String, SysUserInfoDto> levelMap) {
