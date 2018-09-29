@@ -245,7 +245,6 @@ public class XlsxProcessAbstract {
             Integer total=0;//总单量
             BigDecimal weightOne=BigDecimal.ZERO;//总重
 
-
             String ompPath=path+key+".xlsx";
 
             //判斷是否存在該用戶
@@ -289,6 +288,7 @@ public class XlsxProcessAbstract {
             threadDto.setMd(md);
             threadDto.setMw(mw);
             threadDto.setPath(ompPath);
+            threadDto.setPathHead(path);
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);

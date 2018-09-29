@@ -11,6 +11,7 @@ import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.model.ProvinceCalculate;
 import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
+import com.mmall.util.RandomHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
@@ -48,7 +49,11 @@ public class ThreadImport implements Callable<String> {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-                outputStream = new FileOutputStream(threadDto.getPath());
+//                outputStream = new FileOutputStream(threadDto.getPath());
+                String time = new Date().getTime()+"";
+                String path=threadDto.getPathHead()+time.substring(9,time.length())+ RandomHelper.getRandNum(3)+".xlsx";
+                threadDto.setPath(path);
+                outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();
