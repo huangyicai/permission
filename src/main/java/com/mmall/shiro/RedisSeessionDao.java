@@ -26,7 +26,7 @@ public class RedisSeessionDao extends AbstractSessionDAO {
     private final String SHIRO_SESSION_PREFIX="session";
 
     //过期时间
-    private final Integer BE_OVERDUE_TIME = 10*60;
+    private final Integer BE_OVERDUE_TIME = 10*60*10;
 
     private byte[] getKey(String key){
         return (SHIRO_SESSION_PREFIX+key).getBytes();

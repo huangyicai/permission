@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.PricingGroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.PricingGroup">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="city_id" property="cityId" />
+        <result column="area_begin" property="areaBegin" />
+        <result column="area_end" property="areaEnd" />
+        <result column="weight_standard" property="weightStandard" />
+        <result column="price" property="price" />
+        <result column="first_or_continued" property="firstOrContinued" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, city_id, area_begin, area_end, weight_standard, price, first_or_continued
+    </sql>
+    <insert id="insertPricingGroupList"  parameterType="java.util.List">  
+           insert into pricing_group(user_id,
+                                    city_id,
+                                    area_begin,
+                                    area_end,
+                                    weight_standard,
+                                    price,
+                                    first_or_continued)  
+         values  
+           <foreach collection="list" item="item" index="index" separator=",">  
+                                    ( #{item.userId},
+                                    #{item.cityId},
+                                    #{item.areaBegin},
+                                    #{item.areaEnd},
+                                    #{item.weightStandard},
+                                    #{item.price},
+                                    #{item.firstOrContinued} )  
+           </foreach>  
+     </insert>
+
+    <select id="getAllPricingGroups" parameterType="int" resultType="java.lang.Integer">
+          SELECT
+			distinct p.city_id
+        FROM
+            pricing_group p
+        WHERE
+            p.user_id=#{userId}
+    </select>
+</mapper>

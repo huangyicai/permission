@@ -77,3 +77,41 @@ CREATE TABLE `bill_keyword` (
   `status` int(11) NOT NULL DEFAULT '1' COMMENT '该记录是否有效1：有效、0：无效',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `pricing_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `city_id` int(11) NOT NULL DEFAULT '0' COMMENT '省份id',
+  `area_begin` int(11) NOT NULL DEFAULT '0' COMMENT '开始区间',
+  `area_end` int(11) NOT NULL DEFAULT '0' COMMENT '结束区间',
+  `weight_standard` int(11) NOT NULL DEFAULT '1' COMMENT '重量标准',
+  `price` int(11) NOT NULL DEFAULT '0' COMMENT '价格',
+  `first_or_continued ` int(11) NOT NULL DEFAULT '1' COMMENT '1=首重，2=续重',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `city` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `province_name` varchar(64) NOT NULL DEFAULT '' COMMENT '省份名',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+INSERT into city(province_name) value ('北京市');INSERT into city(province_name) value ('天津市');
+INSERT into city(province_name) value ('上海市');INSERT into city(province_name) value ('重庆市');
+INSERT into city(province_name) value ('河北省');INSERT into city(province_name) value ('河南省');
+INSERT into city(province_name) value ('云南省');INSERT into city(province_name) value ('辽宁省');
+INSERT into city(province_name) value ('黑龙江省');INSERT into city(province_name) value ('湖南省');
+INSERT into city(province_name) value ('安徽省');INSERT into city(province_name) value ('山东省');
+INSERT into city(province_name) value ('新疆维吾尔');INSERT into city(province_name) value ('江苏省');
+INSERT into city(province_name) value ('浙江省');INSERT into city(province_name) value ('江西省');
+INSERT into city(province_name) value ('湖北省');INSERT into city(province_name) value ('广西壮族');
+INSERT into city(province_name) value ('甘肃省');INSERT into city(province_name) value ('山西省');
+INSERT into city(province_name) value ('内蒙古');INSERT into city(province_name) value ('陕西省');
+INSERT into city(province_name) value ('吉林省');INSERT into city(province_name) value ('福建省');
+INSERT into city(province_name) value ('贵州省');INSERT into city(province_name) value ('广东省');
+INSERT into city(province_name) value ('青海省');INSERT into city(province_name) value ('西藏');
+INSERT into city(province_name) value ('四川省');INSERT into city(province_name) value ('宁夏回族');
+INSERT into city(province_name) value ('海南省');INSERT into city(province_name) value ('台湾省');
+INSERT into city(province_name) value ('香港特别行政区');INSERT into city(province_name) value ('澳门特别行政区');
+

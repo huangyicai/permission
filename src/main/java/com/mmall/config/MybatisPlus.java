@@ -32,7 +32,7 @@ public class MybatisPlus {
     private static String authorName="hyc";
 
     //table名字
-    private static String table="bill_keyword";
+    private static String table="pricing_group";
 
     //table前缀
     private static String prefix="";
@@ -111,16 +111,16 @@ public class MybatisPlus {
 
         FileOutConfig mapperConfig = getMapperConfig();
         FileOutConfig entityConfig = getEntityConfig();
-        //FileOutConfig serviceConfig = getServiceConfig();
-        //FileOutConfig serviceImplConfig = getServiceImplConfig();
-        //FileOutConfig contolConfig = getContolConfig();
+        FileOutConfig serviceConfig = getServiceConfig();
+        FileOutConfig serviceImplConfig = getServiceImplConfig();
+        FileOutConfig contolConfig = getContolConfig();
         FileOutConfig daoConfig = getDaoConfig();
         List<FileOutConfig> fileOutConfigs = new ArrayList<FileOutConfig>();
         fileOutConfigs.add(mapperConfig);
         fileOutConfigs.add(entityConfig);
-        //fileOutConfigs.add(serviceConfig);
-        //fileOutConfigs.add(serviceImplConfig);
-        //fileOutConfigs.add(contolConfig);
+        fileOutConfigs.add(serviceConfig);
+        fileOutConfigs.add(serviceImplConfig);
+        fileOutConfigs.add(contolConfig);
         fileOutConfigs.add(daoConfig);
         mpg.setCfg(
                 // 注入自定义配置，可以在 VM 中使用 cfg.abc 设置的值
