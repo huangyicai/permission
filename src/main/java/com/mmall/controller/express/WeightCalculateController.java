@@ -44,46 +44,10 @@ public class WeightCalculateController {
     @Autowired
     private WeightCalculateService weightCalculateService;
 
-    @Autowired
-    private TotalService totalService;
-
-    @Autowired
-    private SysUserInfoService sysUserInfoService;
-
     @ApiOperation(value = "获取重量区间占比",  notes="需要Authorization")
     @PostMapping(value = "/getWeightCalculate")
     public Result<Map<String,String>> getWeightCalculate(@RequestBody BillParam billParam){
-
-        if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
-            SysUserInfo user = UserInfoConfig.getUserInfo();
-            String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
-            List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
-                    .like("level", s)
-                    .eq("platform_id", 3)
-                    .select("id"));
-
-            String nameStr="";
-            for(SysUserInfo sysUserInfo: list1){
-                nameStr+=sysUserInfo.getId()+",";
-            }
-
-            nameStr=nameStr.substring(0,nameStr.length()-1);
-
-            billParam.setUserId(nameStr);
-        }
-        List<Total> list = totalService.listToal(billParam.getDate(),billParam.getUserId());
-        if(list.size()<=0){
-            return Result.error(InfoEnums.DATA_IS_NULL);
-        }
-
-        String totalIdStr="";
-
-        for(Total total:list){
-            totalIdStr+=total.getTotalId()+",";
-        }
-
-        totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
-        Map<String,String> weightCalculate = weightCalculateService.getWeightCalculate(totalIdStr);
+        Map<String,String> weightCalculate = weightCalculateService.getWeightCalculate(billParam);
         return Result.ok(weightCalculate);
     }
 }

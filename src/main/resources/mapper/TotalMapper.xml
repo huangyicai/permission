@@ -49,13 +49,8 @@
     </select>
 
     <!--获取账单列表（数据分析）-->
-    <select id="getBill" resultType="com.mmall.model.Total">
-      select total_id as totalId,
-      `name` as name,
-      update_time as updateTime,
-      total_state as totalState,
-      create_time as createTime,
-      total_offer as totalOffer
+    <select id="getBill" resultMap="BaseResultMap">
+      select *
       from total
       <where>
           <if test="userId!=null">
@@ -66,12 +61,8 @@
               and total_time =#{totalTime}
           </if>
 
-          <if test="state!=null and state!=0 and state==1">
+          <if test="state!=null and state!=0">
               and total_state=#{state}
-          </if>
-
-          <if test="state!=null and state!=0 and state!=1">
-              and total_state!=#{state}
           </if>
       </where>
     </select>

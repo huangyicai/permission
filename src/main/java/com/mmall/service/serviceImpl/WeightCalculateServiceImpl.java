@@ -1,14 +1,25 @@
 package com.mmall.service.serviceImpl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.WeightCalculateMapper;
+import com.mmall.model.Response.InfoEnums;
+import com.mmall.model.Response.Result;
+import com.mmall.model.SysUserInfo;
+import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
+import com.mmall.model.params.BillParam;
+import com.mmall.service.SysUserInfoService;
+import com.mmall.service.TotalService;
 import com.mmall.service.WeightCalculateService;
+import com.mmall.util.LevelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,16 +36,51 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
     @Autowired
     private WeightCalculateMapper weightCalculateMapper;
 
+    @Autowired
+    private TotalService totalService;
+
+    @Autowired
+    private SysUserInfoService sysUserInfoService;
     /**
      * 获取重量区间的统计
-     * @param totalId
+     * @param billParam
      * @return
      */
-    public Map<String,String> getWeightCalculate(String totalId) {
+    public Map<String,String> getWeightCalculate(BillParam billParam) {
+
+        if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
+            SysUserInfo user = UserInfoConfig.getUserInfo();
+            String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
+            List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
+                    .like("level", s)
+                    .eq("platform_id", 3)
+                    .select("id"));
+
+            String nameStr="";
+            for(SysUserInfo sysUserInfo: list1){
+                nameStr+=sysUserInfo.getId()+",";
+            }
+
+            nameStr=nameStr.substring(0,nameStr.length()-1);
+
+            billParam.setUserId(nameStr);
+        }
+        List<Total> list = totalService.listToal(billParam.getDate(),billParam.getUserId());
+        if(list.size()<=0){
+            return null;
+        }
+
+        String totalIdStr="";
+
+        for(Total total:list){
+            totalIdStr+=total.getTotalId()+",";
+        }
+
+        totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
 
         Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
 
-        WeightCalculate weightCalculate = weightCalculateMapper.getWeightCalculate(totalId);
+        WeightCalculate weightCalculate = weightCalculateMapper.getWeightCalculate(totalIdStr);
 
         Field fields[]=weightCalculate.getClass().getDeclaredFields();
         String[] name=new String[fields.length];
