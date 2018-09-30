@@ -13,6 +13,9 @@ public class ProfitsDto {
     @ApiModelProperty(value = "总单量")
     private Integer totalNumber;
 
+    @ApiModelProperty(value = "每日单量")
+    private Integer averageNumber;
+
     @ApiModelProperty(value = "总重量")
     private BigDecimal totalWeight;
 

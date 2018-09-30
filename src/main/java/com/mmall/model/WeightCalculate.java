@@ -24,7 +24,6 @@ import java.math.BigDecimal;
  */
 @ApiModel(value = "WeightCalculate", description = "重量区间计算表")
 @TableName("weight_calculate")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeightCalculate implements Serializable {

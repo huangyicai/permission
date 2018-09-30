@@ -23,7 +23,6 @@ import java.io.Serializable;
  */
 @ApiModel(value = "ProvinceCalculate", description = "省计表")
 @TableName("province_calculate")
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProvinceCalculate implements Serializable {
