@@ -1,6 +1,7 @@
 package com.mmall.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.model.Total;
 import com.mmall.model.params.TotalIncomeParam;
 import org.apache.ibatis.annotations.Param;
@@ -24,7 +25,7 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     List<Total> listToal(@Param("totalTime")String totalTime, @Param("userId")String userId);
 
-    List<Total> getBill(@Param("totalTime") String totalTime, @Param("userId")String userId, @Param("state")Integer state);
+    Page<Total> getBill(Page page, @Param("totalTime") String totalTime, @Param("userId")String userId, @Param("state")Integer state);
 
     Total getBillCount(@Param("totalTime") String totalTime, @Param("userId")String userId,@Param("state")String state);
 

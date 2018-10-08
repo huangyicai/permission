@@ -42,12 +42,12 @@ public class ProcessTransDetailDataDto {
             bill.setSerialNumber(cellStrs[2]);
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
-
-            //目的地是否合法
-            boolean province = province(cellStrs[3]);
-            if(!province){
-                nameStr="未识别地址账单";
-            }
+//
+//            //目的地是否合法
+//            boolean province = province(cellStrs[3]);
+//            if(!province){
+//                nameStr="未识别地址账单";
+//            }
             map.put(nameStr,bill);
         }
     }

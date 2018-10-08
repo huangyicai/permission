@@ -35,11 +35,18 @@ public class Total implements Serializable {
     private Integer totalId;
 
     /**
-     * 用户名
+     * 用户id
      */
     @ApiModelProperty(value = "用户id")
     @TableField("user_id")
     private Integer userId;
+
+    /**
+     * 用户id
+     */
+    @ApiModelProperty(value = "用户id")
+    @TableField("send_id")
+    private Integer sendId;
 
     /**
      * 用户名
@@ -47,6 +54,14 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "用户名")
     @TableField("name")
     private String name;
+
+    /**
+     * 用户名
+     */
+    @ApiModelProperty(value = "单号")
+    @TableField("order_no")
+    private String orderNo;
+
     /**
      * 时间
      */
@@ -83,12 +98,20 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "实收")
     @TableField("total_paid")
     private BigDecimal totalPaid;
+
+    /**
+     *凭证路径
+     */
+    @ApiModelProperty(value = "凭证路径")
+    @TableField("total_credentials_url")
+    private String totalCredentialsUrl;
     /**
      * 账单储存地址
      */
     @ApiModelProperty(value = "账单储存地址")
     @TableField("total_url")
     private String totalUrl;
+
     /**
      * 是否结账：1-否，2-是
      */
@@ -113,6 +136,7 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "修改时间")
     @TableField("update_time")
     private Date updateTime;
+
     /**
      * 修改ip
      */
@@ -120,6 +144,21 @@ public class Total implements Serializable {
     @TableField("update_ip")
     private String updateIp;
 
+    public Integer getSendId() {
+        return sendId;
+    }
+
+    public void setSendId(Integer sendId) {
+        this.sendId = sendId;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
 
     public Integer getTotalId() {
         return totalId;
@@ -239,6 +278,14 @@ public class Total implements Serializable {
 
     public void setUpdateIp(String updateIp) {
         this.updateIp = updateIp;
+    }
+
+    public String getTotalCredentialsUrl() {
+        return totalCredentialsUrl;
+    }
+
+    public void setTotalCredentialsUrl(String totalCredentialsUrl) {
+        this.totalCredentialsUrl = totalCredentialsUrl;
     }
 
     @Override

@@ -39,7 +39,7 @@ public class UploadApi {
     private static String returnBaseUrl="https://funwl.oss-cn-hangzhou.aliyuncs.com/";
 
     /**
-     * 本地文件上传
+     * 文件上传
      * @param file
      */
     public static String upload(File file) {

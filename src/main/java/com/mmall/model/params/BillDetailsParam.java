@@ -26,5 +26,5 @@ public class BillDetailsParam {
     private Integer state;
 
     @ApiModelProperty(value = "用户id（数据分析时不填，上传账单页面填用户id）")
-    private String userId;
+    private Integer userId;
 }

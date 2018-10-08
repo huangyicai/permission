@@ -103,16 +103,16 @@ public class TotalController {
 
     @ApiOperation(value = "获取账单列表",  notes="需要Authorization")
     @PostMapping(value = "/getBill")
-    public Result<Page<Total>> getBill(Page<Total> page,@RequestBody BillDetailsParam billDetailsParam){
-        List<Total> bill = totalService.getBill(page,billDetailsParam);
-        page.setRecords(bill);
-        return Result.ok(page);
+    public Result<Page<Total>> getBill(@RequestBody BillDetailsParam billDetailsParam){
+        Page<Total> page=new Page<>(billDetailsParam.getCurrent(),billDetailsParam.getSize());
+        Page<Total> bill = totalService.getBill(page,billDetailsParam);
+        return Result.ok(bill);
     }
 
     @ApiOperation(value = "获取账单详情：已收入和未收入",  notes="需要Authorization")
-    @PostMapping(value = "/getIncome")
-    public Result<TotalIncomeParam> getIncome(@RequestBody BillDetailsParam billDetailsParam){
-        TotalIncomeParam billCount = totalService.getBillCount(billDetailsParam);
+    @PostMapping(value = "/getIncome/{date}")
+    public Result<TotalIncomeParam> getIncome(@PathVariable("date") String date){
+        TotalIncomeParam billCount = totalService.getBillCount(date);
         return Result.ok(billCount);
     }
 
@@ -121,6 +121,16 @@ public class TotalController {
     public Result<ProfitsDto> getProfits(@RequestBody BillParam billParam){
         ProfitsDto profits = totalService.getProfits(billParam);
         return Result.ok(profits);
+    }
+
+    @ApiOperation(value = "定价",  notes="需要Authorization")
+    @GetMapping(value = "/getPricing/{totalId}")
+    public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
+        String pricing = totalService.getPricing(totalId);
+        if("".equals(pricing) || pricing==null){
+            return Result.error(InfoEnums.ERROR);
+        }
+        return Result.ok(pricing);
     }
 }
 

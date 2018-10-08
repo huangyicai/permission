@@ -6,13 +6,16 @@
     <resultMap id="BaseResultMap" type="com.mmall.model.Total">
         <id column="total_id" property="totalId" />
         <result column="user_id" property="userId" />
+        <result column="send_id" property="sendId" />
         <result column="name" property="name" />
+        <result column="order_no" property="orderNo" />
         <result column="total_time" property="totalTime" />
         <result column="total_number" property="totalNumber" />
         <result column="total_weight" property="totalWeight" />
         <result column="total_cost" property="totalCost" />
         <result column="total_offer" property="totalOffer" />
         <result column="total_paid" property="totalPaid" />
+        <result column="total_credentials_url" property="totalCredentialsUrl" />
         <result column="total_url" property="totalUrl" />
         <result column="total_state" property="totalState" />
         <result column="create_time" property="createTime" />
@@ -28,7 +31,7 @@
 
     <!--添加账单-->
     <insert id="insertTotal" parameterType="com.mmall.model.Total"  useGeneratedKeys="true" keyProperty="totalId">
-      insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl})
+      insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url,send_id,order_no) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl},#{sendId},#{orderNo})
     </insert>
 
     <!--获取月计数据-->

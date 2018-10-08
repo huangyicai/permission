@@ -44,13 +44,6 @@ public class ProvinceCalculateController {
     @Autowired
     private ProvinceCalculateService provinceCalculateService;
 
-    @Autowired
-    private TotalService totalService;
-
-    @Autowired
-    private SysUserInfoService sysUserInfoService;
-
-
     @ApiOperation(value = "获取客户省计数据",  notes="需要Authorization")
     @PostMapping(value = "/getProvinceCalculate")
     public Result<Map<String,String>> getProvinceCalculate(@RequestBody BillParam billParam){

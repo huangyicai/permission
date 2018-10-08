@@ -47,6 +47,11 @@ public class ThreadDto {
     private Integer id;
 
     /**
+     * 用户详情id
+     */
+    private Integer sendId;
+
+    /**
      * excel路径
      */
     private String path;
@@ -60,4 +65,9 @@ public class ThreadDto {
      * 本地地址头
      */
     private String pathHead;
+
+    /**
+     * 主键生成的时间
+     */
+    private String Idtime;
 }

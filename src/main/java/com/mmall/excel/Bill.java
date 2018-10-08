@@ -34,6 +34,32 @@ public class Bill implements Serializable {
      */
     private BigDecimal freight;
 
+    /**
+     * 成本
+     */
+    private BigDecimal cost;
+
+    /**
+     * 报价
+     */
+    private BigDecimal offer;
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
+
+    public BigDecimal getOffer() {
+        return offer;
+    }
+
+    public void setOffer(BigDecimal offer) {
+        this.offer = offer;
+    }
+
     public String getBillName() {
         return billName;
     }

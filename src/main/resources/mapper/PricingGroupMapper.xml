@@ -46,4 +46,19 @@
         WHERE
             p.user_id=#{userId}
     </select>
+
+    <!--获取报价表-->
+    <select id="ListPricingGroup" resultMap="BaseResultMap">
+        select
+        pricing_group.id,
+        area_begin as areaBegin,
+        area_end as areaEnd,
+        weight_standard as weightStandard,
+        price,first_or_continued as firstOrContinued,
+        province_name as city
+        from pricing_group
+        join city
+        on city.id=pricing_group.city_id
+        ORDER BY first_or_continued,area_end ASC
+    </select>
 </mapper>
