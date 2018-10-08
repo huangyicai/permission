@@ -21,5 +21,4 @@ public class CityVo extends City {
         return dto;
     }
 
-
 }

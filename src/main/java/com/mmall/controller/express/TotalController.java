@@ -4,6 +4,7 @@ package com.mmall.controller.express;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
 import com.mmall.excel.Bill;
@@ -11,7 +12,9 @@ import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.SysUserInfo;
+import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
+import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.excel.imp.XlsxProcessAbstract;
 import com.mmall.model.Response.Result;
@@ -37,11 +40,8 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -64,23 +64,6 @@ public class TotalController {
 
     @Autowired
     private  XlsxProcessAbstract xlsxProcessAbstract;
-
-    @ApiOperation(value = "获取客户账单",  notes="需要Authorization")
-    @ApiImplicitParams(
-            @ApiImplicitParam(name = "state", value = "状态：1-未发送，2-待确认，3-已付款（未确认，这里不做展示），4-已收款", required = false, dataType = "Integer", paramType = "query")
-    )
-    @PostMapping(value = "/getList")
-    public Result<IPage<Total>> getList(Page page, BillParam billParam,Integer state) throws ParseException {
-        QueryWrapper<Total> queryWrapper = new QueryWrapper<Total>();
-        queryWrapper
-                .eq("total_time", billParam.getDate())
-                .eq("user_id",billParam.getId())
-                .eq(state!=0,"total_state",state)
-                .orderByAsc(false, "total_state")
-                .orderByAsc(false,"total_time");
-        IPage<Total> page1 = totalService.page(page, queryWrapper);
-        return Result.ok(page1);
-    }
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
     @GetMapping(value = "/update")
@@ -113,79 +96,31 @@ public class TotalController {
 
     @ApiOperation(value = "获取账单月份总计",  notes="需要Authorization")
     @PostMapping(value = "/getBillData")
-    public Result<BillDto> getBillData(BillParam billParam){
-        Total one = totalService.getToal( billParam.getDate(), billParam.getId());
-        if(one==null){
-           return Result.error(InfoEnums.DATA_IS_NULL);
-        }
-        BillDto billDto=new BillDto();
-        billDto.setTotalNumber(one.getTotalNumber());
-        billDto.setTotalWeight(one.getTotalWeight());
-        billDto.setAverageWeight(one.getTotalWeight().divide(new BigDecimal(one.getTotalNumber()),2, RoundingMode.DOWN));
-
-        int days = DateUtils.getDays(one.getTotalTime());
-        billDto.setDailyNum(one.getTotalNumber()/days);
-        return Result.ok(billDto);
+    public Result<BillDto> getBillData(@RequestBody BillParam billParam){
+        BillDto billData = totalService.getBillData(billParam);
+        return Result.ok(billData);
     }
 
-    @ApiOperation(value = "获取账单详情",  notes="需要Authorization")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "date", value = "时间", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "是否付款：1-否，2-是", required = false, dataType = "Integer", paramType = "query")
-    })
+    @ApiOperation(value = "获取账单列表",  notes="需要Authorization")
     @PostMapping(value = "/getBill")
-    public Result<IPage<Total>> getBill(Page page,String date,Integer state){
-        IPage<Total> ipage = totalService.page(page, new QueryWrapper<Total>()
-                .eq("total_time", date)
-                .eq(state!=0 && state!=null,"total_state",state)
-                .select("total_id","name","update_time","create_time","total_offer"));
-        return Result.ok(ipage);
+    public Result<Page<Total>> getBill(Page<Total> page,@RequestBody BillDetailsParam billDetailsParam){
+        List<Total> bill = totalService.getBill(page,billDetailsParam);
+        page.setRecords(bill);
+        return Result.ok(page);
     }
 
     @ApiOperation(value = "获取账单详情：已收入和未收入",  notes="需要Authorization")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "date", value = "时间", required = false, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "state", value = "是否付款：1-否，2-是", required = false, dataType = "Integer", paramType = "query")
-    })
     @PostMapping(value = "/getIncome")
-    public Result getIncome(String date,Integer state){
-        QueryWrapper<Total> select1 = new QueryWrapper<Total>();
-
-        select1.eq("total_time", date);
-
-        if(state==1){
-            select1 .eq( "total_state", 1)
-                    .select("total_paid");
-        }
-        if(state==2){
-            select1 .eq( "total_state", 2)
-                    .select("total_offer");
-        }
-        int count = totalService.count(select1);
-        return Result.ok(count);
+    public Result<TotalIncomeParam> getIncome(@RequestBody BillDetailsParam billDetailsParam){
+        TotalIncomeParam billCount = totalService.getBillCount(billDetailsParam);
+        return Result.ok(billCount);
     }
 
     @ApiOperation(value = "利润分析",  notes="需要Authorization")
     @PostMapping(value = "/getProfits")
-    public Result<ProfitsDto> getProfits(BillParam billParam){
-        Total one = totalService.getToal( billParam.getDate(), billParam.getId());
-
-        if(one==null){
-            return Result.error(InfoEnums.DATA_IS_NULL);
-        }
-
-        ProfitsDto billDto=new ProfitsDto();
-        billDto.setTotalNumber(one.getTotalNumber());
-        billDto.setTotalWeight(one.getTotalWeight());
-        billDto.setAverageWeight(one.getTotalWeight().divide(new BigDecimal(one.getTotalNumber()),2, RoundingMode.DOWN));
-        billDto.setTotalOffer(one.getTotalOffer());
-        billDto.setTotalPaid(one.getTotalPaid());
-        billDto.setTotalCost(one.getTotalCost());
-        billDto.setProfits(one.getTotalPaid().subtract(one.getTotalCost()));
-        billDto.setPrice(one.getTotalOffer().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
-        billDto.setCostPrice(one.getTotalCost().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
-
-        return Result.ok(billDto);
+    public Result<ProfitsDto> getProfits(@RequestBody BillParam billParam){
+        ProfitsDto profits = totalService.getProfits(billParam);
+        return Result.ok(profits);
     }
 }
 

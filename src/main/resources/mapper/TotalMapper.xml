@@ -39,6 +39,38 @@
       SUM(total_offer) as totalOffer,
       SUM(total_paid) as totalPaid,
       SUM(total_cost) as totalCost
-      from total where user_id=#{userId} and total_time=#{totalTime}
+      from total where user_id in (${userId}) and total_time=#{totalTime}
+    </select>
+
+    <!--根据用户id获取账单id-->
+    <select id="listToal" resultType="com.mmall.model.Total">
+      select total_id as totalId
+      from total where user_id in (${userId}) and total_time=#{totalTime}
+    </select>
+
+    <!--获取账单列表（数据分析）-->
+    <select id="getBill" resultMap="BaseResultMap">
+      select *
+      from total
+      <where>
+          <if test="userId!=null">
+             and user_id in (${userId})
+          </if>
+
+          <if test="totalTime">
+              and total_time =#{totalTime}
+          </if>
+
+          <if test="state!=null and state!=0">
+              and total_state=#{state}
+          </if>
+      </where>
+    </select>
+
+    <!--获取已收和未收数据-->
+    <select id="getBillCount" resultType="com.mmall.model.Total">
+        select
+        SUM(total_paid) as totalPaid
+        from total where user_id in (${userId}) and total_time =#{totalTime} and total_state in(${state})
     </select>
 </mapper>

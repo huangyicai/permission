@@ -2,6 +2,7 @@ package com.mmall.excel.imp;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.ArrayListMultimap;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.BillKeywordMapper;
 import com.mmall.dao.ProvinceCalculateMapper;
 import com.mmall.dao.TotalMapper;
@@ -199,7 +200,8 @@ public class XlsxProcessAbstract {
     public void processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
 
         //获取用户信息
-        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+//        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        SysUserInfo user = UserInfoConfig.getUserInfo();
         String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
         List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
                 .like("level", s)

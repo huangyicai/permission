@@ -2,6 +2,9 @@ package com.mmall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.model.ProvinceCalculate;
+import com.mmall.model.params.BillParam;
+
+import java.util.Map;
 
 /**
  * <p>
@@ -12,5 +15,5 @@ import com.mmall.model.ProvinceCalculate;
  * @since 2018-09-25
  */
 public interface ProvinceCalculateService extends IService<ProvinceCalculate> {
-    ProvinceCalculate getProvinceCalculate(String totalId);
+    Map<String,String> getProvinceCalculate(BillParam billParam);
 }

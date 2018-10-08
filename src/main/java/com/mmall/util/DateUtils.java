@@ -1,5 +1,7 @@
 package com.mmall.util;
 
+import org.apache.shiro.crypto.hash.Md5Hash;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,7 +67,5 @@ public class DateUtils{
         }
         return days;
     }
-
-
 }
 

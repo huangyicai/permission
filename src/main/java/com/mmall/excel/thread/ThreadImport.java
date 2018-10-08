@@ -93,6 +93,7 @@ public class ThreadImport implements Callable<String> {
         total.setTotalWeight(threadDto.getWeight());
         total.setTotalUrl(threadDto.getPath());
         total.setCreateTime(new Date());
+        total.setUpdateTime(new Date());
         totalMapper.insertTotal(total);
 
         //添加重量区间数据
