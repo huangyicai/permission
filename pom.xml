@@ -269,9 +269,31 @@
       <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
       <version>1.0.0</version>
     </dependency>
+
+    <!--极光-->
+    <dependency>
+      <groupId>cn.jpush.api</groupId>
+      <artifactId>jmessage-client</artifactId>
+      <version>1.1.7</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.jpush.api</groupId>
+      <artifactId>jiguang-common</artifactId>
+      <version>1.1.0</version>
+    </dependency>
   </dependencies>
 
   <build>
     <finalName>permission</finalName>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>7</source>
+                  <target>7</target>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
 </project>

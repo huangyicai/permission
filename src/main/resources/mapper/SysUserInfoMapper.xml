@@ -24,6 +24,7 @@
         i.id,
         i.name,
         i.company_name as companyName,
+        i.telephone,
         i.user_id as userId,
         i.platform_id as platformId,
         i.level ,
@@ -43,6 +44,16 @@
             sys_user_info s
         WHERE
             s.id = #{id}
+    </select>
+
+    <select id="findAllLikeLevel" parameterType="String" resultType="com.mmall.model.SysUserInfo">
+        SELECT
+        i.id,
+        i.name
+        FROM
+            sys_user_info i
+        WHERE
+            i.level like #{level} AND i.platform_id = 3
     </select>
 
 

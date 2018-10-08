@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Objects;
 
 
 /**
@@ -45,6 +46,9 @@ public class City implements Serializable {
     @TableField("province_key")
     private String provinceKey;
 
+
+
+
     public String getProvinceKey() {
         return provinceKey;
     }
@@ -52,15 +56,7 @@ public class City implements Serializable {
     public void setProvinceKey(String provinceKey) {
         this.provinceKey = provinceKey;
     }
-    /*private Integer status=0;
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }*/
 
     public Integer getId() {
         return id;
@@ -78,11 +74,33 @@ public class City implements Serializable {
         this.provinceName = provinceName;
     }
 
+    public City() {
+    }
+
+    public City(Integer id, String provinceName, String provinceKey) {
+        this.id = id;
+        this.provinceName = provinceName;
+        this.provinceKey = provinceKey;
+    }
+
     @Override
     public String toString() {
         return "City{" +
         ", id=" + id +
         ", provinceName=" + provinceName +
         "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        City city = (City) o;
+        return Objects.equals(id, city.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -155,13 +155,14 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     public Result getAllOperate(SysUserInfo userInfo) {
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
                 .eq("parent_id", userInfo.getId())
-                .eq("platform_id",LevelConstants.EXPRESS));
+                .eq("platform_id",LevelConstants.EXPRESS)
+                .in("status",1,0));
         Multimap<String, SysUserInfo> userMap = ArrayListMultimap.create();
         String userService = "userService";//客服
         String userOperate = "userOperate";//运营
         for (SysUserInfo sui:sysUserInfos){
-            SysUserRole sysUserRole = sysUserRoleMapper.selectOne(new QueryWrapper<SysUserRole>().eq("user_id", sui.getId()));
-            userMap.put(sysUserRole.getRoleId()==2?userOperate:userService,sui);
+            //SysUserRole sysUserRole = sysUserRoleMapper.selectOne(new QueryWrapper<SysUserRole>().eq("user_id", sui.getId()));
+            userMap.put(sui.getDisplay()==2?userOperate:userService,sui);
         }
         Map<String,List<SysUserInfo>> map = Maps.newHashMap();
         //客服集合

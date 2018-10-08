@@ -17,4 +17,6 @@ public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
     SysUserInfo findUserByusername(String username);
 
     SysUserInfo findUserInfoByid(Integer id);
+
+    List<SysUserInfo> findAllLikeLevel(String level);
 }

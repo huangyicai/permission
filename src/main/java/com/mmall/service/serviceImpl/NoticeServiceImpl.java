@@ -61,13 +61,13 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice> impleme
     }
 
     public Result<List<Notice>> getNotices(SysUserInfo user) {
-        if(user.getPlatformId()==LevelConstants.SUPER){
+        if(user.getPlatformId().equals(LevelConstants.SUPER)){
             throw new UnauthorizedException();
         }
         List<Notice> notices ;
         String[] split = user.getLevel().split("\\.");
         Integer userId1 = Integer.parseInt(split[1]);
-        if(user.getPlatformId()== LevelConstants.EXPRESS){
+        if(user.getPlatformId().equals(LevelConstants.EXPRESS)){
             notices = noticeMapper.selectList(new QueryWrapper<Notice>().eq("user_id", userId1));
         }else {
             Integer userId2 = Integer.parseInt(split[2]);

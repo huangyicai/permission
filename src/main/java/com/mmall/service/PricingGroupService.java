@@ -39,4 +39,18 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @return
      */
     Result getAllPricingGroups(Integer userId);
+
+    /**
+     * 获取所有客户
+     * @return
+     */
+    Result getAllCustomers(SysUserInfo userInfo);
+
+    /**
+     * 添加客户相同定价组
+     * @param userId
+     * @param selfId
+     * @return
+     */
+    Result saveExistingPricingGroups(Integer userId, Integer selfId);
 }

@@ -166,6 +166,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         SysUser sysUser = SysUser.builder().password(md.toString()).username(user.getUsername()).build();
         int insert = sysUserMapper.insert(sysUser);
         userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",user.getUsername()));
+        Integer display = 0;
+        if(roleId==2) {
+            display=1;
+        }else if(roleId==3){
+            display=2;
+        }
         SysUserInfo userInfo = SysUserInfo.builder()
                 .userId(userByusername.getId())
                 .parentId(parent.getId())
@@ -180,6 +186,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .personInCharge(user.getPersonInCharge())
                 .level(LevelUtil.calculateLevel(parent.getLevel(), parent.getId()))
                 .platformId(platformId)
+                .display(display)
                 .build();
         sysUserInfoMapper.insert(userInfo);
         userInfo =sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id",userByusername.getId()));

@@ -26,7 +26,7 @@
                                     weight_standard,
                                     price,
                                     first_or_continued)  
-         values  
+         value  
            <foreach collection="list" item="item" index="index" separator=",">  
                                     ( #{item.userId},
                                     #{item.cityId},

@@ -17,6 +17,7 @@ CREATE TABLE `sys_user_info` (
   `name` varchar(20) NOT NULL DEFAULT '''' COMMENT ''用户名'',
   `email` varchar(36) NOT NULL DEFAULT '''' COMMENT ''用户邮箱'',
   `status` int(1) NOT NULL DEFAULT ''1'' COMMENT ''该条记录是否有效1:有效、0：无效'',
+  `display` int(1) NOT NULL DEFAULT ''1'' COMMENT ''1:有、0：无'',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT ''创建时间'',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT ''更新时间'',
   PRIMARY KEY (`id`)
@@ -132,5 +133,31 @@ CREATE TABLE `notice` (
   `status` varchar(20) NOT NULL DEFAULT '1' COMMENT '状态（1=系统，2=快递公司）',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+/*客服工单*/
+CREATE TABLE `customer_service` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `express_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属快递公司id',
+  `waybill_number` varchar(20) NOT NULL DEFAULT '' COMMENT '运单号',
+  `content` varchar(20) NOT NULL DEFAULT '' COMMENT '问题描述',
+  `contacts` varchar(20) NOT NULL DEFAULT '' COMMENT '联络人',
+  `phone` varchar(20) NOT NULL DEFAULT '' COMMENT '联系电话',
+  `enclosure` varchar(20) NOT NULL DEFAULT '' COMMENT '附件地址',
+  `time_slot` varchar(20) NOT NULL DEFAULT '' COMMENT '时间段',
+  `type_id` int(20) NOT NULL DEFAULT '3' COMMENT '类型（1=破损，2=丢失，3=其他）',
+  `type_name` varchar(20) NOT NULL DEFAULT '' COMMENT '类型名称',
+  `status` int(20) NOT NULL DEFAULT '1' COMMENT '状态（1=未处理，2=处理中，3=处理完毕）',
+  `remarks` varchar(20) NOT NULL DEFAULT '' COMMENT '备注',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `handle_type` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `type_name` varchar(20) NOT NULL DEFAULT '' COMMENT '处理类型',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

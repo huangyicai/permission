@@ -5,7 +5,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.mmall.constants.LevelConstants;
 import com.mmall.dao.CityMapper;
+import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.model.City;
 import com.mmall.model.PricingGroup;
@@ -16,6 +18,7 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.service.PricingGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mmall.util.LevelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,8 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     private PricingGroupMapper pricingGroupMapper;
     @Autowired
     private CityMapper cityMapper;
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
 
     public Result<Map<String, List<PricingGroup>>> getPricingGroup(Integer userId, Integer cityId) {
         List<PricingGroup> pricingGroups = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>()
@@ -99,5 +104,25 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         }
         List<City> cityIds = cityMapper.getAllById(ids);
         return Result.ok(cityIds);
+    }
+
+    @Override
+    public Result getAllCustomers(SysUserInfo userInfo) {
+        String level = LevelUtil.calculateLevel(userInfo.getLevel(), userInfo.getId());
+        List<SysUserInfo> allLikeLevel = sysUserInfoMapper.findAllLikeLevel(level+"%");
+        return Result.ok(allLikeLevel);
+    }
+
+    @Override
+    @Transactional
+    public Result saveExistingPricingGroups(Integer userId, Integer selfId) {
+        pricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",selfId));
+
+        List<PricingGroup> pricingGroupList = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id", userId));
+        for(PricingGroup pg:pricingGroupList){
+            pg.setUserId(selfId);
+            pricingGroupMapper.insert(pg);
+        }
+        return Result.ok();
     }
 }

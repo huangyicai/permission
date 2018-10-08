@@ -64,6 +64,10 @@ public class SysUserInfo extends Model<SysUserInfo> {
     private String personInCharge;
     @ApiModelProperty(value = "该条记录是否有效1:有效、0：无效 ,-1冻结")
     private Integer status;
+
+    @ApiModelProperty(value = "2：运营好 ，1:老板号，0：其他")
+    private Integer display;
+
     @ApiModelProperty(value = "创建时间")
     @TableField("create_time")
     private String createTime;
@@ -82,6 +86,14 @@ public class SysUserInfo extends Model<SysUserInfo> {
     @JsonView(SysUserInfoDto.UserInfoView.class)
     private Integer platformId;
     //private String  platformName;
+
+    public Integer getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(Integer display) {
+        this.display = display;
+    }
 
     public String getCompanyName() {
         return companyName;
@@ -230,7 +242,7 @@ public class SysUserInfo extends Model<SysUserInfo> {
     public SysUserInfo() {
     }
 
-    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, String createTime, String updateTime, String level, Integer parentId, Integer platformId) {
+    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, Integer display, String createTime, String updateTime, String level, Integer parentId, Integer platformId) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -243,6 +255,7 @@ public class SysUserInfo extends Model<SysUserInfo> {
         this.telephone = telephone;
         this.personInCharge = personInCharge;
         this.status = status;
+        this.display = display;
         this.createTime = createTime;
         this.updateTime = updateTime;
         this.level = level;

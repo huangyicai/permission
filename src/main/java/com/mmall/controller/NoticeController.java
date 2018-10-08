@@ -45,9 +45,11 @@ public class NoticeController {
     }
     @ApiOperation(value = "通知列表",  notes="需要Authorization")
     @GetMapping(value = "list",produces = {"application/json;charest=Utf-8"})
-    public Result<IPage<Notice>> getAllNotices(Page page){
+    public Result<IPage<Notice>> getAllNotices(@RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
+                                               @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo user = UserInfoConfig.getUserInfo();
-        return noticeService.getAllNotices(user,page);
+        Page pageResult = new Page(page,size);
+        return noticeService.getAllNotices(user,pageResult);
     }
 
     @ApiOperation(value = "删除通知",  notes="需要Authorization")

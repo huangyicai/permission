@@ -16,7 +16,7 @@
 
     <select id="getAllById" parameterType="String" resultType="com.mmall.model.City">
          SELECT
-			distinct p.*
+			distinct p.id,p.province_name as provinceName,p.province_key as provinceKey
         FROM
             city p
         WHERE
