@@ -277,7 +277,7 @@ public class UploadApi {
      * @param args
      */
     public static void main(String[] args) {
-        String path="E:\\GDW\\111111.xlsx";
+        String path="E:\\GDW\\0459634.xlsx";
         File file=new File(path);
         System.out.println(upload(file,"123.xlsx","01/张三/"));
     }

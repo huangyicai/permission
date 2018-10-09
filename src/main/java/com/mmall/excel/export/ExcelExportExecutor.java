@@ -86,6 +86,7 @@ public class ExcelExportExecutor<T> {
 
     public void execute() {
         List<T> data = this.data;
+        pageSize=data.size();
         /**
          * 处理表头
          */

@@ -126,11 +126,7 @@ public class TotalController {
     @ApiOperation(value = "定价",  notes="需要Authorization")
     @GetMapping(value = "/getPricing/{totalId}")
     public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
-        String pricing = totalService.getPricing(totalId);
-        if("".equals(pricing) || pricing==null){
-            return Result.error(InfoEnums.ERROR);
-        }
-        return Result.ok(pricing);
+        return totalService.getPricing(totalId);
     }
 }
 

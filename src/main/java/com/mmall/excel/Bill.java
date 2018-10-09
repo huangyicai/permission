@@ -37,12 +37,12 @@ public class Bill implements Serializable {
     /**
      * 成本
      */
-    private BigDecimal cost;
+    private BigDecimal cost=BigDecimal.ZERO;
 
     /**
      * 报价
      */
-    private BigDecimal offer;
+    private BigDecimal offer=BigDecimal.ZERO;
 
     public BigDecimal getCost() {
         return cost;

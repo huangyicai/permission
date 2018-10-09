@@ -49,21 +49,7 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
     public Map<String,String> getWeightCalculate(BillParam billParam) {
 
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
-            SysUserInfo user = UserInfoConfig.getUserInfo();
-            String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
-            List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
-                    .like("level", s)
-                    .eq("platform_id", 3)
-                    .select("id"));
-
-            String nameStr="";
-            for(SysUserInfo sysUserInfo: list1){
-                nameStr+=sysUserInfo.getId()+",";
-            }
-
-            nameStr=nameStr.substring(0,nameStr.length()-1);
-
-            billParam.setUserId(nameStr);
+            billParam.setUserId(totalService.getUserIdStr());
         }
         List<Total> list = totalService.listToal(billParam.getDate(),billParam.getUserId());
         if(list.size()<=0){

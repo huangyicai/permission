@@ -188,11 +188,36 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param totalId
      * @return
      */
-    public String getPricing(Integer totalId) {
+    public Result<String> getPricing(Integer totalId) {
+
+        //获取账单信息
         Total total = totalMapper.selectById(totalId);
+
         if(total==null){
-            return null;
+            return  Result.error(InfoEnums.BILL_IS_NULL);
         }
+
+        //獲取报价表
+        List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(total.getUserId());
+
+        //获取成本表
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(user.getUserId());
+
+        //定价表是否数据存在
+        List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(total.getUserId());
+        if(allPricingGroups.size()!=34){
+            return Result.error(InfoEnums.PROCING_IS_NULL);
+        }
+
+        //校验成本表是否存在数据
+        List<Integer> ag = pricingGroupMapper.getAllPricingGroups(user.getId());
+        if(ag.size()!=34){
+            return Result.error(InfoEnums.COST_IS_NULL);
+        }
+
+
+
         String[] str=total.getTotalUrl().split("/");
         final String ompPath=path+str[str.length-1];
 
@@ -209,12 +234,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             return null;
         }
 
-        //獲取报价表
-        List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(total.getUserId());
 
-        //获取成本表
-        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
-        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(user.getUserId());
 
         //创建bill集合
         List<Bill> list=new ArrayList<Bill>();
@@ -263,7 +283,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         total.setTotalUrl(upload);
 
         totalMapper.updateById(total);
-        return upload;
+        return Result.ok(upload);
     }
 
     /**
@@ -272,6 +292,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     public String getUserIdStr(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
+
+        //判断是否是客户
+        if(user.getPlatformId()==3){
+            return user.getId().toString();
+        }
         String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
         List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
                 .like("level", s)
@@ -336,15 +361,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             //遍历首重
             for(PricingGroupVo pg: first){
 
-                //和区间开始比较
-                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()));
-
-                //和区间结束大小比较
-                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()));
-                i++;
-
                 //根据城市锁定价格计算规则
                 if(pg.getCity().startsWith(bill.getDestination())){
+
+                    //和区间开始比较
+                    int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()));
+
+                    //和区间结束大小比较
+                    int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()));
+                    i++;
 
                     //在区间，计算首重
                     if(greater>=0 && less<=0){
@@ -405,8 +430,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     }
                 }
             }
-
-            list.add(bill);
         }
 
 
