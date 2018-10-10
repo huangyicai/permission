@@ -34,6 +34,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,6 +64,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
     @Autowired
     private PricingGroupMapper pricingGroupMapper;
+
+    @Autowired
+    private  XlsxProcessAbstract xlsxProcessAbstract;
 
     //成本
     private static  BigDecimal totalCost=BigDecimal.ZERO;
@@ -216,8 +220,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             return Result.error(InfoEnums.COST_IS_NULL);
         }
 
-
-
         String[] str=total.getTotalUrl().split("/");
         final String ompPath=path+str[str.length-1];
 
@@ -281,6 +283,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         total.setTotalCost(totalCost);
         total.setTotalOffer(totalOffer);
         total.setTotalUrl(upload);
+        total.setUpdateTime(new Date());
 
         totalMapper.updateById(total);
         return Result.ok(upload);
@@ -412,7 +415,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                                 }
 
                                 //获取首重的钱
-                                BigDecimal fist=new BigDecimal(first.get(first.size()-1).getPrice());
+                                BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
 
                                 //计算续重的钱
                                 BigDecimal two=new BigDecimal(pp.getCity()).multiply(new BigDecimal(num));

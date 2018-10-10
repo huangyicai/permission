@@ -62,4 +62,32 @@
         SUM(twenty_one) as twentyOne
         from weight_calculate where total_id in (${totalId})
     </select>
+
+    <!--修改賬單-->
+    <update id="updateByTotalId" parameterType="com.mmall.model.WeightCalculate">
+        update weight_calculate set
+        zero=#{zero},
+        one=#{one},
+        two=#{two},
+        three=#{three},
+        four=#{four},
+        five=#{five},
+        six=#{six},
+        seven=#{seven},
+        eight=#{eight},
+        nine=#{nine},
+        ten=#{ten},
+        eleven=#{eleven},
+        twelve=#{twelve},
+        thirteen=#{thirteen},
+        fourteen=#{fourteen},
+        fifteen=#{fifteen	},
+        sixteen=#{sixteen},
+        seventeen=#{seventeen},
+        eighteen=#{eighteen},
+        nineteen=#{nineteen},
+        twenty=#{twenty},
+        twenty_one=#{twentyOne}
+        where total_id=#{totalId}
+    </update>
 </mapper>

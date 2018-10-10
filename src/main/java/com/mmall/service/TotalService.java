@@ -9,6 +9,7 @@ import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

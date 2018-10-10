@@ -11,6 +11,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 /**
@@ -94,7 +95,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setBeijing(Integer beijing) {
-        this.beijing = beijing;
+        if(beijing==null||beijing==0){
+            this.beijing =0;
+        }else {
+            this.beijing = beijing;
+        }
     }
 
     public Integer getTianjing() {
@@ -102,7 +107,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setTianjing(Integer tianjing) {
-        this.tianjing = tianjing;
+        if(tianjing==null||tianjing==0){
+            this.tianjing =0;
+        }else {
+            this.tianjing = tianjing;
+        }
     }
 
     public Integer getHebei() {
@@ -110,7 +119,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHebei(Integer hebei) {
-        this.hebei = hebei;
+        if(hebei==null||hebei==0){
+            this.hebei =0;
+        }else {
+            this.hebei = hebei;
+        }
     }
 
     public Integer getShanxi() {
@@ -118,7 +131,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setShanxi(Integer shanxi) {
-        this.shanxi = shanxi;
+        if(shanxi==null||shanxi==0){
+            this.shanxi =0;
+        }else {
+            this.shanxi = shanxi;
+        }
     }
 
     public Integer getNeimenggu() {
@@ -126,7 +143,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setNeimenggu(Integer neimenggu) {
-        this.neimenggu = neimenggu;
+        if(neimenggu==null||neimenggu==0){
+            this.neimenggu =0;
+        }else {
+            this.neimenggu = neimenggu;
+        }
     }
 
     public Integer getLiaoning() {
@@ -134,7 +155,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setLiaoning(Integer liaoning) {
-        this.liaoning = liaoning;
+        if(liaoning==null||liaoning==0){
+            this.liaoning =0;
+        }else {
+            this.liaoning = liaoning;
+        }
     }
 
     public Integer getJiling() {
@@ -142,7 +167,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setJiling(Integer jiling) {
-        this.jiling = jiling;
+        if(jiling==null||jiling==0){
+            this.jiling =0;
+        }else {
+            this.jiling = jiling;
+        }
     }
 
     public Integer getHeilongjiang() {
@@ -150,7 +179,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHeilongjiang(Integer heilongjiang) {
-        this.heilongjiang = heilongjiang;
+        if(heilongjiang==null||heilongjiang==0){
+            this.heilongjiang =0;
+        }else {
+            this.heilongjiang = heilongjiang;
+        }
     }
 
     public Integer getShanghai() {
@@ -158,7 +191,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setShanghai(Integer shanghai) {
-        this.shanghai = shanghai;
+        if(shanghai==null||shanghai==0){
+            this.shanghai =0;
+        }else {
+            this.shanghai = shanghai;
+        }
     }
 
     public Integer getJiangsu() {
@@ -166,7 +203,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setJiangsu(Integer jiangsu) {
-        this.jiangsu = jiangsu;
+        if(jiangsu==null||jiangsu==0){
+            this.jiangsu =0;
+        }else {
+            this.jiangsu = jiangsu;
+        }
     }
 
     public Integer getZhejaing() {
@@ -174,7 +215,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setZhejaing(Integer zhejaing) {
-        this.zhejaing = zhejaing;
+        if(zhejaing==null||zhejaing==0){
+            this.zhejaing =0;
+        }else {
+            this.zhejaing = zhejaing;
+        }
     }
 
     public Integer getAnhui() {
@@ -182,7 +227,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setAnhui(Integer anhui) {
-        this.anhui = anhui;
+        if(anhui==null||anhui==0){
+            this.anhui =0;
+        }else {
+            this.anhui = anhui;
+        }
     }
 
     public Integer getFujian() {
@@ -190,7 +239,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setFujian(Integer fujian) {
-        this.fujian = fujian;
+        if(fujian==null||fujian==0){
+            this.fujian =0;
+        }else {
+            this.fujian = fujian;
+        }
     }
 
     public Integer getJaingxi() {
@@ -198,7 +251,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setJaingxi(Integer jaingxi) {
-        this.jaingxi = jaingxi;
+        if(jaingxi==null||jaingxi==0){
+            this.jaingxi =0;
+        }else {
+            this.jaingxi = jaingxi;
+        }
     }
 
     public Integer getShandong() {
@@ -206,7 +263,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setShandong(Integer shandong) {
-        this.shandong = shandong;
+        if(shandong==null||shandong==0){
+            this.shandong =0;
+        }else {
+            this.shandong = shandong;
+        }
     }
 
     public Integer getHenan() {
@@ -214,7 +275,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHenan(Integer henan) {
-        this.henan = henan;
+        if(henan==null||henan==0){
+            this.henan =0;
+        }else {
+            this.henan = henan;
+        }
     }
 
     public Integer getHubei() {
@@ -222,7 +287,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHubei(Integer hubei) {
-        this.hubei = hubei;
+        if(hubei==null||hubei==0){
+            this.hubei =0;
+        }else {
+            this.hubei = hubei;
+        }
     }
 
     public Integer getHunan() {
@@ -230,7 +299,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHunan(Integer hunan) {
-        this.hunan = hunan;
+        if(hunan==null||hunan==0){
+            this.hunan =0;
+        }else {
+            this.hunan = hunan;
+        }
     }
 
     public Integer getGuangdong() {
@@ -238,7 +311,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setGuangdong(Integer guangdong) {
-        this.guangdong = guangdong;
+        if(guangdong==null||guangdong==0){
+            this.guangdong =0;
+        }else {
+            this.guangdong = guangdong;
+        }
     }
 
     public Integer getGuangxi() {
@@ -246,7 +323,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setGuangxi(Integer guangxi) {
-        this.guangxi = guangxi;
+        if(guangxi==null||guangxi==0){
+            this.guangxi =0;
+        }else {
+            this.guangxi = guangxi;
+        }
     }
 
     public Integer getHainan() {
@@ -254,7 +335,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setHainan(Integer hainan) {
-        this.hainan = hainan;
+        if(hainan==null||hainan==0){
+            this.hainan =0;
+        }else {
+            this.hainan = hainan;
+        }
     }
 
     public Integer getChongqing() {
@@ -262,7 +347,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setChongqing(Integer chongqing) {
-        this.chongqing = chongqing;
+        if(chongqing==null||chongqing==0){
+            this.chongqing =0;
+        }else {
+            this.chongqing = chongqing;
+        }
     }
 
     public Integer getSichuan() {
@@ -270,7 +359,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setSichuan(Integer sichuan) {
-        this.sichuan = sichuan;
+        if(sichuan==null||sichuan==0){
+            this.sichuan =0;
+        }else {
+            this.sichuan = sichuan;
+        }
     }
 
     public Integer getGuizhou() {
@@ -278,7 +371,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setGuizhou(Integer guizhou) {
-        this.guizhou = guizhou;
+        if(guizhou==null||guizhou==0){
+            this.guizhou =0;
+        }else {
+            this.guizhou = guizhou;
+        }
     }
 
     public Integer getYunnan() {
@@ -286,7 +383,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setYunnan(Integer yunnan) {
-        this.yunnan = yunnan;
+        if(yunnan==null||yunnan==0){
+            this.yunnan =0;
+        }else {
+            this.yunnan = yunnan;
+        }
     }
 
     public Integer getXizang() {
@@ -294,7 +395,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setXizang(Integer xizang) {
-        this.xizang = xizang;
+        if(xizang==null||xizang==0){
+            this.xizang =0;
+        }else {
+            this.xizang = xizang;
+        }
     }
 
     public Integer getShaanxi() {
@@ -302,7 +407,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setShaanxi(Integer shaanxi) {
-        this.shaanxi = shaanxi;
+        if(shaanxi==null||shaanxi==0){
+            this.shaanxi =0;
+        }else {
+            this.shaanxi = shaanxi;
+        }
     }
 
     public Integer getGansu() {
@@ -310,7 +419,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setGansu(Integer gansu) {
-        this.gansu = gansu;
+        if(gansu==null||gansu==0){
+            this.gansu =0;
+        }else {
+            this.gansu = gansu;
+        }
     }
 
     public Integer getQinghai() {
@@ -318,7 +431,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setQinghai(Integer qinghai) {
-        this.qinghai = qinghai;
+        if(qinghai==null||qinghai==0){
+            this.qinghai =0;
+        }else {
+            this.qinghai = qinghai;
+        }
     }
 
     public Integer getNingxia() {
@@ -326,7 +443,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setNingxia(Integer ningxia) {
-        this.ningxia = ningxia;
+        if(ningxia==null||ningxia==0){
+            this.ningxia =0;
+        }else {
+            this.ningxia = ningxia;
+        }
     }
 
     public Integer getXinjang() {
@@ -334,7 +455,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setXinjang(Integer xinjang) {
-        this.xinjang = xinjang;
+        if(xinjang==null||xinjang==0){
+            this.xinjang =0;
+        }else {
+            this.xinjang = xinjang;
+        }
     }
 
     public Integer getTaiwan() {
@@ -342,7 +467,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setTaiwan(Integer taiwan) {
-        this.taiwan = taiwan;
+        if(taiwan==null||taiwan==0){
+            this.taiwan =0;
+        }else {
+            this.taiwan = taiwan;
+        }
     }
 
     public Integer getXianggang() {
@@ -350,7 +479,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setXianggang(Integer xianggang) {
-        this.xianggang = xianggang;
+        if(xianggang==null||xianggang==0){
+            this.xianggang =0;
+        }else {
+            this.xianggang = xianggang;
+        }
     }
 
     public Integer getAomen() {
@@ -358,7 +491,11 @@ public class ProvinceCalculate implements Serializable {
     }
 
     public void setAomen(Integer aomen) {
-        this.aomen = aomen;
+        if(aomen==null||aomen==0){
+            this.aomen =0;
+        }else {
+            this.aomen = aomen;
+        }
     }
 
     @Override

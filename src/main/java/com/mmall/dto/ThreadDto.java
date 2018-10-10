@@ -24,7 +24,7 @@ public class ThreadDto {
     /**
      * 省份区间信息
      */
-    private Map<String,Integer> md;
+    private Map<String, Integer> md;
 
     /**
      * 時間

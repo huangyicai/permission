@@ -152,9 +152,9 @@ public class ExcelExportExecutor<T> {
                      * 创建一个row
                      */
                     tmpRow = sheet.createRow(currentRow);
-                    if (watcherRowStatus && executorListener != null) {
-                        executorListener.listen(tmpRow, currentRow);
-                    }
+//                    if (watcherRowStatus && executorListener != null) {
+//                        executorListener.listen(tmpRow, currentRow);
+//                    }
                     /*
                      * 将list中的数据对象设置到指定的row中
                      */
