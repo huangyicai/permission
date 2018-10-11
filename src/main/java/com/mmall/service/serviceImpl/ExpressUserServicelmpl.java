@@ -33,16 +33,18 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     @Autowired
     private BillKeywordMapper billKeywordMapper;
     @Autowired
-    private SysUserMapper sysUserMapper;
-    @Autowired
-    private SysUserRoleMapper sysUserRoleMapper;
+    private PaymentMethodMapper paymentMethodMapper;
 
     public Result expressRegister(UserInfoExpressParm user, SysUserInfo parent,Integer id,Integer level) {
-        if(id!=0) parent= sysUserInfoMapper.selectById(id);;
 
+        if(id!=0) parent= sysUserInfoMapper.selectById(id);
         if(level==1){
             BeanValidator.check(user);
-           return sysUserService.register(user,parent, LevelConstants.SERVICE,5);
+            PaymentMethod paymentMethod = paymentMethodMapper.selectOne(new QueryWrapper<PaymentMethod>().eq("user_id", parent.getId()));
+            if(paymentMethod==null){
+                return Result.error(InfoEnums.ADD_PAYMENT_INSTITUTION);
+            }
+            return sysUserService.register(user,parent, LevelConstants.SERVICE,5);
         }
         SysUserInfo userInfo = SysUserInfo.builder()
                 .parentId(parent.getId())
@@ -51,7 +53,14 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .level(LevelUtil.calculateLevel(parent.getLevel(), parent.getId()))
                 .platformId(-1)
                 .build();
+
         sysUserInfoMapper.insert(userInfo);
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .userId(userInfo.getId())
+                .payee(user.getPayee())
+                .paymentAccount(user.getPaymentAccount())
+                .typeName(user.getTypeName()).build();
+        paymentMethodMapper.insert(paymentMethod);
         return Result.ok();
     }
 
@@ -60,7 +69,9 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         Integer id = user.getId();
         //List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
-                .like("level","%"+id+"%").in("status",1,0).in("platform_id",LevelConstants.BRANCH,LevelConstants.SERVICE));
+                .like("level","%"+id+"%")
+                .in("status",1,0)
+                .in("platform_id",LevelConstants.BRANCH,LevelConstants.SERVICE));
         String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
         List<SysUserInfoDto> dtoList = Lists.newArrayList();
         for (SysUserInfo sysUserInfo : sysUserInfos) {

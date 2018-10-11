@@ -48,13 +48,13 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getAllCustomerService(Integer status, Integer expressId, Page ipage,String waybillNumber,String createTime,String endTime) {
-        customerServiceMapper.getAllCustomerServices(ipage,status,expressId,waybillNumber, createTime,endTime);
+    public Result getAllCustomerService(Integer status,Integer type, Integer expressId, Page ipage,String waybillNumber,String createTime,String endTime) {
+        customerServiceMapper.getAllCustomerServices(ipage,status,type,expressId,waybillNumber, createTime,endTime);
         return Result.ok(ipage);
     }
 
     @Override
-    public Result getAllCustomerServiceByUser(Integer status, Integer userId, Page ipage, String waybillNumber) {
+    public Result<Page<CustomerService>> getAllCustomerServiceByUser(Integer status, Integer userId, Page ipage, String waybillNumber) {
         customerServiceMapper.getAllCustomerServiceByUser(ipage,status,userId,waybillNumber);
         return Result.ok(ipage);
     }
@@ -70,8 +70,8 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getCustomerServiceBySelf(Integer status, Integer id, Page ipage, String waybillNumber) {
-        customerServiceMapper.getCustomerServiceBySelf(ipage,status,id,waybillNumber);
+    public Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber) {
+        customerServiceMapper.getCustomerServiceBySelf(ipage,status,type,id,waybillNumber);
         return Result.ok(ipage);
     }
 }

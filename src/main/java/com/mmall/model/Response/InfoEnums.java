@@ -17,6 +17,8 @@ public enum InfoEnums {
 	PASSWORD_INCORRECT(10014, "密码不正确！"),
 	DATA_IS_NULL(10010,"没有数据"),
 
+	ADD_PAYMENT_INSTITUTION(10015,"请先为该分支添加付款机构！"),
+
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),
 

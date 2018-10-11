@@ -27,6 +27,7 @@
         i.telephone,
         i.user_id as userId,
         i.platform_id as platformId,
+        i.person_in_charge as personInCharge,
         i.level ,
         i.parent_id as  parentId,
         i.status,

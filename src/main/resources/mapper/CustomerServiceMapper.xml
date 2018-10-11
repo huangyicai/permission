@@ -51,6 +51,9 @@
             <if test="status!=0">
                 and status = #{status}
             </if>
+            <if test="type!=0">
+                and type_id = #{type}
+            </if>
             <if test="waybillNumber!=null and waybillNumber!=''">
                 and waybill_number = #{waybillNumber}
             </if>
@@ -83,6 +86,9 @@
         <where>
             <if test="status!=0">
                 and status = #{status}
+            </if>
+            <if test="type!=0">
+                and type_id = #{type}
             </if>
             <if test="waybillNumber!=null">
                 and waybillNumber = #{waybillNumber}

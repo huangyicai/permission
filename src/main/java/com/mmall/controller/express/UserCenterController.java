@@ -1,19 +1,15 @@
 package com.mmall.controller.express;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.config.UserInfoConfig;
-import com.mmall.model.City;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
-import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoOperateParam;
 import com.mmall.service.ExpressUserService;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

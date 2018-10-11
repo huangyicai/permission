@@ -7,7 +7,7 @@ import com.google.common.collect.Maps;
 import java.util.HashMap;
 import java.util.Map;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> {
     public interface ResultMenus{}
 

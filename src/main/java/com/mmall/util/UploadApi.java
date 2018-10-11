@@ -308,11 +308,8 @@ public class UploadApi {
      * @param args
      */
     public static void main(String[] args) {
-<<<<<<< HEAD
-        String path="E:\\GDW\\微信图片_20180930130001.png";
-=======
+       // String path="E:\\GDW\\微信图片_20180930130001.png";
         String path="E:\\GDW\\0459634.xlsx";
->>>>>>> b724a2df59160b068f29f2a73d45034887562a5d
         File file=new File(path);
 
         System.out.println(upload(file));

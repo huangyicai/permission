@@ -28,6 +28,7 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      */
     Page<CustomerService> getAllCustomerServices(Page ipage,
                                                  @Param("status") Integer status,
+                                                 @Param("type") Integer type,
                                                  @Param("userId")Integer userId,
                                                  @Param("waybillNumber")String waybillNumber,
                                                  @Param("createTime")String createTime,
@@ -53,5 +54,5 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      * @param id
      * @param waybillNumber
      */
-    void getCustomerServiceBySelf(Page ipage, Integer status, Integer id, String waybillNumber);
+    void getCustomerServiceBySelf(Page ipage, Integer status,Integer type, Integer id, String waybillNumber);
 }

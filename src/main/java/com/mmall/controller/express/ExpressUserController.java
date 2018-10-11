@@ -1,13 +1,18 @@
 package com.mmall.controller.express;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.dao.PaymentMethodMapper;
 import com.mmall.dto.SysUserInfoDto;
 import com.mmall.model.BillKeyword;
+import com.mmall.model.PaymentMethod;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
+import com.mmall.model.params.PaymentMethodParam;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.service.ExpressUserService;
+import com.mmall.util.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -15,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +33,8 @@ public class ExpressUserController {
 
     @Autowired
     private ExpressUserService expressUserService;
+    @Autowired
+    private PaymentMethodMapper paymentMethodMapper;
 
     @ApiOperation(value = "快递公司注册(1=客户,2=分支)",  notes="需要Authorization")
     @PostMapping(value = "/register/{id}/{level}",produces = {"application/json;charest=Utf-8"})
@@ -35,6 +43,32 @@ public class ExpressUserController {
                                   @PathVariable("level") Integer level){
         SysUserInfo parent = UserInfoConfig.getUserInfo();
         return expressUserService.expressRegister(user,parent,id,level);
+    }
+
+    @ApiOperation(value = "为分支添加/修改付款机构",  notes="需要Authorization")
+    @PostMapping(value = "/pay/{id}",produces = {"application/json;charest=Utf-8"})
+    @Transactional
+    public Result savePricingGroup(@RequestBody PaymentMethodParam paymentMethodParam,
+                                   @PathVariable("id") Integer id){
+        BeanValidator.check(paymentMethodParam);
+        List<PaymentMethod> paymentMethods = paymentMethodMapper.selectList(new QueryWrapper<PaymentMethod>().eq("user_id", id));
+        if(!paymentMethods.isEmpty()){
+            for(PaymentMethod pm: paymentMethods){
+                paymentMethodMapper.deleteById(pm.getId());
+            }
+        }
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .userId(id)
+                .payee(paymentMethodParam.getPayee())
+                .paymentAccount(paymentMethodParam.getPaymentAccount())
+                .typeName(paymentMethodParam.getTypeName()).build();
+        paymentMethodMapper.insert(paymentMethod);
+        return Result.ok();
+    }
+    @ApiOperation(value = "获取该分支付款机构",  notes="需要Authorization")
+    @GetMapping(value = "/pay/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result getPricingGroup(@PathVariable("id") Integer id){
+        return Result.ok(paymentMethodMapper.selectOne(new QueryWrapper<PaymentMethod>().eq("user_id",id)));
     }
 
     @ApiOperation(value = "获取用户信息",  notes="需要Authorization")

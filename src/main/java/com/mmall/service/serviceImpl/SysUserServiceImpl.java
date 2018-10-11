@@ -162,7 +162,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return register(user,parent, LevelConstants.EXPRESS,2);
     }
 
-
+    @Transactional
     public  Result register(UserInfoExpressParm user,SysUserInfo parent,Integer platformId,Integer roleId){
         SysUser userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",user.getUsername()));
         if(userByusername!=null){
@@ -171,15 +171,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Md5Hash md = new Md5Hash(user.getPassword(),user.getUsername(),1024);
         SysUser sysUser = SysUser.builder().password(md.toString()).username(user.getUsername()).build();
         int insert = sysUserMapper.insert(sysUser);
-        userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",user.getUsername()));
         Integer display = 0;
         if(roleId==2) {
             display=1;
+
         }else if(roleId==3){
             display=2;
         }
+
         SysUserInfo userInfo = SysUserInfo.builder()
-                .userId(userByusername.getId())
+                .userId(sysUser.getId())
                 .parentId(parent.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -192,10 +193,32 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .personInCharge(user.getPersonInCharge())
                 .level(LevelUtil.calculateLevel(parent.getLevel(), parent.getId()))
                 .platformId(platformId)
+                .courierId(roleId==2?user.getCourierId():parent.getCourierId())
                 .display(display)
                 .build();
+
         sysUserInfoMapper.insert(userInfo);
-        userInfo =sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id",userByusername.getId()));
+        if(roleId==2){
+            //注册分支
+            SysUserInfo bet = SysUserInfo.builder()
+                    .parentId(userInfo.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .companyName(user.getCompanyName())
+                    .province(user.getProvince())
+                    .city(user.getCity())
+                    .area(user.getArea())
+                    .address(user.getAddress())
+                    .telephone(user.getTelephone())
+                    .personInCharge(user.getPersonInCharge())
+                    .level(LevelUtil.calculateLevel(userInfo.getLevel(), userInfo.getId()))
+                    .platformId(-1)
+                    .courierId(userInfo.getCourierId())
+                    .display(0)
+                    .build();
+            sysUserInfoMapper.insert(bet);
+        }
+
 
         SysUserRole sysUserRole = new SysUserRole();
         sysUserRole.setRoleId(roleId);

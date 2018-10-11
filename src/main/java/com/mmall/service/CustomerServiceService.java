@@ -28,7 +28,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param status
      * @return
      */
-    Result getAllCustomerService(Integer status, Integer userId, Page ipage,String waybillNumber,String createTime,String endTime);
+    Result getAllCustomerService(Integer status,Integer type, Integer userId, Page ipage,String waybillNumber,String createTime,String endTime);
 
     /**
      * 获取客户自己的工单
@@ -55,5 +55,5 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param waybillNumber
      * @return
      */
-    Result getCustomerServiceBySelf(Integer status, Integer id, Page ipage, String waybillNumber);
+    Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber);
 }

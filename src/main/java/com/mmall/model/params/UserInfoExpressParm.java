@@ -37,4 +37,24 @@ public class UserInfoExpressParm  extends SysUserParam{
     @ApiModelProperty(value = "负责人")
     @NotBlank(message = "负责人不可以为空")
     private String personInCharge;
+
+    @ApiModelProperty(value = "快递公司ID")
+    private Integer courierId;
+
+
+    /**
+     * 付款方式
+     */
+    @ApiModelProperty(value = "付款方式")
+    private String typeName;
+    /**
+     * 收款人
+     */
+    @ApiModelProperty(value = "收款人")
+    private String payee;
+    /**
+     * 付款账号
+     */
+    @ApiModelProperty(value = "付款账号")
+    private String paymentAccount;
 }

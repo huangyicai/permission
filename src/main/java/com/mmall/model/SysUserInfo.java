@@ -60,6 +60,7 @@ public class SysUserInfo extends Model<SysUserInfo> {
     @ApiModelProperty(value = "联系电话/手机")
     private String telephone;
     @ApiModelProperty(value = "负责人")
+    @JsonView(SysUserInfoDto.UserInfoView.class)
     @TableField("person_in_charge")
     private String personInCharge;
     @ApiModelProperty(value = "该条记录是否有效1:有效、0：无效 ,-1冻结")

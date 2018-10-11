@@ -1,5 +1,8 @@
 package com.mmall.controller.fn;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mmall.dao.CourierCompanyMapper;
+import com.mmall.model.CourierCompany;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
@@ -26,6 +29,8 @@ import java.util.List;
 public class FnUserController {
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private CourierCompanyMapper courierCompanyMapper;
 
     @ApiOperation(value = "弗恩注册快递公司",  notes="需要Authorization")
     @PostMapping(value = "/register",produces = {"application/json;charest=Utf-8"})
@@ -34,6 +39,13 @@ public class FnUserController {
         BeanValidator.check(user);
         SysUserInfo parent = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
         return sysUserService.fnRegister(user,parent);
+    }
+
+
+    @ApiOperation(value = "快递公司名称",  notes="需要Authorization")
+    @GetMapping(value = "/express/list",produces = {"application/json;charest=Utf-8"})
+    public Result<List<CourierCompany>> getExpress(){
+        return Result.ok(courierCompanyMapper.selectList(new QueryWrapper<CourierCompany>().notIn("id",1)));
     }
 
     @ApiOperation(value = "修改快递公司信息",  notes="需要Authorization")

@@ -170,3 +170,25 @@ CREATE TABLE `courier_company ` (
   `logo_url` varchar(20) NOT NULL DEFAULT '' COMMENT 'logo地址',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `payment_method` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) NOT NULL DEFAULT '' COMMENT 'userID',
+  `type_name` varchar(20) NOT NULL DEFAULT '' COMMENT '付款方式',
+  `payee` varchar(20) NOT NULL DEFAULT '' COMMENT '收款人',
+  `payment_account` varchar(20) NOT NULL DEFAULT '' COMMENT '付款账号',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `pricing_group` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `city_id` int(11) NOT NULL DEFAULT '0' COMMENT '省份id',
+  `area_begin` int(11) NOT NULL DEFAULT '0' COMMENT '开始区间',
+  `area_end` int(11) NOT NULL DEFAULT '0' COMMENT '结束区间',
+  `weight_standard` int(11) NOT NULL DEFAULT '1' COMMENT '重量标准',
+  `price` int(11) NOT NULL DEFAULT '0' COMMENT '价格',
+  `first_or_continued ` int(11) NOT NULL DEFAULT '1' COMMENT '1=首重，2=续重',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

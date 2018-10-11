@@ -39,6 +39,10 @@ public class CourierCompany implements Serializable {
     @ApiModelProperty(value = "颜色")
     @TableField("color")
     private String color;
+
+    @ApiModelProperty(value = "快递公司名称")
+    @TableField("name")
+    private String name;
     /**
      * logo地址
      */
@@ -46,6 +50,13 @@ public class CourierCompany implements Serializable {
     @TableField("logo_url")
     private String logoUrl;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Integer getId() {
         return id;
