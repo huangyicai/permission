@@ -27,6 +27,7 @@ public enum InfoEnums {
 
 	//账单相关
 	BILL_IS_NULL(120002,"账单不存在"),
+	SEND_FAILURE(120003,"发送失败，清确认是否定价，或者已经发送过"),
 
 	;
 

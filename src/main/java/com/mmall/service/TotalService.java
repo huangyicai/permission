@@ -1,5 +1,6 @@
 package com.mmall.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.BillDto;
@@ -9,6 +10,7 @@ import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
+import com.mmall.vo.TotalVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -26,7 +28,7 @@ public interface TotalService extends IService<Total> {
 
     List<Total> listToal(String totalTime,String userId);
 
-    Page<Total> getBill(Page<Total> page, BillDetailsParam billDetailsParam);
+    IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam);
 
     TotalIncomeParam getBillCount(String date);
 

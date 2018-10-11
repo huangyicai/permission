@@ -16,6 +16,11 @@ public class TotalParam {
     private Integer totalId;
 
     @ApiModelProperty(value = "付款金额")
-    @NotBlank(message = "付款金额不能为空")
     private BigDecimal money;
+
+    @ApiModelProperty(value = "备注")
+    private String totalRemark;
+
+    @ApiModelProperty(value = "状态")
+    private Integer state;
 }

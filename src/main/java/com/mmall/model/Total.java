@@ -131,7 +131,7 @@ public class Total implements Serializable {
      */
     @ApiModelProperty(value = "备注")
     @TableField("total_remark")
-    private Integer totalRemark;
+    private String totalRemark;
 
     /**
      * 创建时间
@@ -176,11 +176,11 @@ public class Total implements Serializable {
         this.cdUrl = cdUrl;
     }
 
-    public Integer getTotalRemark() {
+    public String getTotalRemark() {
         return totalRemark;
     }
 
-    public void setTotalRemark(Integer totalRemark) {
+    public void setTotalRemark(String totalRemark) {
         this.totalRemark = totalRemark;
     }
 
