@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -89,8 +90,11 @@ public class TotalController {
 
     @ApiOperation(value = "上传账单",  notes="需要Authorization")
     @PostMapping(value = "/set")
-    public Result set(MultipartFile file,@RequestParam("time") String time) throws Exception {
-        xlsxProcessAbstract.processAllSheet(file,time);
+    public Result set(MultipartFile file,@RequestParam("time") String time,HttpServletRequest request) throws Exception {
+
+        //创建文件写入路径
+        String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
+        xlsxProcessAbstract.processAllSheet(file,time,realPath);
         return Result.ok();
     }
 
@@ -127,13 +131,19 @@ public class TotalController {
     @ApiOperation(value = "定价",  notes="需要Authorization")
     @GetMapping(value = "/getPricing/{totalId}")
     public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
+
         return totalService.getPricing(totalId);
     }
 
     @ApiOperation(value = "重新上传",  notes="需要Authorization")
     @PostMapping(value = "/againSet/{totalId}")
-    public Result<String> againSet(@PathVariable("totalId")Integer totalId,MultipartFile file) throws Exception {
-        xlsxProcessAbstract.againSet(file,totalId);
+    public Result<String> againSet(@PathVariable("totalId")Integer totalId,
+                                   MultipartFile file,
+                                   HttpServletRequest request) throws Exception {
+        String realPath = request.getServletContext().getRealPath("total/");
+        String s = "192.168.1.6:8080"+realPath.split(":")[1];
+//        System.out.println("---------"+realPath);
+        xlsxProcessAbstract.againSet(file,totalId,s);
         return Result.ok();
     }
 

@@ -76,7 +76,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     //报价
     private static  BigDecimal totalOffer=BigDecimal.ZERO;
 
-    //设置导出路径
+    //设置导出路径（生产环境无效）
     private static String path="E:/GDW/";
 
     /**

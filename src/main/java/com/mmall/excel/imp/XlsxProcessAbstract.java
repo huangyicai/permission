@@ -98,9 +98,8 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
-    //设置导出路径
-    private static String path="E:/GDW/";
-
+    //文件的项目路径
+    private final String ompPath="192.168.1.6:8080/total/";
 
     /**
      * 根据路径读取数据
@@ -135,7 +134,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
+    public void processAllSheet(MultipartFile xlsxFile,String time,String realPath) throws Exception {
 
         //获取用户信息
 //        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
@@ -152,7 +151,6 @@ public class XlsxProcessAbstract {
         }
 
         nameStr=nameStr.substring(0,nameStr.length()-1);
-
         //獲取姓名集合
         List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
 
@@ -227,8 +225,8 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-//            threadDto.setPath(ompPath);
-            threadDto.setPathHead(path);
+            threadDto.setPath(ompPath);
+            threadDto.setPathHead(realPath);
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
@@ -258,7 +256,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void againSet(MultipartFile xlsxFile,Integer totalId) throws Exception {
+    public void againSet(MultipartFile xlsxFile,Integer totalId,String realPath) throws Exception {
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -316,7 +314,7 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPathHead(path);
+            threadDto.setPathHead(realPath);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             updateTatal(threadDto);
