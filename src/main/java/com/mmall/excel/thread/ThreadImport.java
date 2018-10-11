@@ -60,6 +60,7 @@ public class ThreadImport implements Callable<String> {
                 String pathIpUrl=threadDto.getPath()+keyId+".xlsx";
 
                 threadDto.setPath(pathIpUrl);
+                threadDto.setPathHead(path);
                 threadDto.setIdtime(keyId);
                 outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
@@ -102,6 +103,7 @@ public class ThreadImport implements Callable<String> {
         total.setTotalWeight(threadDto.getWeight());
         total.setOrderNo(threadDto.getIdtime());
         total.setTotalUrl(threadDto.getPath());
+        total.setCdUrl(threadDto.getPathHead());
         total.setCreateTime(new Date());
         totalMapper.insertTotal(total);
 

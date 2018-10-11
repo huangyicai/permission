@@ -138,12 +138,8 @@ public class TotalController {
     @ApiOperation(value = "重新上传",  notes="需要Authorization")
     @PostMapping(value = "/againSet/{totalId}")
     public Result<String> againSet(@PathVariable("totalId")Integer totalId,
-                                   MultipartFile file,
-                                   HttpServletRequest request) throws Exception {
-        String realPath = request.getServletContext().getRealPath("total/");
-        String s = "192.168.1.6:8080"+realPath.split(":")[1];
-//        System.out.println("---------"+realPath);
-        xlsxProcessAbstract.againSet(file,totalId,s);
+                                   MultipartFile file) throws Exception {
+        xlsxProcessAbstract.againSet(file,totalId);
         return Result.ok();
     }
 

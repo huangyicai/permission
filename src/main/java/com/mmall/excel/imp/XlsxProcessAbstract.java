@@ -256,7 +256,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void againSet(MultipartFile xlsxFile,Integer totalId,String realPath) throws Exception {
+    public void againSet(MultipartFile xlsxFile,Integer totalId) throws Exception {
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -314,7 +314,6 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPathHead(realPath);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             updateTatal(threadDto);
@@ -346,7 +345,7 @@ public class XlsxProcessAbstract {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-                outputStream = new FileOutputStream(total.getTotalUrl());
+                outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();

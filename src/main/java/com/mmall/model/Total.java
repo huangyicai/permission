@@ -106,11 +106,18 @@ public class Total implements Serializable {
     @TableField("total_credentials_url")
     private String totalCredentialsUrl;
     /**
-     * 账单储存地址
+     * 账单访问地址
      */
-    @ApiModelProperty(value = "账单储存地址")
+    @ApiModelProperty(value = "账单访问地址")
     @TableField("total_url")
     private String totalUrl;
+
+    /**
+     * 账单生成地址
+     */
+    @ApiModelProperty(value = "账单生成地址")
+    @TableField("cd_url")
+    private String cdUrl;
 
     /**
      * 是否结账：1-否，2-是
@@ -118,12 +125,29 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "是否结账：1-否，2-是")
     @TableField("total_state")
     private Integer totalState;
+
+    /**
+     * 备注
+     */
+    @ApiModelProperty(value = "备注")
+    @TableField("total_remark")
+    private Integer totalRemark;
+
     /**
      * 创建时间
      */
     @ApiModelProperty(value = "创建时间")
     @TableField("create_time")
     private Date createTime;
+
+    /**
+     * 截止时间
+     */
+    @ApiModelProperty(value = "截止时间")
+    @TableField("as_of_time")
+    private Date asOfTime;
+
+
     /**
      * 创建ip
      */
@@ -143,6 +167,30 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "修改ip")
     @TableField("update_ip")
     private String updateIp;
+
+    public String getCdUrl() {
+        return cdUrl;
+    }
+
+    public void setCdUrl(String cdUrl) {
+        this.cdUrl = cdUrl;
+    }
+
+    public Integer getTotalRemark() {
+        return totalRemark;
+    }
+
+    public void setTotalRemark(Integer totalRemark) {
+        this.totalRemark = totalRemark;
+    }
+
+    public Date getAsOfTime() {
+        return asOfTime;
+    }
+
+    public void setAsOfTime(Date asOfTime) {
+        this.asOfTime = asOfTime;
+    }
 
     public Integer getSendId() {
         return sendId;
