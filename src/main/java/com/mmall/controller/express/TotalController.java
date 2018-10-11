@@ -113,7 +113,7 @@ public class TotalController {
         return Result.ok(bill);
     }
 
-    @ApiOperation(value = "获取账单详情：已收入和未收入",  notes="需要Authorization")
+    @ApiOperation(value = "获取账单详情：已收入和未收入 ",  notes="需要Authorization")
     @PostMapping(value = "/getIncome/{date}")
     public Result<TotalIncomeParam> getIncome(@PathVariable("date") String date){
         TotalIncomeParam billCount = totalService.getBillCount(date);
