@@ -76,4 +76,18 @@
         SUM(total_paid) as totalPaid
         from total where user_id in (${userId}) and total_time =#{totalTime} and total_state in(${state})
     </select>
+
+
+    <select id="getTotals" resultType="com.mmall.model.Total">
+        select
+          user_id as userId,
+          name,
+          total_number as totalNumber,
+          total_url as totalUrl
+        from
+          total
+        where
+          send_id=#{sendId} and create_time>#{time}
+    </select>
+
 </mapper>

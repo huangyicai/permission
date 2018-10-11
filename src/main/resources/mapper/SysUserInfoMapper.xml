@@ -29,7 +29,8 @@
         i.platform_id as platformId,
         i.level ,
         i.parent_id as  parentId,
-        i.status
+        i.status,
+        i.courier_id as  courierId
         FROM
             sys_user s
         INNER JOIN sys_user_info i ON s.id = i.user_id

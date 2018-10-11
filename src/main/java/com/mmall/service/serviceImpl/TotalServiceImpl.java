@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.PricingGroupMapper;
 import com.mmall.dao.TotalMapper;
@@ -264,6 +266,26 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         totalMapper.updateById(total);
         return upload;
+    }
+
+    @Override
+    public Result polling(String time, Integer id) {
+        List<Total> totals = totalMapper.getTotals(time, id);
+        Multimap<String, Total> totalMap = ArrayListMultimap.create();
+        String existence = "existence";//已存在账单
+        String other = "other";//其他账单
+        for(Total total:totals){
+            totalMap.put(total.getUserId()>0?existence:other,total);
+        }
+        Map<String,List<Total>> map = Maps.newHashMap();
+        //首重集合
+        List<Total> existenceList = (List<Total>) totalMap.get(existence);
+        //续重集合
+        List<Total> otherList = (List<Total>) totalMap.get(other);
+
+        map.put(existence,existenceList);
+        map.put(other,otherList);
+        return Result.ok(map);
     }
 
     /**

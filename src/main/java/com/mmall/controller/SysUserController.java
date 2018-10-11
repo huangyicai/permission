@@ -11,6 +11,7 @@ import com.mmall.model.params.SysUserParam;
 import com.mmall.model.params.UserPasswordParam;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
+import com.mmall.util.UploadApi;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -18,6 +19,7 @@ import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -38,7 +40,13 @@ public class SysUserController {
     @Autowired
     private SysUserService sysUserService;
 
-    @ApiOperation(value = "获取菜单",  notes="不需要Authorization")
+    @ApiOperation(value = "上传文件返回url",  notes="需要Authorization")
+    @PostMapping(value = "/uploadFile",produces = {"application/json;charest=Utf-8"})
+    public  Result uploadFile(MultipartFile file){
+        return Result.ok(UploadApi.uploadFile(file));
+    }
+
+    @ApiOperation(value = "获取菜单",  notes="需要Authorization")
     @ApiImplicitParams(
             @ApiImplicitParam(name = "platId",value = "平台ID",required = false,dataType = "long",paramType = "query")
     )

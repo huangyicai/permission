@@ -12,13 +12,11 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 
 /**
@@ -37,6 +35,39 @@ public class UploadApi {
     private static String bucketName="funwl";
 
     private static String returnBaseUrl="https://funwl.oss-cn-hangzhou.aliyuncs.com/";
+
+
+
+    /**
+     * 流式上传
+     *
+     */
+    public static  String uploadFile(MultipartFile file) {
+        InputStream inputStream = null;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String name = file.getContentType();
+        String firstKey = RandomHelper.generateRandomStr(5) + file.getOriginalFilename();
+        OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        // 设置content type
+        String strContentType = file.getContentType();
+        objectMetadata.setContentType(strContentType);
+        try {
+            if (!ossClient.doesBucketExist(bucketName)) {
+                ossClient.createBucket(bucketName);
+            }
+            ossClient.putObject(bucketName, firstKey, inputStream, objectMetadata);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            ossClient.shutdown();
+        }
+        return returnBaseUrl + firstKey;
+    }
 
     /**
      * 文件上传
@@ -277,8 +308,9 @@ public class UploadApi {
      * @param args
      */
     public static void main(String[] args) {
-        String path="E:\\GDW\\111111.xlsx";
+        String path="E:\\GDW\\微信图片_20180930130001.png";
         File file=new File(path);
-        System.out.println(upload(file,"123.xlsx","01/张三/"));
+
+        System.out.println(upload(file));
     }
 }

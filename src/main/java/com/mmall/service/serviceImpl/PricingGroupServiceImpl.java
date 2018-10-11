@@ -85,7 +85,10 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
                     .areaEnd(prp.getAreaEnd())
                     .weightStandard(prp.getWeightStandard())
                     .price(prp.getPrice())
-                    .firstOrContinued(prp.getFirstOrContinued()).build();
+                    .firstOrContinued(prp.getFirstOrContinued())
+                    .firstWeightPrice(prp.getFirstWeightPrice())
+                    .firstWeight(prp.getFirstWeight())
+                    .build();
             pricingGroupList.add(pg);
             pricingGroupMapper.insert(pg);
         }

@@ -12,6 +12,7 @@ import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.dto.SysUserInfoDto;
+import com.mmall.dto.SysUserInfoTypeDto;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.*;
@@ -59,6 +60,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserRoleMapper sysUserRoleMapper;
     @Autowired
     private CodeRecordMapper codeRecordMapper;
+    @Autowired
+    private CourierCompanyMapper courierCompanyMapper;
 
     public Comparator<SysMenuDto> menusSeqComparator = new Comparator<SysMenuDto>() {
         public int compare(SysMenuDto o1, SysMenuDto o2) {
@@ -124,6 +127,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return Result.error(InfoEnums.USER_NOT_EXISTENCE);
         }
         if(!subject.isAuthenticated()){
+            CourierCompany courierCompany = courierCompanyMapper.selectById(sysUserInfo.getCourierId());
+            SysUserInfoTypeDto adapt = SysUserInfoTypeDto.adapt(sysUserInfo);
+            adapt.setCourierCompany(courierCompany);
             AuthInfo<SysUserInfo> authInfo = new AuthInfo();
             //SysUser userByusername = sysUserMapper.findUserByusername(username);
             //SysUser userByusername =sysUserMapper
@@ -137,7 +143,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 // 在session中存放用户信息
                 subject.getSession().setAttribute("user", sysUserInfo);
                 authInfo.setToken( subject.getSession().getId().toString());
-                authInfo.setAuth(sysUserInfo);
+                authInfo.setAuth(adapt);
             } catch (IncorrectCredentialsException e) {
                 return Result.error(InfoEnums.PASSWORD_INCORRECT);
             } catch (LockedAccountException e) {

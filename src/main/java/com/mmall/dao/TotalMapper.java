@@ -29,4 +29,11 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     Total getBillCount(@Param("totalTime") String totalTime, @Param("userId")String userId,@Param("state")String state);
 
+    /**
+     * 轮询
+     * @param time
+     * @return
+     */
+    List<Total> getTotals(@Param("time") String time,@Param("sendId") Integer sendId);
+
 }

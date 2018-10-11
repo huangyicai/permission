@@ -30,6 +30,7 @@
                  /public/register = anon
                  /public/403 = anon
                  /fn/** = roles[SUPER]
+                 /customer/** = roles[CUSTOMER]
                  /express/** = roles["ADMIN,OPERATE"]
                  /express/total/** = roles["ADMIN,OPERATE"]
                  /** = authc

@@ -61,7 +61,7 @@ public class NoticeController {
 
     @ApiOperation(value = "获取首页通知",  notes="需要Authorization")
     @GetMapping(produces = {"application/json;charest=Utf-8"})
-    public Result<List<Notice>> getNotices(Page page){
+    public Result<List<Notice>> getNotices(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return noticeService.getNotices(user);
     }

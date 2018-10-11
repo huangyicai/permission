@@ -119,6 +119,7 @@ public class TotalController {
     @ApiOperation(value = "利润分析",  notes="需要Authorization")
     @PostMapping(value = "/getProfits")
     public Result<ProfitsDto> getProfits(@RequestBody BillParam billParam){
+
         ProfitsDto profits = totalService.getProfits(billParam);
         return Result.ok(profits);
     }
@@ -132,5 +133,13 @@ public class TotalController {
         }
         return Result.ok(pricing);
     }
+
+    @ApiOperation(value = "轮询账单表",  notes="需要Authorization")
+    @GetMapping(produces = {"application/json;charest=Utf-8"})
+    public Result polling(@RequestParam("time") String time){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return totalService.polling(time,user.getId());
+    }
+
 }
 

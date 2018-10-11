@@ -41,6 +41,10 @@ public class PricingGroupController {
     @ApiOperation(value = "获取省份",  notes="需要Authorization")
     @GetMapping(value = "/cityList/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result<List<CityVo>> getCusmotersInfo(@PathVariable("userId") Integer userId) throws InvocationTargetException, IllegalAccessException {
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
         Result allPricingGroups = pricingGroupService.getAllPricingGroups(userId);
         List<City> cities = cityMapper.selectList(new QueryWrapper<City>());
         List<City> data = (List<City>)allPricingGroups.getData();
@@ -67,6 +71,10 @@ public class PricingGroupController {
     @GetMapping(value = "/{userId}/{cityId}",produces = {"application/json;charest=Utf-8"})
     public Result<Map<String,List<PricingGroup>>> getPricingGroup(@PathVariable("userId")Integer userId,
                                                                   @PathVariable() Integer cityId){
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
         return pricingGroupService.getPricingGroup(userId,cityId);
     }
     @ApiOperation(value = "添加/修改省份定价",  notes="需要Authorization")
@@ -77,12 +85,20 @@ public class PricingGroupController {
         for(PricingGroupParam pgp :pricingGroups){
             BeanValidator.check(pgp);
         }
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
         return pricingGroupService.savePricingGroup(pricingGroups,userId,cityId);
     }
 
     @ApiOperation(value = "获取已上传的省份定价组",  notes="需要Authorization")
     @GetMapping(value = "/upload/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result getAllPricingGroups(@PathVariable("userId")Integer userId){
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
         return pricingGroupService.getAllPricingGroups(userId);
     }
 

@@ -64,9 +64,23 @@ public class PricingGroup implements Serializable {
     /**
      * 重量标准
      */
-    @ApiModelProperty(value = "重量标准")
+    @ApiModelProperty(value = "续重重量标准")
     @TableField("weight_standard")
     private Double weightStandard;
+
+    /**
+     * 续重关联的首重
+     */
+    @ApiModelProperty(value = "续重关联的首重")
+    @TableField("first_weight")
+    private Double firstWeight;
+
+    /**
+     * 续重关联的首重
+     */
+    @ApiModelProperty(value = "续重关联的首重价格")
+    @TableField("first_weight_price")
+    private Double firstWeightPrice;
     /**
      * 价格
      */
@@ -80,6 +94,21 @@ public class PricingGroup implements Serializable {
     @TableField("first_or_continued")
     private Integer firstOrContinued;
 
+    public Double getFirstWeight() {
+        return firstWeight;
+    }
+
+    public void setFirstWeight(Double firstWeight) {
+        this.firstWeight = firstWeight;
+    }
+
+    public Double getFirstWeightPrice() {
+        return firstWeightPrice;
+    }
+
+    public void setFirstWeightPrice(Double firstWeightPrice) {
+        this.firstWeightPrice = firstWeightPrice;
+    }
 
     public Integer getId() {
         return id;

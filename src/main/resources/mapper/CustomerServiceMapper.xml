@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.CustomerServiceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.CustomerService">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="express_id" property="expressId" />
+        <result column="handle_id" property="handleId" />
+        <result column="handle_name" property="handleName" />
+        <result column="waybill_number" property="waybillNumber" />
+        <result column="content" property="content" />
+        <result column="contacts" property="contacts" />
+        <result column="phone" property="phone" />
+        <result column="enclosure" property="enclosure" />
+        <result column="time_slot" property="timeSlot" />
+        <result column="type_id" property="typeId" />
+        <result column="type_name" property="typeName" />
+        <result column="status" property="status" />
+        <result column="remarks" property="remarks" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_id, express_id, handle_id, handle_name, waybill_number, content, contacts, phone, enclosure, time_slot, type_id, type_name, status, remarks, create_time, update_time
+    </sql>
+
+    <sql id="View">
+        id,  handle_name as handleName, waybill_number as waybillNumber, content, contacts, phone, enclosure, time_slot as timeSlot, type_name as typeName, status, remarks, create_time as createTime
+    </sql>
+
+    <select id="getAllCustomerServices" resultMap="BaseResultMap">
+        select
+        id,
+        handle_name,
+        waybill_number ,
+        content,
+        contacts,
+        phone,
+        enclosure,
+        time_slot ,
+        type_name ,
+        status,
+        remarks,
+        create_time
+        from customer_service
+        <where>
+            <if test="status!=0">
+                and status = #{status}
+            </if>
+            <if test="waybillNumber!=null and waybillNumber!=''">
+                and waybill_number = #{waybillNumber}
+            </if>
+            <if test="createTime!=null and createTime!=''">
+                and create_time &gt; #{createTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and create_time &lt; #{endTime}
+            </if>
+                and express_id =#{userId}
+        </where>
+    </select>
+
+
+    <select id="getAllCustomerServiceByUser" resultMap="BaseResultMap">
+        select
+        id,
+        handle_name,
+        waybill_number ,
+        content,
+        contacts,
+        phone,
+        enclosure,
+        time_slot ,
+        type_name ,
+        status,
+        remarks,
+        create_time
+        from customer_service
+        <where>
+            <if test="status!=0">
+                and status = #{status}
+            </if>
+            <if test="waybillNumber!=null">
+                and waybillNumber = #{waybillNumber}
+            </if>
+            and user_id =#{userId}
+
+        </where>
+    </select>
+</mapper>

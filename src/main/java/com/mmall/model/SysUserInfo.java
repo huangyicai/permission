@@ -81,11 +81,23 @@ public class SysUserInfo extends Model<SysUserInfo> {
     @TableField("parent_id")
     private Integer parentId;
 
+    @ApiModelProperty(value = "快递公司ID")
+    @TableField("courier_id")
+    private Integer courierId;
+
     @ApiModelProperty(value = "-1=快递分支 1:弗恩平台 2:快递平台 3:客户平台")
     @TableField("platform_id")
     @JsonView(SysUserInfoDto.UserInfoView.class)
     private Integer platformId;
     //private String  platformName;
+
+    public Integer getCourierId() {
+        return courierId;
+    }
+
+    public void setCourierId(Integer courierId) {
+        this.courierId = courierId;
+    }
 
     public Integer getDisplay() {
         return display;
@@ -242,7 +254,7 @@ public class SysUserInfo extends Model<SysUserInfo> {
     public SysUserInfo() {
     }
 
-    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, Integer display, String createTime, String updateTime, String level, Integer parentId, Integer platformId) {
+    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, Integer display, String createTime, String updateTime, String level, Integer parentId, Integer courierId, Integer platformId) {
         this.id = id;
         this.userId = userId;
         this.name = name;
@@ -260,6 +272,7 @@ public class SysUserInfo extends Model<SysUserInfo> {
         this.updateTime = updateTime;
         this.level = level;
         this.parentId = parentId;
+        this.courierId = courierId;
         this.platformId = platformId;
     }
 

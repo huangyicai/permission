@@ -141,6 +141,8 @@ CREATE TABLE `customer_service` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `user_id` int(11) NOT NULL DEFAULT '0' COMMENT '用户id',
   `express_id` int(11) NOT NULL DEFAULT '0' COMMENT '所属快递公司id',
+  `handle_id` int(11) NOT NULL DEFAULT '0' COMMENT '处理人ID',
+  `handle_name` int(11) NOT NULL DEFAULT '0' COMMENT '处理人昵称',
   `waybill_number` varchar(20) NOT NULL DEFAULT '' COMMENT '运单号',
   `content` varchar(20) NOT NULL DEFAULT '' COMMENT '问题描述',
   `contacts` varchar(20) NOT NULL DEFAULT '' COMMENT '联络人',
@@ -159,5 +161,12 @@ CREATE TABLE `customer_service` (
 CREATE TABLE `handle_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `type_name` varchar(20) NOT NULL DEFAULT '' COMMENT '处理类型',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `courier_company ` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `color` varchar(20) NOT NULL DEFAULT '' COMMENT '颜色',
+  `logo_url` varchar(20) NOT NULL DEFAULT '' COMMENT 'logo地址',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

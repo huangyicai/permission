@@ -1,5 +1,6 @@
 package com.mmall.model.params;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,15 @@ public class PricingGroupParam {
     @NotNull(message = "必须指定价格")
     @ApiModelProperty(value = "价格")
     private Double price;
+
+    @ApiModelProperty(value = "续重关联的首重")
+    @NotNull(message = "续重关联的首重必须指定")
+    private Double firstWeight;
+
+    @ApiModelProperty(value = "续重关联的首重价格")
+    @NotNull(message = "必须指定续重关联的首重价格")
+    private Double firstWeightPrice;
+
 
     @NotNull(message = "必须指定首重还是续重（1=首重，2=续重）")
     @Min(value = 0, message = "权限点状态不合法（1=首重，2=续重）")

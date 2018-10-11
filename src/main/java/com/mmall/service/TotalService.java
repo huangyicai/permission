@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
+import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
@@ -31,4 +32,12 @@ public interface TotalService extends IService<Total> {
     ProfitsDto getProfits(BillParam billParam);
 
     String getPricing(Integer totalId);
+
+    /**
+     * 轮询
+     * @param time
+     * @param id
+     * @return
+     */
+    Result polling(String time, Integer id);
 }
