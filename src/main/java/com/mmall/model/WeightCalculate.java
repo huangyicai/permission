@@ -193,7 +193,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setZero(BigDecimal zero) {
-        this.zero = zero;
+        if("".equals(zero)||zero==null){
+            this.zero = BigDecimal.ZERO;
+        }else {
+            this.zero = zero;
+        }
     }
 
     public BigDecimal getOne() {
@@ -201,7 +205,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setOne(BigDecimal one) {
-        this.one = one;
+        if("".equals(one)||one==null){
+            this.one = BigDecimal.ZERO;
+        }else{
+            this.one = one;
+        }
     }
 
     public BigDecimal getTwo() {
@@ -209,7 +217,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setTwo(BigDecimal two) {
-        this.two = two;
+        if("".equals(two)||two==null){
+            this.two = BigDecimal.ZERO;
+        }else{
+            this.two = two;
+        }
     }
 
     public BigDecimal getThree() {
@@ -217,7 +229,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setThree(BigDecimal three) {
-        this.three = three;
+        if("".equals(three)||three==null){
+            this.three = BigDecimal.ZERO;
+        }else{
+            this.three = three;
+        }
     }
 
     public BigDecimal getFour() {
@@ -225,7 +241,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setFour(BigDecimal four) {
-        this.four = four;
+        if("".equals(four)||four==null){
+            this.four = BigDecimal.ZERO;
+        }else{
+            this.four = four;
+        }
     }
 
     public BigDecimal getFive() {
@@ -233,7 +253,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setFive(BigDecimal five) {
-        this.five = five;
+        if("".equals(five)||five==null){
+            this.five = BigDecimal.ZERO;
+        }else{
+            this.five = five;
+        }
     }
 
     public BigDecimal getSix() {
@@ -241,7 +265,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setSix(BigDecimal six) {
-        this.six = six;
+        if("".equals(six)||six==null){
+            this.six = BigDecimal.ZERO;
+        }else {
+            this.six = six;
+        }
     }
 
     public BigDecimal getSeven() {
@@ -249,7 +277,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setSeven(BigDecimal seven) {
-        this.seven = seven;
+        if("".equals(seven)||seven==null){
+            this.seven = BigDecimal.ZERO;
+        }else{
+            this.seven = seven;
+        }
     }
 
     public BigDecimal getEight() {
@@ -257,7 +289,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setEight(BigDecimal eight) {
-        this.eight = eight;
+        if("".equals(eight)||eight==null){
+            this.eight = BigDecimal.ZERO;
+        }else{
+            this.eight = eight;
+        }
     }
 
     public BigDecimal getNine() {
@@ -265,7 +301,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setNine(BigDecimal nine) {
-        this.nine = nine;
+        if("".equals(nine)||nine==null){
+            this.nine = BigDecimal.ZERO;
+        }else {
+            this.nine = nine;
+        }
     }
 
     public BigDecimal getTen() {
@@ -273,7 +313,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setTen(BigDecimal ten) {
-        this.ten = ten;
+        if("".equals(ten)||ten==null){
+            this.ten = BigDecimal.ZERO;
+        }else{
+            this.ten = ten;
+        }
     }
 
     public BigDecimal getEleven() {
@@ -281,7 +325,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setEleven(BigDecimal eleven) {
-        this.eleven = eleven;
+        if("".equals(eleven)||eleven==null){
+            this.eleven = BigDecimal.ZERO;
+        }else {
+            this.eleven = eleven;
+        }
     }
 
     public BigDecimal getTwelve() {
@@ -289,7 +337,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setTwelve(BigDecimal twelve) {
-        this.twelve = twelve;
+        if("".equals(twelve)||twelve==null){
+            this.twelve = BigDecimal.ZERO;
+        }else{
+            this.twelve = twelve;
+        }
     }
 
     public BigDecimal getThirteen() {
@@ -297,7 +349,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setThirteen(BigDecimal thirteen) {
-        this.thirteen = thirteen;
+        if("".equals(thirteen)||thirteen==null){
+            this.thirteen = BigDecimal.ZERO;
+        }else{
+            this.thirteen = thirteen;
+        }
     }
 
     public BigDecimal getFourteen() {
@@ -305,7 +361,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setFourteen(BigDecimal fourteen) {
-        this.fourteen = fourteen;
+        if("".equals(fourteen)||fourteen==null){
+            this.fourteen = BigDecimal.ZERO;
+        }else{
+            this.fourteen = fourteen;
+        }
     }
 
     public BigDecimal getFifteen() {
@@ -313,7 +373,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setFifteen(BigDecimal fifteen) {
-        this.fifteen = fifteen;
+        if("".equals(fifteen)||fifteen==null){
+            this.fifteen = BigDecimal.ZERO;
+        }else{
+            this.fifteen = fifteen;
+        }
     }
 
     public BigDecimal getSixteen() {
@@ -321,7 +385,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setSixteen(BigDecimal sixteen) {
-        this.sixteen = sixteen;
+        if("".equals(sixteen)||sixteen==null){
+            this.sixteen = BigDecimal.ZERO;
+        }else{
+            this.sixteen = sixteen;
+        }
     }
 
     public BigDecimal getSeventeen() {
@@ -329,7 +397,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setSeventeen(BigDecimal seventeen) {
-        this.seventeen = seventeen;
+        if("".equals(seventeen)||seventeen==null){
+            this.seventeen = BigDecimal.ZERO;
+        }else{
+            this.seventeen = seventeen;
+        }
     }
 
     public BigDecimal getEighteen() {
@@ -337,7 +409,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setEighteen(BigDecimal eighteen) {
-        this.eighteen = eighteen;
+        if("".equals(eighteen)||eighteen==null){
+            this.eighteen = BigDecimal.ZERO;
+        }else{
+            this.eighteen = eighteen;
+        }
     }
 
     public BigDecimal getNineteen() {
@@ -345,7 +421,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setNineteen(BigDecimal nineteen) {
-        this.nineteen = nineteen;
+        if("".equals(nineteen)||nineteen==null){
+            this.nineteen = BigDecimal.ZERO;
+        }else{
+            this.nineteen = nineteen;
+        }
     }
 
     public BigDecimal getTwenty() {
@@ -353,7 +433,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setTwenty(BigDecimal twenty) {
-        this.twenty = twenty;
+        if("".equals(twenty)||twenty==null){
+            this.twenty = BigDecimal.ZERO;
+        }else{
+            this.twenty = twenty;
+        }
     }
 
     public BigDecimal getTwentyOne() {
@@ -361,7 +445,11 @@ public class WeightCalculate implements Serializable {
     }
 
     public void setTwentyOne(BigDecimal twentyOne) {
-        this.twentyOne = twentyOne;
+        if("".equals(twentyOne)||twentyOne==null){
+            this.twentyOne = BigDecimal.ZERO;
+        }else{
+            this.twentyOne = twentyOne;
+        }
     }
 
     @Override

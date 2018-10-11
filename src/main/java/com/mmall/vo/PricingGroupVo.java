@@ -36,6 +36,16 @@ public class PricingGroupVo implements Serializable {
     private Double areaEnd;
 
     /**
+     * 第一重量
+     */
+    private Double firstWeight;
+
+    /**
+     * 第一重量价格
+     */
+    private Double firstWeightPrice;
+
+    /**
      * 重量标准
      */
     private Double weightStandard;

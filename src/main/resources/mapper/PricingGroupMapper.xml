@@ -48,17 +48,21 @@
     </select>
 
     <!--获取报价表-->
-    <select id="ListPricingGroup" resultMap="BaseResultMap">
+    <select id="ListPricingGroup" resultType="com.mmall.vo.PricingGroupVo">
         select
         pricing_group.id,
         area_begin as areaBegin,
+        user_id as userId,
         area_end as areaEnd,
         weight_standard as weightStandard,
-        price,first_or_continued as firstOrContinued,
+        first_weight as firstWeight,
+        first_weight_price as firstWeightPrice,
+        price,
+        first_or_continued as firstOrContinued,
         province_name as city
         from pricing_group
         join city
-        on city.id=pricing_group.city_id
+        on city.id=pricing_group.city_id and user_id=#{userId}
         ORDER BY first_or_continued,area_end ASC
     </select>
 </mapper>

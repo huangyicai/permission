@@ -20,6 +20,14 @@ public enum InfoEnums {
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),
 
+
+	//定价相关
+	PROCING_IS_NULL(110001,"定价组参数不齐"),
+	COST_IS_NULL(110002,"成本组参数不齐"),
+
+	//账单相关
+	BILL_IS_NULL(120002,"账单不存在"),
+
 	;
 
 	private Integer code;

@@ -9,6 +9,7 @@ import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public interface TotalService extends IService<Total> {
 
     ProfitsDto getProfits(BillParam billParam);
 
+<<<<<<< HEAD
     String getPricing(Integer totalId);
 
     /**
@@ -40,4 +42,9 @@ public interface TotalService extends IService<Total> {
      * @return
      */
     Result polling(String time, Integer id);
+=======
+    Result<String> getPricing(Integer totalId);
+
+    String getUserIdStr();
+>>>>>>> b724a2df59160b068f29f2a73d45034887562a5d
 }

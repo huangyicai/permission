@@ -51,21 +51,7 @@ public class ProvinceCalculateServiceImpl extends ServiceImpl<ProvinceCalculateM
     public Map<String,String> getProvinceCalculate(BillParam billParam) {
 
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
-            SysUserInfo user = UserInfoConfig.getUserInfo();
-            String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
-            List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
-                    .like("level", s)
-                    .eq("platform_id", 3)
-                    .select("id"));
-
-            String nameStr="";
-            for(SysUserInfo sysUserInfo: list1){
-                nameStr+=sysUserInfo.getId()+",";
-            }
-
-            nameStr=nameStr.substring(0,nameStr.length()-1);
-
-            billParam.setUserId(nameStr);
+            billParam.setUserId(totalService.getUserIdStr());
         }
 
         List<Total> one = totalService.listToal(billParam.getDate(),billParam.getUserId());

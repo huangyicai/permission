@@ -127,11 +127,14 @@ public class TotalController {
     @ApiOperation(value = "定价",  notes="需要Authorization")
     @GetMapping(value = "/getPricing/{totalId}")
     public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
-        String pricing = totalService.getPricing(totalId);
-        if("".equals(pricing) || pricing==null){
-            return Result.error(InfoEnums.ERROR);
-        }
-        return Result.ok(pricing);
+        return totalService.getPricing(totalId);
+    }
+
+    @ApiOperation(value = "重新上传",  notes="需要Authorization")
+    @PostMapping(value = "/againSet/{totalId}")
+    public Result<String> againSet(@PathVariable("totalId")Integer totalId,MultipartFile file) throws Exception {
+        xlsxProcessAbstract.againSet(file,totalId);
+        return Result.ok();
     }
 
     @ApiOperation(value = "轮询账单表",  notes="需要Authorization")
