@@ -94,7 +94,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId());
 
         if(one==null){
-            return null;
+            return new BillDto();
         }
         BillDto billDto=new BillDto();
         billDto.setTotalNumber(one.getTotalNumber());
