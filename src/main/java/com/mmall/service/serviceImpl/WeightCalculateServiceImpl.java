@@ -51,22 +51,28 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
             billParam.setUserId(totalService.getUserIdStr());
         }
-        List<Total> list = totalService.listToal(billParam.getDate(),billParam.getUserId());
-        if(list.size()<=0){
-            return null;
-        }
 
-        String totalIdStr="";
+        //定义反射实体
+        WeightCalculate weightCalculate;
 
-        for(Total total:list){
-            totalIdStr+=total.getTotalId()+",";
-        }
-
-        totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
-
+        //定义循环判断的规则
         Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
 
-        WeightCalculate weightCalculate = weightCalculateMapper.getWeightCalculate(totalIdStr);
+        List<Total> list = totalService.listToal(billParam.getDate(),billParam.getUserId());
+        if(list.size()<=0){
+            weightCalculate=new WeightCalculate();
+        }else{
+            String totalIdStr="";
+
+            for(Total total:list){
+                totalIdStr+=total.getTotalId()+",";
+            }
+
+            totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
+
+
+            weightCalculate = weightCalculateMapper.getWeightCalculate(totalIdStr);
+        }
 
         Field fields[]=weightCalculate.getClass().getDeclaredFields();
         String[] name=new String[fields.length];
@@ -80,11 +86,11 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
                 value[i] = fields[i].get(weightCalculate);
 
                 if(i==3){
-                    map.put("20以上",value[i].toString());
+                    map.put("20以上",value[i]==null?"0":value[i].toString());
                     continue;
                 }
 
-                map.put(interval[i-4]+"到"+interval[i-3],value[i].toString());
+                map.put(interval[i-4]+"到"+interval[i-3],value[i]==null?"0.00":value[i].toString());
 //                System.out.println(interval[i-4]+"到"+interval[i-3]+"-------"+name[i]+"-------"+value[i]);
             }
         } catch (Exception e) {
