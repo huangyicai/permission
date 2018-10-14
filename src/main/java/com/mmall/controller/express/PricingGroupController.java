@@ -5,10 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.CityMapper;
-import com.mmall.model.City;
-import com.mmall.model.PricingGroup;
+import com.mmall.dao.SpecialPricingGroupKeyMapper;
+import com.mmall.model.*;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.BeanValidator;
@@ -38,6 +37,8 @@ public class PricingGroupController {
     private PricingGroupService pricingGroupService;
     @Autowired
     private CityMapper cityMapper;
+    @Autowired
+    private SpecialPricingGroupKeyMapper specialPricingGroupKeyMapper;
     @ApiOperation(value = "获取省份",  notes="需要Authorization")
     @GetMapping(value = "/cityList/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result<List<CityVo>> getCusmotersInfo(@PathVariable("userId") Integer userId) throws InvocationTargetException, IllegalAccessException {
@@ -77,6 +78,55 @@ public class PricingGroupController {
         }
         return pricingGroupService.getPricingGroup(userId,cityId);
     }
+
+
+    @ApiOperation(value = "删除特殊定价",  notes="需要Authorization")
+    @DeleteMapping(value = "/{keyId}",produces = {"application/json;charest=Utf-8"})
+    public Result deleteSpecialPricingGroup(@PathVariable("keyId")Integer keyId){
+
+        return pricingGroupService.deleteSpecialPricingGroup(keyId);
+    }
+
+    @ApiOperation(value = "添加特殊定价",  notes="需要Authorization")
+    @PostMapping(value = "/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result saveSpecialPricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,
+                                   @PathVariable("userId")Integer userId){
+        for(PricingGroupParam pgp :pricingGroups){
+            BeanValidator.check(pgp);
+        }
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
+        return pricingGroupService.saveSpecialPricingGroup(pricingGroups,userId);
+    }
+
+    @ApiOperation(value = "修改特殊定价",  notes="需要Authorization")
+    @PutMapping(value = "/{keyId}",produces = {"application/json;charest=Utf-8"})
+    public Result updateSpecialPricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,
+                                          @PathVariable("keyId")Integer keyId){
+        for(PricingGroupParam pgp :pricingGroups){
+            BeanValidator.check(pgp);
+        }
+        return pricingGroupService.updateSpecialPricingGroup(pricingGroups,keyId);
+    }
+    @ApiOperation(value = "获取用户特殊定价关键字",  notes="需要Authorization")
+    @GetMapping(value = "/specialKey/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result<List<SpecialPricingGroupKey>> getSpecialPricingGroup(@PathVariable("userId")Integer userId){
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
+        return Result.ok(specialPricingGroupKeyMapper.selectList(new QueryWrapper<SpecialPricingGroupKey>().eq("user_id",userId)));
+    }
+
+    @ApiOperation(value = "获取用户特殊定价（通过关键字ID）",  notes="需要Authorization")
+    @GetMapping(value = "/special/{specialId}",produces = {"application/json;charest=Utf-8"})
+    public Result<Map<String,List<SpecialPricingGroup>>> getSpecialPricingGroupByKey(@PathVariable("specialId")Integer specialId){
+
+        return pricingGroupService.getSpecialPricingGroupByKey(specialId);
+    }
+
     @ApiOperation(value = "添加/修改省份定价",  notes="需要Authorization")
     @PostMapping(value = "/{userId}/{cityId}",produces = {"application/json;charest=Utf-8"})
     public Result savePricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,

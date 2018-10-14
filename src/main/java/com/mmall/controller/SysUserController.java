@@ -2,8 +2,10 @@ package com.mmall.controller;
 
 
 import com.aliyuncs.exceptions.ClientException;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.dao.HandleTypeMapper;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.model.Response.Result;
 import com.mmall.model.*;
@@ -39,6 +41,13 @@ import java.util.Map;
 public class SysUserController {
     @Autowired
     private SysUserService sysUserService;
+    @Autowired
+    private HandleTypeMapper handleTypeMapper;
+    @ApiOperation(value = "获取处理类型",  notes="需要Authorization")
+    @GetMapping(value = "/types",produces = {"application/json;charest=Utf-8"})
+    public Result<List<HandleType>> getHandleTypes(){
+        return Result.ok(handleTypeMapper.selectList(new QueryWrapper<HandleType>()));
+    }
 
     @ApiOperation(value = "上传文件返回url",  notes="需要Authorization")
     @PostMapping(value = "/uploadFile",produces = {"application/json;charest=Utf-8"})

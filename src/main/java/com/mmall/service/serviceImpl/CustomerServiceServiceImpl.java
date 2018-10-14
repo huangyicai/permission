@@ -38,7 +38,6 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                 .enclosure(customerServiceParam.getEnclosure())
                 .timeSlot(customerServiceParam.getTimeSlot())
                 .typeId(customerServiceParam.getTypeId())
-
                 .userId(userInfo.getId())
                 .expressId(Integer.parseInt(level))
                 .typeName(handleTypeMapper.selectById(customerServiceParam.getTypeId()).getTypeName())

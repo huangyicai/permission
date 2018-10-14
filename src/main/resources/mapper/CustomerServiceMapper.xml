@@ -65,6 +65,7 @@
             </if>
                 and express_id =#{userId}
         </where>
+        ORDER BY status ASC,create_time DESC
     </select>
 
 
@@ -87,14 +88,45 @@
             <if test="status!=0">
                 and status = #{status}
             </if>
-            <if test="type!=0">
-                and type_id = #{type}
-            </if>
-            <if test="waybillNumber!=null">
-                and waybillNumber = #{waybillNumber}
+
+            <if test="waybillNumber!=null and waybillNumber!=''">
+                and waybill_number = #{waybillNumber}
             </if>
             and user_id =#{userId}
 
         </where>
+        ORDER BY status ASC,create_time DESC
+    </select>
+
+
+    <select id="getCustomerServiceBySelf" resultMap="BaseResultMap">
+        select
+        id,
+        handle_name,
+        waybill_number ,
+        content,
+        contacts,
+        phone,
+        enclosure,
+        time_slot ,
+        type_name ,
+        status,
+        remarks,
+        create_time
+        from customer_service
+        <where>
+            <if test="status!=0">
+                and status = #{status}
+            </if>
+            <if test="type!=0">
+                and type_id = #{type}
+            </if>
+            <if test="waybillNumber!=null and waybillNumber!=''">
+                and waybill_number = #{waybillNumber}
+            </if>
+
+            and handle_id =#{userId}
+        </where>
+        ORDER BY status ASC,create_time DESC
     </select>
 </mapper>

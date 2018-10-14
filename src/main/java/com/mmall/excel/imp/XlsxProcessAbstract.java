@@ -98,9 +98,8 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
-    //设置导出路径
-    private static String path="E:/GDW/";
-
+    //文件的项目路径
+    private final String ompPath="192.168.1.6:8080/total/";
 
     /**
      * 根据路径读取数据
@@ -135,7 +134,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void processAllSheet(MultipartFile xlsxFile,String time) throws Exception {
+    public void processAllSheet(MultipartFile xlsxFile,String time,String realPath) throws Exception {
 
         //获取用户信息
 //        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
@@ -152,7 +151,6 @@ public class XlsxProcessAbstract {
         }
 
         nameStr=nameStr.substring(0,nameStr.length()-1);
-
         //獲取姓名集合
         List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
 
@@ -227,8 +225,8 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-//            threadDto.setPath(ompPath);
-            threadDto.setPathHead(path);
+            threadDto.setPath(ompPath);
+            threadDto.setPathHead(realPath);
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
@@ -316,7 +314,6 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPathHead(path);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             updateTatal(threadDto);
@@ -348,7 +345,7 @@ public class XlsxProcessAbstract {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-                outputStream = new FileOutputStream(total.getTotalUrl());
+                outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();

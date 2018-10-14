@@ -13,6 +13,7 @@ import com.mmall.service.CustomerServiceService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +30,9 @@ public class ExpressServiceController {
     private SysUserInfoMapper sysUserInfoMapper;
 
     @ApiOperation(value = "获取所有工单（0=全部，1=未处理，2=处理中，3=处理完毕）",  notes="需要Authorization")
-    @GetMapping(value = "/list/{status}/{type}",produces = {"application/json;charest=Utf-8"})
-    public Result getAllCustomerService(@PathVariable("status") Integer status,
-                                        @PathVariable("type") Integer type,
+    @GetMapping(value = "/list",produces = {"application/json;charest=Utf-8"})
+    public Result getAllCustomerService(@RequestParam(name="status",required = false,defaultValue = "0") Integer status,
+                                        @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                                         @RequestParam(name = "createTime",required = false) String createTime,
                                         @RequestParam(name = "endTime",required = false) String endTime,
@@ -43,13 +44,14 @@ public class ExpressServiceController {
     }
 
     @ApiOperation(value = "我处理的工单（0=全部，2=处理中，3=处理完毕）",  notes="需要Authorization")
-    @GetMapping(value = "/self/list/{status}/{type}",produces = {"application/json;charest=Utf-8"})
-    public Result getCustomerServiceBySelf(@PathVariable("status") Integer status,
-                                           @PathVariable("type") Integer type,
+    @GetMapping(value = "/self/list",produces = {"application/json;charest=Utf-8"})
+    public Result getCustomerServiceBySelf(@RequestParam(name="status",required = false,defaultValue = "0") Integer status,
+                                           @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                                         @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                         @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
-        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        //SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        SysUserInfo userInfo = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         Page ipage = new Page(page,size);
         return customerServiceService.getCustomerServiceBySelf(status,type,userInfo.getId(),ipage,waybillNumber);
     }
@@ -57,7 +59,7 @@ public class ExpressServiceController {
     @ApiOperation(value = "我来处理工单",  notes="需要Authorization")
     @PostMapping(value = "/handle/{handleId}",produces = {"application/json;charest=Utf-8"})
     public Result handleService(@PathVariable("handleId") Integer handleId){
-        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        SysUserInfo userInfo = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         return customerServiceService.handleService(handleId,userInfo);
     }
     @ApiOperation(value = "转至其他客服处理",  notes="需要Authorization")
@@ -65,13 +67,15 @@ public class ExpressServiceController {
     public Result forwardhandleService(@PathVariable("handleId") Integer handleId,
                                        @PathVariable("userId") Integer userId){
         CustomerService byId = customerServiceService.getById(handleId);
-        byId.setUserId(userId);
-        customerServiceService.save(byId);
+        byId.setHandleId(userId);
+        SysUserInfo userInfo = sysUserInfoMapper.selectById(userId);
+        byId.setHandleName(userInfo.getName());
+        customerServiceService.saveOrUpdate(byId);
         return Result.ok();
     }
 
     @ApiOperation(value = "获取其他客服",  notes="需要Authorization")
-    @PostMapping(value = "/customers",produces = {"application/json;charest=Utf-8"})
+    @GetMapping(value = "/customers",produces = {"application/json;charest=Utf-8"})
     @JsonView(SysUserInfoDto.UserInfoView.class)
     public Result getCustomers(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
@@ -88,7 +92,7 @@ public class ExpressServiceController {
         CustomerService byId = customerServiceService.getById(handleId);
         byId.setRemarks(remarks);
         byId.setStatus(3);
-        customerServiceService.save(byId);
+        customerServiceService.saveOrUpdate(byId);
         return Result.ok();
     }
 

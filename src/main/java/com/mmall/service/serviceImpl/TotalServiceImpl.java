@@ -1,6 +1,7 @@
 package com.mmall.service.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
@@ -31,6 +32,7 @@ import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
 import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
+import com.mmall.vo.TotalVo;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
@@ -76,8 +78,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     //报价
     private static  BigDecimal totalOffer=BigDecimal.ZERO;
 
-    //设置导出路径
-    private static String path="E:/GDW/";
+    //设置导出路径（生产环境无效）
+//    private static String path="E:/GDW/";
 
     /**
      * 获取客户月计统计
@@ -117,18 +119,20 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         return totalMapper.listToal(totalTime,userId);
     }
 
+
+
     /**
      * 获取公司账单----数据分析
      * @return
      */
-    public Page<Total> getBill(Page<Total> page, BillDetailsParam billDetailsParam) {
+    public IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam) {
         String nameStr=getUserIdStr();
 
         if(!"".equals(billDetailsParam.getUserId()) && billDetailsParam.getUserId()!=null){
             nameStr=billDetailsParam.getUserId().toString();
         }
 
-        Page<Total> bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState());
+        Page<TotalVo> bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState());
         return bill;
     }
 
@@ -223,13 +227,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         String[] str=total.getTotalUrl().split("/");
-        final String ompPath=path+str[str.length-1];
+//        final String ompPath=path+str[str.length-1];
 
         //读取本地数据
         XlsxProcessAbstract xls=new XlsxProcessAbstract();
         ArrayListMultimap<String, Bill> map=null;
         try {
-            map = xls.processAllSheet(ompPath);
+            map = xls.processAllSheet(total.getCdUrl());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -265,7 +269,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-                outputStream = new FileOutputStream(ompPath);
+                outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();
@@ -279,7 +283,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         new ExcelExportExecutor<Bill>(strings, list, dataSheetExecute, true).execute();
 
         //上传到oss
-        File file=new File(path);
+        File file=new File(total.getCdUrl());
         String upload = UploadApi.upload(file, str[str.length-1], total.getTotalTime()+"/"+total.getName()+"/");
 
         total.setTotalCost(totalCost);

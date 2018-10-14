@@ -17,6 +17,8 @@ public enum InfoEnums {
 	PASSWORD_INCORRECT(10014, "密码不正确！"),
 	DATA_IS_NULL(10010,"没有数据"),
 
+	KEY_EXISTENCE(10017,"已有相同关键字定价组！"),
+	PLEASE_ADD_PRICING(10018,"请添加定价！"),
 	ADD_PAYMENT_INSTITUTION(10015,"请先为该分支添加付款机构！"),
 
 	//oss相关
@@ -29,6 +31,7 @@ public enum InfoEnums {
 
 	//账单相关
 	BILL_IS_NULL(120002,"账单不存在"),
+	SEND_FAILURE(120003,"发送失败，清确认是否定价，或者已经发送过"),
 
 	;
 

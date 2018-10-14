@@ -51,8 +51,11 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      * 客服获取自己处理的工单
      * @param ipage
      * @param status
-     * @param id
      * @param waybillNumber
      */
-    void getCustomerServiceBySelf(Page ipage, Integer status,Integer type, Integer id, String waybillNumber);
+    Page<CustomerService> getCustomerServiceBySelf(Page ipage,
+                                                   @Param("status") Integer status,
+                                                   @Param("type") Integer type,
+                                                   @Param("userId")Integer userId,
+                                                   @Param("waybillNumber")String waybillNumber);
 }

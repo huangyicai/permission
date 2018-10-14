@@ -31,7 +31,7 @@
 
     <!--添加账单-->
     <insert id="insertTotal" parameterType="com.mmall.model.Total"  useGeneratedKeys="true" keyProperty="totalId">
-      insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url,send_id,order_no) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl},#{sendId},#{orderNo})
+      insert into total(`name`,total_time,total_number,total_weight,create_time,user_id,total_url,cd_url,send_id,order_no) values (#{name},#{totalTime},#{totalNumber},#{totalWeight},#{createTime},#{userId},#{totalUrl},#{cdUrl},#{sendId},#{orderNo})
     </insert>
 
     <!--获取月计数据-->
@@ -52,22 +52,42 @@
     </select>
 
     <!--获取账单列表（数据分析）-->
-    <select id="getBill" resultMap="BaseResultMap">
-      select *
-      from total
-      <where>
-          <if test="userId!=null">
-             and user_id in (${userId})
-          </if>
+    <select id="getBill"  resultType="com.mmall.vo.TotalVo">
+        select
+        total_id as totalId,
+        send_id as sendId,
+        total.user_id as userId,
+        order_no as orderNo,
+        `name`,
+        total_time as totalTime,
+        total_number as totalNumber,
+        total_cost as totalCost,
+        total_offer as totalOffer,
+        total_paid as totalPaid,
+        total_credentials_url as totalCredentialsUrl,
+        total_url as totalUrl,
+        total_remark as totalRemark,
+        total_state as totalState,
+        create_time as createTime,
+        as_of_time as asOfTime,
+        update_time as updateTime,
+        type_name as typeName,
+        payee,
+        payment_account as paymentAccount
+        from total LEFT  join payment_method on payment_method.user_id=total.user_id
+          <where>
+              <if test="userId!=null">
+                 and total.user_id =#{userId}
+              </if>
 
-          <if test="totalTime">
-              and total_time =#{totalTime}
-          </if>
+              <if test="totalTime">
+                  and total_time =#{totalTime}
+              </if>
 
-          <if test="state!=null and state!=0">
-              and total_state=#{state}
-          </if>
-      </where>
+              <if test="state!=null and state!=0">
+                  and total_state=#{state}
+              </if>
+          </where>
     </select>
 
     <!--获取已收和未收数据-->

@@ -3,6 +3,7 @@ package com.mmall.service;
 import com.mmall.model.PricingGroup;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SpecialPricingGroup;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 
@@ -53,4 +54,34 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @return
      */
     Result saveExistingPricingGroups(Integer userId, Integer selfId);
+
+    /**
+     * 获取用户特殊定价
+     * @param specialId
+     * @return
+     */
+    Result<Map<String, List<SpecialPricingGroup>>> getSpecialPricingGroupByKey( Integer specialId);
+
+    /**
+     * 添加特殊定价
+     * @param pricingGroups
+     * @param userId
+     * @return
+     */
+    Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId);
+
+    /**
+     * 修改特殊定价
+     * @param pricingGroups
+     * @param keyId
+     * @return
+     */
+    Result updateSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer keyId);
+
+    /**
+     * 删除特殊定价
+     * @param keyId
+     * @return
+     */
+    Result deleteSpecialPricingGroup(Integer keyId);
 }

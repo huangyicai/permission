@@ -6,15 +6,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mmall.constants.LevelConstants;
-import com.mmall.dao.CityMapper;
-import com.mmall.dao.SysUserInfoMapper;
+import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
-import com.mmall.model.City;
-import com.mmall.model.PricingGroup;
-import com.mmall.dao.PricingGroupMapper;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.service.PricingGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -43,6 +39,10 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     private CityMapper cityMapper;
     @Autowired
     private SysUserInfoMapper sysUserInfoMapper;
+    @Autowired
+    private SpecialPricingGroupMapper specialPricingGroupMapper;
+    @Autowired
+    private SpecialPricingGroupKeyMapper specialPricingGroupKeyMapper;
 
     public Result<Map<String, List<PricingGroup>>> getPricingGroup(Integer userId, Integer cityId) {
         List<PricingGroup> pricingGroups = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>()
@@ -126,6 +126,107 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             pg.setUserId(selfId);
             pricingGroupMapper.insert(pg);
         }
+        return Result.ok();
+    }
+
+    @Override
+    public Result<Map<String, List<SpecialPricingGroup>>> getSpecialPricingGroupByKey( Integer specialId) {
+        List<SpecialPricingGroup> pricingGroups = specialPricingGroupMapper.selectList(new QueryWrapper<SpecialPricingGroup>()
+                .eq("key_id", specialId));
+        Multimap<String, SpecialPricingGroup> weightMap = ArrayListMultimap.create();
+        String firstWeight = "firstWeight";//首重
+        String continuedWeight = "continuedWeight";//续重
+        for(SpecialPricingGroup pg:pricingGroups){
+            weightMap.put(pg.getFirstOrContinued()==1?firstWeight:continuedWeight,pg);
+        }
+        Map<String,List<SpecialPricingGroup>> map = Maps.newHashMap();
+        //首重集合
+        List<SpecialPricingGroup> firstWeightList = (List<SpecialPricingGroup>) weightMap.get(firstWeight);
+        //续重集合
+        List<SpecialPricingGroup> continuedWeightList = (List<SpecialPricingGroup>) weightMap.get(continuedWeight);
+
+        map.put(firstWeight,firstWeightList);
+        map.put(continuedWeight,continuedWeightList);
+        return Result.ok(map);
+    }
+
+    @Override
+    public Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId) {
+        if(pricingGroups.isEmpty()){
+            return Result.error(InfoEnums.PLEASE_ADD_PRICING);
+        }
+        boolean firstWeight = true;
+        boolean continuedWeight = true;
+        for(PricingGroupParam pg:pricingGroups){
+            if(pg.getFirstOrContinued()==1)firstWeight=false;
+            if(pg.getFirstOrContinued()==2)continuedWeight=false;
+        }
+
+        String keyName = pricingGroups.get(0).getKeyName();
+        if(firstWeight||continuedWeight) return Result.error(InfoEnums.WEIGHT_NOT_WRITE);
+        SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>().eq("key_name", keyName));
+        if(key_name!=null){
+            return Result.error(InfoEnums.KEY_EXISTENCE);
+        }
+        SpecialPricingGroupKey specialPricingGroupKey = new SpecialPricingGroupKey();
+        specialPricingGroupKey.setKeyName(keyName);
+        specialPricingGroupKey.setUserId(userId);
+        specialPricingGroupKeyMapper.insert(specialPricingGroupKey);
+        //specialPricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",userId).eq("city_id",cityId));
+        List<SpecialPricingGroup> pricingGroupList = Lists.newArrayList();
+        for(PricingGroupParam prp : pricingGroups){
+            SpecialPricingGroup pg = SpecialPricingGroup.builder()
+                    .keyId(specialPricingGroupKey.getId())
+                    .areaBegin(prp.getAreaBegin())
+                    .areaEnd(prp.getAreaEnd())
+                    .weightStandard(prp.getWeightStandard())
+                    .price(prp.getPrice())
+                    .firstOrContinued(prp.getFirstOrContinued())
+                    .firstWeightPrice(prp.getFirstWeightPrice())
+                    .firstWeight(prp.getFirstWeight())
+                    .build();
+            pricingGroupList.add(pg);
+            specialPricingGroupMapper.insert(pg);
+        }
+        //pricingGroupMapper.insertPricingGroupList(pricingGroupList);
+        return Result.ok();
+    }
+
+    @Override
+    @Transactional
+    public Result updateSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer keyId) {
+        boolean firstWeight = true;
+        boolean continuedWeight = true;
+        for(PricingGroupParam pg:pricingGroups){
+            if(pg.getFirstOrContinued()==1)firstWeight=false;
+            if(pg.getFirstOrContinued()==2)continuedWeight=false;
+        }
+        if(firstWeight||continuedWeight) return Result.error(InfoEnums.WEIGHT_NOT_WRITE);
+        specialPricingGroupMapper.delete(new QueryWrapper<SpecialPricingGroup>().eq("key_id",keyId));
+        List<SpecialPricingGroup> pricingGroupList = Lists.newArrayList();
+        for(PricingGroupParam prp : pricingGroups){
+            SpecialPricingGroup pg = SpecialPricingGroup.builder()
+                    .keyId(keyId)
+                    .areaBegin(prp.getAreaBegin())
+                    .areaEnd(prp.getAreaEnd())
+                    .weightStandard(prp.getWeightStandard())
+                    .price(prp.getPrice())
+                    .firstOrContinued(prp.getFirstOrContinued())
+                    .firstWeightPrice(prp.getFirstWeightPrice())
+                    .firstWeight(prp.getFirstWeight())
+                    .build();
+            pricingGroupList.add(pg);
+            specialPricingGroupMapper.insert(pg);
+        }
+        //pricingGroupMapper.insertPricingGroupList(pricingGroupList);
+        return Result.ok();
+    }
+
+    @Override
+    @Transactional
+    public Result deleteSpecialPricingGroup(Integer keyId) {
+        specialPricingGroupKeyMapper.deleteById(keyId);
+        specialPricingGroupMapper.delete(new QueryWrapper<SpecialPricingGroup>().eq("key_id",keyId));
         return Result.ok();
     }
 }

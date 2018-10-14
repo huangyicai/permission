@@ -49,11 +49,18 @@ public class ThreadImport implements Callable<String> {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-//                outputStream = new FileOutputStream(threadDto.getPath());
+                //生成随机码
                 String time = new Date().getTime()+"";
                 String keyId=time.substring(9,time.length())+ RandomHelper.getRandNum(3);
+
+                //生成创建路径
                 String path=threadDto.getPathHead()+keyId+".xlsx";
-                threadDto.setPath(path);
+
+                //生成下载路径
+                String pathIpUrl=threadDto.getPath()+keyId+".xlsx";
+
+                threadDto.setPath(pathIpUrl);
+                threadDto.setPathHead(path);
                 threadDto.setIdtime(keyId);
                 outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
@@ -96,6 +103,7 @@ public class ThreadImport implements Callable<String> {
         total.setTotalWeight(threadDto.getWeight());
         total.setOrderNo(threadDto.getIdtime());
         total.setTotalUrl(threadDto.getPath());
+        total.setCdUrl(threadDto.getPathHead());
         total.setCreateTime(new Date());
         totalMapper.insertTotal(total);
 

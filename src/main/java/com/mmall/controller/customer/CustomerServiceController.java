@@ -25,8 +25,7 @@ import java.util.List;
 @Slf4j
 public class CustomerServiceController {
 
-    @Autowired
-    private HandleTypeMapper handleTypeMapper;
+
     @Autowired
     private CustomerServiceService customerServiceService;
 
@@ -38,11 +37,7 @@ public class CustomerServiceController {
         return customerServiceService.saveCustomerService(userInfo,customerServiceParam);
     }
 
-    @ApiOperation(value = "获取处理类型",  notes="需要Authorization")
-    @GetMapping(value = "/types",produces = {"application/json;charest=Utf-8"})
-    public Result<List<HandleType>> getHandleTypes(){
-        return Result.ok(handleTypeMapper.selectList(new QueryWrapper<HandleType>()));
-    }
+
 
     @ApiOperation(value = "获取工单（0=全部，1=未处理，2=处理中，3=处理完毕）",  notes="需要Authorization")
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
