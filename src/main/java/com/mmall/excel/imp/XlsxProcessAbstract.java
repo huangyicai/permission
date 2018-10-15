@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -346,6 +347,7 @@ public class XlsxProcessAbstract {
      * 重新上传----写入新的Excel
      * @param threadDto
      */
+    @Transactional
     public void updateTatal(final ThreadDto threadDto){
 
         final Total total = totalService.selectById(threadDto.getId());

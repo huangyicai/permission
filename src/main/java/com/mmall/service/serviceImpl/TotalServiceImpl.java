@@ -391,7 +391,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             for(PricingGroupVo pg: first){
 
                 //根据城市锁定价格计算规则
-                if(pg.getCity().startsWith(bill.getDestination())){
+                if(bill.getDestination().startsWith(pg.getCity())){
 
                     //和区间开始比较
                     int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()));

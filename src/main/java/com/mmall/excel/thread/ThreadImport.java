@@ -14,6 +14,7 @@ import com.mmall.model.WeightCalculate;
 import com.mmall.util.RandomHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+@Transactional
 public class ThreadImport implements Callable<String> {
 
     private ThreadDto threadDto;
