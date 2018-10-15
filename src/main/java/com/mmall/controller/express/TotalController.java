@@ -1,6 +1,7 @@
 package com.mmall.controller.express;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.config.UserInfoConfig;
@@ -91,7 +92,7 @@ public class TotalController {
 
     @ApiOperation(value = "上传账单",  notes="需要Authorization")
     @PostMapping(value = "/set")
-    public Result set(MultipartFile file,@RequestParam("time") String time,HttpServletRequest request) throws Exception {
+    public Result set(MultipartFile file,@RequestParam("time") String time) throws Exception {
 
         //创建文件写入路径
         String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";

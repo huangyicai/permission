@@ -86,4 +86,9 @@
         SUM(fujian) as fujian
         from province_calculate where total_id in (${totalId})
     </select>
+
+    <!--删除省计数据-->
+    <delete id="deleteByTotalId">
+        delete from province_calculate where total_id in (${idStr})
+    </delete>
 </mapper>

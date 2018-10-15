@@ -53,11 +53,14 @@ public class ThreadImport implements Callable<String> {
                 String time = new Date().getTime()+"";
                 String keyId=time.substring(9,time.length())+ RandomHelper.getRandNum(3);
 
+                //重名名账单
+                String[] timeStr=threadDto.getTime().split("-");
+
                 //生成创建路径
-                String path=threadDto.getPathHead()+keyId+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getKey()+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+keyId+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getKey()+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);

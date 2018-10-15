@@ -13,5 +13,8 @@ import org.apache.ibatis.annotations.Param;
  * @since 2018-09-25
  */
 public interface ProvinceCalculateMapper extends BaseMapper<ProvinceCalculate> {
+
     ProvinceCalculate getProvinceCalculate(@Param("totalId") String totalId);
+
+    void deleteByTotalId(@Param("idStr") String idStr);
 }

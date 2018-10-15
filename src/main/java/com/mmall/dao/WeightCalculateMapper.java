@@ -17,4 +17,6 @@ public interface WeightCalculateMapper extends BaseMapper<WeightCalculate> {
     WeightCalculate getWeightCalculate(@Param("totalId") String totalId);
 
     void updateByTotalId(WeightCalculate weightCalculate);
+
+    void deleteByTotalId(@Param("idStr") String idStr);
 }
