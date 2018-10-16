@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.SpecialPricingGroupMapper">
+
+    <!--获取特殊定价组-->
+    <select id="getPricingGroupVo" resultType="com.mmall.vo.PricingGroupVo">
+        select
+        special_pricing_group.id,
+        area_begin as areaBegin,
+        area_end as areaEnd,
+        weight_standard as weightStandard,
+        first_weight as firstWeight,
+        first_weight_price as firstWeightPrice,
+        price,
+        first_or_continued as firstOrContinued,
+        user_id as userId,
+        key_name as city
+        from special_pricing_group
+        join special_pricing_group_key sk
+        on sk.id=special_pricing_group.key_id AND user_id =#{userId}
+        ORDER BY first_or_continued,area_end ASC
+    </select>
+</mapper>

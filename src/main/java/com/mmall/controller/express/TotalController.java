@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
 import com.mmall.model.Response.InfoEnums;
@@ -26,7 +27,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
+
+import static java.math.BigDecimal.ROUND_DOWN;
 
 /**
  * <p>
@@ -45,17 +49,21 @@ public class TotalController {
     private TotalService totalService;
 
     @Autowired
+    private TotalMapper totalMapper;
+
+    @Autowired
     private SysUserInfoService sysUserInfoService;
 
     @Autowired
     private  XlsxProcessAbstract xlsxProcessAbstract;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
-    @GetMapping(value = "/update")
-    public Result updateSatte(TotalParam totalParam){
+    @GetMapping(value = "/update/{totalId}/{money}")
+    public Result updateSatte(@PathVariable(value = "totalId") Integer totalId,
+                              @PathVariable(value = "money") Double money){
         Total total=new Total();
-        total.setTotalId(totalParam.getTotalId());
-        total.setTotalPaid(totalParam.getMoney());
+        total.setTotalId(totalId);
+        total.setTotalPaid(new BigDecimal(money).setScale(2,ROUND_DOWN));
         total.setTotalState(2);
         total.setUpdateTime(new Date());
         totalService.updateById(total);
@@ -66,8 +74,7 @@ public class TotalController {
     @GetMapping(value = "/updateMoney")
     public Result updateMoney(TotalParam totalParam){
         Total total=new Total();
-        total.setTotalId(totalParam.getTotalId());
-        total.setTotalPaid(totalParam.getMoney());
+        total.setTotalId(Integer.parseInt(totalParam.getTotalId()));
         totalService.updateById(total);
         return Result.ok();
     }
@@ -77,12 +84,7 @@ public class TotalController {
     public Result send(@RequestBody TotalParam totalParam){
         Total byId = totalService.getById(totalParam.getTotalId());
         if(byId.getTotalState()==1){
-            Total total=new Total();
-            total.setTotalId(totalParam.getTotalId());
-            total.setTotalState(totalParam.getState());
-            total.setTotalRemark(totalParam.getTotalRemark());
-            total.setTotalState(2);
-            totalService.updateById(total);
+            totalMapper.updateById(totalParam.getTotalId(),totalParam.getTotalRemark());
             return Result.ok();
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);
@@ -150,6 +152,5 @@ public class TotalController {
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return totalService.polling(time,user.getId());
     }
-
 }
 

@@ -110,4 +110,8 @@
           send_id=#{sendId} and create_time>#{time}
     </select>
 
+    <!--发送订单-->
+    <update id="updateById">
+      update total set total_remark=#{totalRemark},total_state=2 where total_id in (${totalId})
+    </update>
 </mapper>

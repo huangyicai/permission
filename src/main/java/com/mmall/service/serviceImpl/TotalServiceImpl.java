@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.PricingGroupMapper;
+import com.mmall.dao.SpecialPricingGroupMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
@@ -70,7 +71,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     private PricingGroupMapper pricingGroupMapper;
 
     @Autowired
-    private  XlsxProcessAbstract xlsxProcessAbstract;
+    private SpecialPricingGroupMapper specialPricingGroupMapper;
 
     //成本
     private static  BigDecimal totalCost=BigDecimal.ZERO;
@@ -211,8 +212,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(total.getUserId());
 
         //获取成本表
-        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
-        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(user.getUserId());
+//        SysUserInfo user = UserInfoConfig.getUserInfo();
+        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(total.getSendId());
+
+        //获取特殊报价表
+        List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(total.getUserId());
+
+        //获取特殊成本表
+        List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
 
         //定价表是否数据存在
         List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(total.getUserId());
@@ -221,7 +228,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         //校验成本表是否存在数据
-        List<Integer> ag = pricingGroupMapper.getAllPricingGroups(user.getId());
+        List<Integer> ag = pricingGroupMapper.getAllPricingGroups(total.getSendId());
         if(ag.size()!=34){
             return Result.error(InfoEnums.COST_IS_NULL);
         }
@@ -248,10 +255,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         List<Bill> list=new ArrayList<Bill>();
 
         //计算成本
-        list= getCalculate(pricingOffer,map,1,list);
+        list= getCalculate(pricingOffer,map,1,list,special1);
 
         //计算报价
-        list=getCalculate(pricingGroup,map,2,list);
+        list=getCalculate(pricingGroup,map,2,list,special);
 
         //写入Excel
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","成本","报价"};
@@ -352,7 +359,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
                                    ArrayListMultimap<String, Bill> map,
                                    Integer type,
-                                   List<Bill> list){
+                                   List<Bill> list,
+                                   List<PricingGroupVo> special){
         //确定遍历的账单集合
         if(type==1){
             for (String key:map.keySet()) {
@@ -363,8 +371,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //首重集合
         List<PricingGroupVo> first=new ArrayList<PricingGroupVo>();
 
+        //特殊定价表首重集合
+        List<PricingGroupVo> specialFirst=new ArrayList<PricingGroupVo>();
+
         //续重集合
         List<PricingGroupVo> Continued=new ArrayList<PricingGroupVo>();
+
+        //特殊定价表续重集合
+        List<PricingGroupVo> specialContinued=new ArrayList<PricingGroupVo>();
 
         //分离首重和续重
         for(PricingGroupVo p:pricingGroupVo){
@@ -381,88 +395,124 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             }
         }
 
+        //分离特殊定价表首重和续重
+        for(PricingGroupVo p:special){
+
+            //首重
+            if(p.getFirstOrContinued()==1){
+                specialFirst.add(p);
+                continue;
+            }
+
+            if(p.getFirstOrContinued()==2){
+                specialContinued.add(p);
+                continue;
+            }
+        }
 
         //获取每一条账单数据
         for (Bill bill:list) {
 
+            //计数，判断首重是否循环完毕
             int i=1;
 
-            //遍历首重
-            for(PricingGroupVo pg: first){
+            //遍历特殊定价组
+            Boolean traverse = traverse(bill, i, specialFirst, specialContinued, type);
 
-                //根据城市锁定价格计算规则
-                if(bill.getDestination().startsWith(pg.getCity())){
+            if(!traverse){
+                //遍历定价组
+                traverse(bill,i,first,Continued,type);
+            }
+        }
 
-                    //和区间开始比较
-                    int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()));
+        return list;
+    }
 
-                    //和区间结束大小比较
-                    int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()));
-                    i++;
+    /**
+     * 计算首重和续重
+     * @param bill
+     * @param i
+     * @param first
+     * @param Continued
+     */
+    public Boolean traverse(Bill bill,Integer i,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
 
-                    //在区间，计算首重
-                    if(greater>=0 && less<=0){
-                        if(type==1){
-                            bill.setCost(new BigDecimal(pg.getPrice()));
-                            totalCost=totalCost.add(new BigDecimal(pg.getPrice()));
-                        }else{
-                            bill.setOffer(new BigDecimal(pg.getPrice()));
-                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice()));
-                        }
-                        break;
+        //遍历首重
+        for(PricingGroupVo pg: first){
+
+            //根据城市锁定价格计算规则
+            if(bill.getDestination().startsWith(pg.getCity())){
+
+                //和区间开始比较
+                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()).setScale(2,BigDecimal.ROUND_DOWN));
+
+                //和区间结束大小比较
+                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()).setScale(2,BigDecimal.ROUND_DOWN));
+                i++;
+
+                //在区间，计算首重
+                if(greater>=0 && less<=0){
+                    if(type==1){
+                        bill.setCost(new BigDecimal(pg.getPrice()));
+                        totalCost=totalCost.add(new BigDecimal(pg.getPrice()));
+                        return true;
+                    }else{
+                        bill.setOffer(new BigDecimal(pg.getPrice()));
+                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice()));
+                        return true;
                     }
+                }
 
-                    //不在区间，计算续重
-                    if(i==first.size() && less==1){
+                //不在区间，计算续重
+                if(i==first.size() && less==1){
 
-                        //遍历续重区间
-                        for(PricingGroupVo pp: Continued){
+                    //遍历续重区间
+                    for(PricingGroupVo pp: Continued){
 
-                            //和区间开始比较
-                            int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
+                        //和区间开始比较
+                        int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
 
-                            //和区间结束大小比较
-                            int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
+                        //和区间结束大小比较
+                        int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
 
-                            if(greaterContinue>=0 && lessContinue<=0){
+                        if(greaterContinue>=0 && lessContinue<=0){
 
-                                //获取计算的单位个数
-                                BigDecimal bd=bill.getWeight()
-                                        .subtract(new BigDecimal(first.get(first.size()-1).getAreaBegin()))
-                                        .divide(new BigDecimal(pp.getWeightStandard()))
-                                        .multiply(new BigDecimal(100));
+                            //获取计算的单位个数
+                            BigDecimal bd=bill.getWeight()
+                                    .subtract(new BigDecimal(first.get(first.size()-1).getAreaBegin()))
+                                    .divide(new BigDecimal(pp.getWeightStandard()))
+                                    .multiply(new BigDecimal(100));
 
-                                Integer num=bd.intValue();
+                            Integer num=bd.intValue();
 
-                                if(num%100!=0){
-                                    num=num/100+1;
-                                }else{
-                                    num=num/100;
-                                }
-
-                                //获取首重的钱
-                                BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
-
-                                //计算续重的钱
-                                BigDecimal two=new BigDecimal(pp.getCity()).multiply(new BigDecimal(num));
-
-                                if(type==1){
-                                    bill.setCost(fist.add(two));
-                                    totalCost=totalCost.add(fist.add(two));
-                                }else{
-                                    bill.setOffer(fist.add(two));
-                                    totalOffer=totalOffer.add(fist.add(two));
-                                }
-                                break;
+                            if(num%100!=0){
+                                num=num/100+1;
+                            }else{
+                                num=num/100;
                             }
+
+                            //获取首重的钱
+                            BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
+
+                            //计算续重的钱
+                            BigDecimal two=new BigDecimal(pp.getCity()).multiply(new BigDecimal(num));
+
+                            if(type==1){
+                                bill.setCost(fist.add(two));
+                                totalCost=totalCost.add(fist.add(two));
+                                return true;
+                            }else{
+                                bill.setOffer(fist.add(two));
+                                totalOffer=totalOffer.add(fist.add(two));
+                                return true;
+                            }
+
                         }
                     }
                 }
             }
         }
 
-
-        return list;
+        return false;
     }
-
 }
