@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 public class TotalVo extends Total implements Serializable {
 
-    @ApiModelProperty(value = "付款方式")
+    @ApiModelProperty(value = "付款机构")
     private String typeName;
 
     @ApiModelProperty(value = "收款人")

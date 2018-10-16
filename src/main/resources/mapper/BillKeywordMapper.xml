@@ -21,6 +21,8 @@
 
     <!--获取用户id:select * from bill_keyword  WHERE user_id in(${nameStr}) resultMap="BaseResultMap"-->
     <select id="getBillKeyword"  resultType="com.mmall.model.BillKeyword">
-        select * from bill_keyword  WHERE FIND_IN_SET(user_id,#{nameStr}) and status=1
+        select bk.* from bill_keyword bk
+        JOIN sys_user_info si on si.id=bk.user_id
+        WHERE bk.user_id in(${nameStr}) and bk.status!=0 and si.status!=-1
     </select>
 </mapper>

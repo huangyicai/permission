@@ -293,12 +293,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         File file=new File(total.getCdUrl());
         String upload = UploadApi.upload(file, str[str.length-1], total.getTotalTime()+"/"+total.getName()+"/");
 
-        total.setTotalCost(totalCost);
-        total.setTotalOffer(totalOffer);
-        total.setTotalUrl(upload);
-        total.setUpdateTime(new Date());
+        Total total1=new Total();
+        total1.setTotalId(totalId);
+        total1.setTotalCost(totalCost);
+        total1.setTotalOffer(totalOffer);
+        total1.setTotalState(1);
+        total1.setTotalUrl(upload);
+        total1.setUpdateTime(new Date());
 
-        totalMapper.updateById(total);
+        totalMapper.updateById(total1);
         return Result.ok(upload);
     }
 

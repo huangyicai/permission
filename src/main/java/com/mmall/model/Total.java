@@ -155,9 +155,9 @@ public class Total implements Serializable {
     @TableField("create_ip")
     private String createIp;
     /**
-     * 修改时间
+     * 付款时间
      */
-    @ApiModelProperty(value = "修改时间")
+    @ApiModelProperty(value = "付款时间")
     @TableField("update_time")
     private Date updateTime;
 

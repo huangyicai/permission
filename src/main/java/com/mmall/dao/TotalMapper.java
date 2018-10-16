@@ -38,6 +38,6 @@ public interface TotalMapper extends BaseMapper<Total> {
      */
     List<Total> getTotals(@Param("time") String time,@Param("sendId") Integer sendId);
 
-    void updateById(@Param("totalId") String totalId,@Param("totalRemark")String totalRemark);
+    void updateByTotalId(@Param("totalId") String totalId,@Param("totalRemark")String totalRemark,@Param("date") String date);
 
 }
