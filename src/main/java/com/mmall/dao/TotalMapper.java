@@ -27,7 +27,11 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     List<Total> listToal(@Param("totalTime")String totalTime, @Param("userId")String userId);
 
-    Page<TotalVo> getBill(IPage page, @Param("totalTime") String totalTime, @Param("userId")String userId, @Param("state")Integer state);
+    List<Total> listTotal(@Param("totalTime")String totalTime, @Param("sumId")String sumId);
+
+    List<Total> deleteTotal(@Param("totalTime")String totalTime, @Param("sumId")String sumId);
+
+    Page<TotalVo> getBill(IPage page, @Param("totalTime") String totalTime, @Param("userId")String userId, @Param("state")Integer state,@Param("type") Integer type,@Param("sendId") Integer sendId);
 
     Total getBillCount(@Param("totalTime") String totalTime, @Param("userId")String userId,@Param("state")String state);
 

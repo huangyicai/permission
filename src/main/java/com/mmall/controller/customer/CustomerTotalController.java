@@ -40,9 +40,8 @@ public class CustomerTotalController {
     @ApiOperation(value = "获取账单列表",  notes="需要Authorization")
     @PostMapping(value = "/getBill")
     public Result<IPage<TotalVo>> getBill(@RequestBody BillDetailsParam billDetailsParam){
-        billDetailsParam.setState(2);
         IPage<TotalVo> page=new Page<>(billDetailsParam.getCurrent(),billDetailsParam.getSize());
-        IPage<TotalVo> bill = totalService.getBill(page,billDetailsParam);
+        IPage<TotalVo> bill = totalService.getBill(page,billDetailsParam,2);
         return Result.ok(bill);
     }
 
@@ -52,6 +51,7 @@ public class CustomerTotalController {
         Total total=new Total();
         total.setTotalId(credentialsParam.getTotalId());
         total.setTotalState(3);
+        total.setTotalCredentialsUrl(credentialsParam.getTotalCredentialsUrl());
         totalService.updateById(total);
         return Result.ok();
     }

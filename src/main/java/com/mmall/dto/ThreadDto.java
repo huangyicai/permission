@@ -70,4 +70,9 @@ public class ThreadDto {
      * 主键生成的时间
      */
     private String Idtime;
+
+    /**
+     * 总账单名字
+     */
+    private String name;
 }

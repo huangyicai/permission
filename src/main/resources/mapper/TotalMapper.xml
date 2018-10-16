@@ -51,6 +51,19 @@
       from total where user_id in (${userId}) and total_time=#{totalTime}
     </select>
 
+    <!--根据总账单id获取账单-->
+    <select id="listTotal" resultType="com.mmall.model.Total">
+      select
+      total_id as totalId,
+      sum_id as sumId
+      from total where sum_id in (${sumId}) and total_time=#{totalTime}
+    </select>
+
+    <!--根据总账单id删除账单-->
+    <delete id="deleteTotal">
+       delete from total where sum_id in (${sumId}) and total_time=#{totalTime}
+    </delete>
+
     <!--获取账单列表（数据分析）-->
     <select id="getBill"  resultType="com.mmall.vo.TotalVo">
         select
@@ -62,8 +75,10 @@
         total_time as totalTime,
         total_number as totalNumber,
         total_weight as totalWeight,
-        total_cost as totalCost,
         total_offer as totalOffer,
+        <if test="type!=2">
+            total_cost as totalCost,
+        </if>
         total_paid as totalPaid,
         total_credentials_url as totalCredentialsUrl,
         total_url as totalUrl,
@@ -92,6 +107,10 @@
 
           <if test="state!=null and state!=0">
               and total_state=#{state}
+          </if>
+
+          <if test="sendId!=null and sendId!=0">
+              and send_id = #{sendId}
           </if>
         </where>
     </select>

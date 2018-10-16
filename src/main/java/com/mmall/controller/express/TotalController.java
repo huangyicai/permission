@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.dao.SumTatalMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
 import com.mmall.model.Response.InfoEnums;
+import com.mmall.model.SumTatal;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
@@ -21,6 +23,8 @@ import com.mmall.model.params.TotalParam;
 import com.mmall.service.TotalService;
 import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import static java.math.BigDecimal.ROUND_DOWN;
 
@@ -52,7 +57,7 @@ public class TotalController {
     private TotalMapper totalMapper;
 
     @Autowired
-    private SysUserInfoService sysUserInfoService;
+    private SumTatalMapper sumTatalMapper;
 
     @Autowired
     private  XlsxProcessAbstract xlsxProcessAbstract;
@@ -92,14 +97,70 @@ public class TotalController {
 
     }
 
-    @ApiOperation(value = "上传账单",  notes="需要Authorization")
-    @PostMapping(value = "/set")
-    public Result set(MultipartFile file,@RequestParam("time") String time) throws Exception {
+    @ApiOperation(value = "上传账单---追加",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer")
+    })
+    @PostMapping(value = "/additional")
+    public Result additional(MultipartFile file,@RequestParam("time") String time) throws Exception {
 
         //创建文件写入路径
-        String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
-        xlsxProcessAbstract.processAllSheet(file,time,realPath);
+        xlsxProcessAbstract.processAllSheet(file,time,1,null);
         return Result.ok();
+    }
+
+    @ApiOperation(value = "上传账单---替换",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer"),
+            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String")
+    })
+    @PostMapping(value = "/replace")
+    public Result replace(MultipartFile file,
+                          @RequestParam("time") String time,
+                          @RequestParam("sumId") String sumId) throws Exception {
+
+        //创建文件写入路径
+        xlsxProcessAbstract.processAllSheet(file,time,2,sumId);
+        return Result.ok();
+    }
+
+    @ApiOperation(value = "替换账单--检测是否有已经发送的订单",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
+            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String")
+    })
+    @PostMapping(value = "/retrieve")
+    public Result retrieve(@RequestParam("time") String time,
+                          @RequestParam("sumId") String sumId){
+
+        List<Total> totals = totalMapper.listTotal(time, sumId);
+        return Result.ok(totals);
+    }
+
+    @ApiOperation(value = "客户追加上传",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
+            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "Integer"),
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer"),
+    })
+    @PostMapping(value = "/additionalSet")
+    public Result additionalSet(MultipartFile file,
+                                @RequestParam("time") String time,
+                                @RequestParam("type") Integer type,@RequestParam("userId") Integer userId) throws Exception {
+        xlsxProcessAbstract.additionalSet(file,userId,type,time);
+        return Result.ok();
+    }
+
+    @ApiOperation(value = "获取该月总账单",  notes="需要Authorization")
+    @PostMapping(value = "/judgeSet")
+    public Result<List<SumTatal>> judgeSet(@RequestParam("time") String time) throws Exception {
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        List<SumTatal> sumTatals = sumTatalMapper.selectList(new QueryWrapper<SumTatal>()
+                .eq("sum_time", time)
+                .eq("user_id",userInfo.getId()));
+       return Result.ok(sumTatals);
     }
 
     @ApiOperation(value = "获取账单月份总计",  notes="需要Authorization")
@@ -113,7 +174,7 @@ public class TotalController {
     @PostMapping(value = "/getBill")
     public Result<IPage<TotalVo>> getBill(@RequestBody BillDetailsParam billDetailsParam){
         IPage<TotalVo> page=new Page<>(billDetailsParam.getCurrent(),billDetailsParam.getSize());
-        IPage<TotalVo> bill = totalService.getBill(page,billDetailsParam);
+        IPage<TotalVo> bill = totalService.getBill(page,billDetailsParam,0);
         return Result.ok(bill);
     }
 

@@ -126,14 +126,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * 获取公司账单----数据分析
      * @return
      */
-    public IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam) {
+    public IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam,Integer type) {
+
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+
         String nameStr=getUserIdStr();
 
         if(!"".equals(billDetailsParam.getUserId()) && billDetailsParam.getUserId()!=null){
             nameStr=billDetailsParam.getUserId().toString();
         }
 
-        Page<TotalVo> bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState());
+        Page<TotalVo> bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,userInfo.getUserId());
         return bill;
     }
 

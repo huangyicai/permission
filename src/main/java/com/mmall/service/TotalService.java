@@ -26,7 +26,7 @@ public interface TotalService extends IService<Total> {
 
     List<Total> listToal(String totalTime,String userId);
 
-    IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam);
+    IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam,Integer type);
 
     TotalIncomeParam getBillCount(String date);
 

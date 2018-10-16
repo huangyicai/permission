@@ -42,11 +42,18 @@ public class Total implements Serializable {
     private Integer userId;
 
     /**
-     * 用户id
+     * 发送者id
      */
-    @ApiModelProperty(value = "用户id")
+    @ApiModelProperty(value = "发送者id")
     @TableField("send_id")
     private Integer sendId;
+
+    /**
+     * 总账单id
+     */
+    @ApiModelProperty(value = "总账单id")
+    @TableField("sum_id")
+    private Integer sumId;
 
     /**
      * 用户名
@@ -359,4 +366,11 @@ public class Total implements Serializable {
     public Total() {
     }
 
+    public Integer getSumId() {
+        return sumId;
+    }
+
+    public void setSumId(Integer sumId) {
+        this.sumId = sumId;
+    }
 }

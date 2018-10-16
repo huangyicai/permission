@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
@@ -59,7 +60,13 @@ public class ThreadImport implements Callable<String> {
                 String[] timeStr=threadDto.getTime().split("-");
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getKey()+"月账单"+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getName()+"/"+threadDto.getKey()+"/";
+
+                File file=new File(path);
+                if(!file .exists() && !file .isDirectory()){
+                    file.mkdir();
+                }
+                path=path+threadDto.getKey()+"月账单"+".xlsx";
 
                 //生成下载路径
                 String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";

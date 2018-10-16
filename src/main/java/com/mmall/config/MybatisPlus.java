@@ -29,17 +29,17 @@ public class MybatisPlus {
     private static String packageName="";
 
     //作者
-    private static String authorName="hyc";
+    private static String authorName="qty";
 
     //table名字
-    private static String table="special_pricing_group_key";
+    private static String table="sum_tatal";
 
     //table前缀
     private static String prefix="";
 
     private static File file = new File(packageName);
-        private static String path = "E:\\java\\manage\\permission";
-    //private static String path = "E:\\java\\manage";//--qyy
+//        private static String path = "E:\\java\\manage\\permission";
+    private static String path = "E:\\project\\permission";//--qyy
     private static String pathTwo = "\\src\\main\\java\\com\\mmall";
     public static void main(String[] args) {
         // 自定义需要填充的字段
@@ -109,18 +109,18 @@ public class MybatisPlus {
                 //.setXml("mapper")
         );
 
-        //FileOutConfig mapperConfig = getMapperConfig();
+        FileOutConfig mapperConfig = getMapperConfig();
         FileOutConfig entityConfig = getEntityConfig();
-        //FileOutConfig serviceConfig = getServiceConfig();
-        //FileOutConfig serviceImplConfig = getServiceImplConfig();
-        //FileOutConfig contolConfig = getContolConfig();
+//        FileOutConfig serviceConfig = getServiceConfig();
+//        FileOutConfig serviceImplConfig = getServiceImplConfig();
+//        FileOutConfig contolConfig = getContolConfig();
         FileOutConfig daoConfig = getDaoConfig();
         List<FileOutConfig> fileOutConfigs = new ArrayList<FileOutConfig>();
-        //fileOutConfigs.add(mapperConfig);
+        fileOutConfigs.add(mapperConfig);
         fileOutConfigs.add(entityConfig);
-        //fileOutConfigs.add(serviceConfig);
-        //fileOutConfigs.add(serviceImplConfig);
-        //fileOutConfigs.add(contolConfig);
+//        fileOutConfigs.add(serviceConfig);
+//        fileOutConfigs.add(serviceImplConfig);
+//        fileOutConfigs.add(contolConfig);
         fileOutConfigs.add(daoConfig);
         mpg.setCfg(
                 // 注入自定义配置，可以在 VM 中使用 cfg.abc 设置的值

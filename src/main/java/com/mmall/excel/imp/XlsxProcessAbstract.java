@@ -99,6 +99,9 @@ public class XlsxProcessAbstract {
     //文件的项目路径
     private final String ompPath="10.10.10.114:80/total/";
 
+    //创建文件写入路径
+    private final String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
+
     /**
      * 根据路径读取数据
      * @param filename
@@ -132,21 +135,25 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void processAllSheet(MultipartFile xlsxFile,String time,String realPath) throws Exception {
+    public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
 
-        //判断当月是否有数据
-        List<Total> totalList = totalService.selectList(new QueryWrapper<Total>().eq("total_time", time));
+        //替换
+        if(type==2){
 
-        if(totalList!=null && totalList.size()>0){
-            //删除之前的账单
-            totalService.delete(new QueryWrapper<Total>().eq("total_time",time));
-            String idStr="";
-            for(Total total:totalList){
-                idStr+=total.getTotalId()+",";
+            //获取所替换的账单
+            List<Total> totals = totalService.listTotal(time, sunTotalId);
+
+            if(totals!=null && totals.size()>0){
+                //删除之前的账单
+                totalService.delete(new QueryWrapper<Total>().eq("total_time",time));
+                String idStr="";
+                for(Total total:totals){
+                    idStr+=total.getTotalId()+",";
+                }
+                idStr=idStr.substring(0,idStr.length()-1);
+                weightCalculateMapper.deleteByTotalId(idStr);
+                provinceCalculateMapper.deleteByTotalId(idStr);
             }
-            idStr=idStr.substring(0,idStr.length()-1);
-            weightCalculateMapper.deleteByTotalId(idStr);
-            provinceCalculateMapper.deleteByTotalId(idStr);
         }
 
         //判断文件夹是否存在，不存在则创建
@@ -249,7 +256,7 @@ public class XlsxProcessAbstract {
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
-
+            threadDto.setName(xlsxFile.getName().split(".")[0]);
             ThreadImport threadImport=new ThreadImport(threadDto);
             threadPool.submit(threadImport);
 
@@ -276,6 +283,148 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public void againSet(MultipartFile xlsxFile,Integer totalId) throws Exception {
+        ThreadDto threadDto = getThreadDto(xlsxFile, totalId,"");
+        updateTatal(threadDto);
+        destination.clear();
+        weightMap.clear();
+    }
+
+    /**
+     * 客户追加上传
+     * @param xlsxFile
+     * @return
+     * @throws Exception
+     */
+    public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
+
+        ThreadDto threadDto = getThreadDto(xlsxFile, userId,realPath);
+        threadDto.setTime(date);
+
+        final Total total = new Total();
+
+        String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
+
+        DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
+
+            public void execute(Row row, Bill personUser) {
+                row.createCell(0).setCellValue(personUser.getBillName());
+                row.createCell(1).setCellValue(personUser.getSweepTime());
+                row.createCell(2).setCellValue(personUser.getSerialNumber());
+                row.createCell(3).setCellValue(personUser.getDestination());
+                row.createCell(4).setCellValue(personUser.getWeight().toString());
+            }
+
+            public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
+                outputStream = new FileOutputStream(total.getCdUrl());
+                workbook.write(outputStream);
+                outputStream.close();
+                workbook.close();
+
+                //初始化数据
+                WeightCalculate weightCalculate=new WeightCalculate();
+                ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+
+                //修改账单表数据
+                total.setName(threadDto.getKey());
+                total.setUserId(threadDto.getId());
+                total.setSendId(threadDto.getSendId());
+                total.setTotalTime(threadDto.getTime());
+                total.setTotalNumber(threadDto.getTotalNum());
+                total.setTotalWeight(threadDto.getWeight());
+                total.setOrderNo(threadDto.getIdtime());
+                total.setTotalUrl(threadDto.getPath());
+                total.setCdUrl(threadDto.getPathHead());
+                total.setCreateTime(new Date());
+                if(type==1){
+                    total.setTotalState(1);
+                }else{
+                    total.setTotalState(-1);
+                }
+                int insert = totalMapper.insert(total);
+
+                //修改重量区间数据
+                weightCalculate.setTotalId(insert);
+                weightCalculate.setZero(threadDto.getMw().get(0));
+                weightCalculate.setOne(threadDto.getMw().get(1));
+                weightCalculate.setTwo(threadDto.getMw().get(2));
+                weightCalculate.setThree(threadDto.getMw().get(3));
+                weightCalculate.setFour(threadDto.getMw().get(4));
+                weightCalculate.setFive(threadDto.getMw().get(5));
+                weightCalculate.setSix(threadDto.getMw().get(6));
+                weightCalculate.setSeven(threadDto.getMw().get(7));
+                weightCalculate.setEight(threadDto.getMw().get(8));
+                weightCalculate.setNine(threadDto.getMw().get(9));
+                weightCalculate.setTen(threadDto.getMw().get(10));
+                weightCalculate.setEleven(threadDto.getMw().get(11));
+                weightCalculate.setTwelve(threadDto.getMw().get(12));
+                weightCalculate.setThirteen(threadDto.getMw().get(13));
+                weightCalculate.setFourteen(threadDto.getMw().get(14));
+                weightCalculate.setFifteen(threadDto.getMw().get(15));
+                weightCalculate.setSixteen(threadDto.getMw().get(16));
+                weightCalculate.setSeventeen(threadDto.getMw().get(17));
+                weightCalculate.setEighteen(threadDto.getMw().get(18));
+                weightCalculate.setNineteen(threadDto.getMw().get(19));
+                weightCalculate.setTwenty(threadDto.getMw().get(20));
+                weightCalculate.setTwentyOne(threadDto.getMw().get(21));
+                weightCalculateMapper.insert(weightCalculate);
+
+                //修改省计表数据
+                provinceCalculate.setTotalId(insert);
+                provinceCalculate.setBeijing(threadDto.getMd().get("北京"));
+                provinceCalculate.setTianjing(threadDto.getMd().get("天津"));
+                provinceCalculate.setHebei(threadDto.getMd().get("河北"));
+                provinceCalculate.setShanxi(threadDto.getMd().get("山西"));
+                provinceCalculate.setNeimenggu(threadDto.getMd().get("内蒙古"));
+                provinceCalculate.setLiaoning(threadDto.getMd().get("辽宁"));
+                provinceCalculate.setJiling(threadDto.getMd().get("吉林"));
+                provinceCalculate.setHeilongjiang(threadDto.getMd().get("黑龙江"));
+                provinceCalculate.setShanghai(threadDto.getMd().get("上海"));
+                provinceCalculate.setJiangsu(threadDto.getMd().get("江苏"));
+                provinceCalculate.setZhejaing(threadDto.getMd().get("浙江"));
+                provinceCalculate.setAnhui(threadDto.getMd().get("安徽"));
+                provinceCalculate.setFujian(threadDto.getMd().get("福建"));
+                provinceCalculate.setJaingxi(threadDto.getMd().get("江西"));
+                provinceCalculate.setShandong(threadDto.getMd().get("山东"));
+                provinceCalculate.setHenan(threadDto.getMd().get("河南"));
+                provinceCalculate.setHubei(threadDto.getMd().get("湖北"));
+                provinceCalculate.setHunan(threadDto.getMd().get("湖南"));
+                provinceCalculate.setGuangdong(threadDto.getMd().get("广东"));
+                provinceCalculate.setGuangxi(threadDto.getMd().get("广西"));
+                provinceCalculate.setHainan(threadDto.getMd().get("海南"));
+                provinceCalculate.setChongqing(threadDto.getMd().get("重庆"));
+                provinceCalculate.setSichuan(threadDto.getMd().get("四川"));
+                provinceCalculate.setGuizhou(threadDto.getMd().get("贵州"));
+                provinceCalculate.setYunnan(threadDto.getMd().get("云南"));
+                provinceCalculate.setXizang(threadDto.getMd().get("西藏"));
+                provinceCalculate.setShanxi(threadDto.getMd().get("陕西"));
+                provinceCalculate.setGansu(threadDto.getMd().get("甘肃"));
+                provinceCalculate.setQinghai(threadDto.getMd().get("青海"));
+                provinceCalculate.setNingxia(threadDto.getMd().get("宁夏"));
+                provinceCalculate.setXinjang(threadDto.getMd().get("新疆"));
+                provinceCalculate.setTaiwan(threadDto.getMd().get("台湾"));
+                provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
+                provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
+                provinceCalculateMapper.insert(provinceCalculate);
+            }
+
+            public void listen(Row row, int rows) {
+//                System.out.println("执行到了：<" + rows + "> 这一行");
+            }
+        };
+
+        new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
+        destination.clear();
+        weightMap.clear();
+    }
+
+    /**
+     * 分离数据用户级别账单
+     * @param xlsxFile
+     * @param totalId
+     * @return
+     */
+    public ThreadDto getThreadDto(MultipartFile xlsxFile,Integer totalId,String realPath) throws Exception {
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -295,7 +444,7 @@ public class XlsxProcessAbstract {
 
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
-
+        ThreadDto threadDto=new ThreadDto();
         for (String key:map.keySet()) {
 
             Integer total=0;//总单量
@@ -318,7 +467,7 @@ public class XlsxProcessAbstract {
                 for (BigDecimal bigDecimal:weightMap.get(integer)){
                     weight=weight.add(bigDecimal);
                 }
-                    mw.put(integer,weight);
+                mw.put(integer,weight);
             }
 
             //根据省份分离数据
@@ -327,21 +476,22 @@ public class XlsxProcessAbstract {
                 md.put(str,destination.get(str).size());
             }
 
-            ThreadDto threadDto=new ThreadDto();
-            threadDto.setId(totalId);
+            threadDto.setSendId(userInfo.getId());
             threadDto.setKey(key);
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
+            threadDto.setPath(ompPath);
+            threadDto.setPathHead(realPath);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
-            updateTatal(threadDto);
-
-            destination.clear();
-            weightMap.clear();
         }
         map.clear();
+        return threadDto;
     }
+
+
+
 
     /**
      * 重新上传----写入新的Excel
