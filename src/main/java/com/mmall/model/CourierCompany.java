@@ -36,19 +36,51 @@ public class CourierCompany implements Serializable {
     /**
      * 颜色
      */
-    @ApiModelProperty(value = "颜色")
+    @ApiModelProperty(value = "字体颜色")
     @TableField("color")
     private String color;
+
+
+    /**
+     * 选中后颜色
+     */
+    @ApiModelProperty(value = "选中后字体颜色")
+    @TableField("select_color")
+    private String selectColor;
 
     @ApiModelProperty(value = "快递公司名称")
     @TableField("name")
     private String name;
+    /**
+     * 主题背景色
+     */
+    @ApiModelProperty(value = "主题背景色")
+    @TableField("background_color")
+    private String backgroundColor;
+
     /**
      * logo地址
      */
     @ApiModelProperty(value = "logo地址")
     @TableField("logo_url")
     private String logoUrl;
+
+
+    public String getSelectColor() {
+        return selectColor;
+    }
+
+    public void setSelectColor(String selectColor) {
+        this.selectColor = selectColor;
+    }
+
+    public String getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(String backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
 
     public String getName() {
         return name;

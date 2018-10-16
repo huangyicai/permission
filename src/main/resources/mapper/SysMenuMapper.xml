@@ -28,7 +28,7 @@
         INNER JOIN sys_menu e ON m.menu_id = e.id
         WHERE
             s.id =#{id} AND m.`status`=1
-		ORDER BY e.seq
+		ORDER BY m.seq
 </select>
 
 

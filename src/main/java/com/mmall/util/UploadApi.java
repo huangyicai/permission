@@ -60,13 +60,13 @@ public class UploadApi {
             if (!ossClient.doesBucketExist(bucketName)) {
                 ossClient.createBucket(bucketName);
             }
-            ossClient.putObject(bucketName, firstKey, inputStream, objectMetadata);
+            ossClient.putObject(bucketName, "images/"+firstKey, inputStream, objectMetadata);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             ossClient.shutdown();
         }
-        return returnBaseUrl + firstKey;
+        return returnBaseUrl + "images/"+firstKey;
     }
 
     /**

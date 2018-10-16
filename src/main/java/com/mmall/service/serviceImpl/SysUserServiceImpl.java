@@ -81,7 +81,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         for (SysMenu sysMenu : sysMenus) {
             dtoList.add(SysMenuDto.adapt(sysMenu));
         }
-        if (CollectionUtils.isEmpty(dtoList)) {
+        /*if (CollectionUtils.isEmpty(dtoList)) {
             return Result.ok(dtoList);
         }
         // level -> [aclmodule1, aclmodule2, ...] Map<String, List<Object>>
@@ -95,8 +95,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         }
         Collections.sort(rootList, menusSeqComparator);
-        transformMenuTree(rootList, LevelUtil.ROOT, levelAclModuleMap);
-        return Result.ok(rootList);
+        transformMenuTree(rootList, LevelUtil.ROOT, levelAclModuleMap);*/
+        return Result.ok(dtoList);
     }
     public void transformMenuTree(List<SysMenuDto> dtoList, String level, Multimap<String, SysMenuDto> levelAclModuleMap) {
         for (int i = 0; i < dtoList.size(); i++) {
