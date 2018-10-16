@@ -97,7 +97,7 @@ public class XlsxProcessAbstract {
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
     //文件的项目路径
-    private final String ompPath="10.10.10.114:8080/total/";
+    private final String ompPath="10.10.10.114:80/total/";
 
     /**
      * 根据路径读取数据

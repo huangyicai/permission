@@ -57,7 +57,7 @@ public class ThreadImport implements Callable<String> {
 
                 //重名名账单
                 String[] timeStr=threadDto.getTime().split("-");
-                threadDto.setKey(threadDto.getKey()+timeStr[0]+"年"+timeStr[1]);
+                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
                 //生成创建路径
                 String path=threadDto.getPathHead()+threadDto.getKey()+"月账单"+".xlsx";
 

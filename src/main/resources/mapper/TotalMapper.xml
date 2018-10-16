@@ -56,11 +56,12 @@
         select
         total_id as totalId,
         send_id as sendId,
-        total.user_id as userId,
+        t.user_id as userId,
         order_no as orderNo,
-        `name`,
+        t.`name`,
         total_time as totalTime,
         total_number as totalNumber,
+        total_weight as totalWeight,
         total_cost as totalCost,
         total_offer as totalOffer,
         total_paid as totalPaid,
@@ -68,26 +69,31 @@
         total_url as totalUrl,
         total_remark as totalRemark,
         total_state as totalState,
-        create_time as createTime,
+        t.create_time as createTime,
         as_of_time as asOfTime,
-        update_time as updateTime,
+        t.update_time as updateTime,
         type_name as typeName,
         payee,
         payment_account as paymentAccount
-        from total LEFT  join payment_method on payment_method.user_id=total.user_id
-          <where>
-              <if test="userId!=null">
-                 and total.user_id =#{userId}
-              </if>
+        from
+        total t
+        LEFT JOIN sys_user_info ui on ui.id=t.user_id
+        LEFT join
+        payment_method m
+        on m.user_id=ui.parent_id
+        <where>
+          <if test="userId!=null">
+             and t.user_id =#{userId}
+          </if>
 
-              <if test="totalTime">
-                  and total_time =#{totalTime}
-              </if>
+          <if test="totalTime">
+              and total_time =#{totalTime}
+          </if>
 
-              <if test="state!=null and state!=0">
-                  and total_state=#{state}
-              </if>
-          </where>
+          <if test="state!=null and state!=0">
+              and total_state=#{state}
+          </if>
+        </where>
     </select>
 
     <!--获取已收和未收数据-->
@@ -111,7 +117,7 @@
     </select>
 
     <!--发送订单-->
-    <update id="updateById">
-      update total set total_remark=#{totalRemark},total_state=2 where total_id in (${totalId})
+    <update id="updateByTotalId">
+      update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date} where total_id in (${totalId})
     </update>
 </mapper>

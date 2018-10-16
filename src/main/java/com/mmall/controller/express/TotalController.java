@@ -64,7 +64,7 @@ public class TotalController {
         Total total=new Total();
         total.setTotalId(totalId);
         total.setTotalPaid(new BigDecimal(money).setScale(2,ROUND_DOWN));
-        total.setTotalState(2);
+        total.setTotalState(4);
         total.setUpdateTime(new Date());
         totalService.updateById(total);
         return Result.ok();
@@ -84,7 +84,7 @@ public class TotalController {
     public Result send(@RequestBody TotalParam totalParam){
         Total byId = totalService.getById(totalParam.getTotalId());
         if(byId.getTotalState()==1){
-            totalMapper.updateById(totalParam.getTotalId(),totalParam.getTotalRemark());
+            totalMapper.updateByTotalId(totalParam.getTotalId(),totalParam.getTotalRemark(),totalParam.getDate());
             return Result.ok();
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);
