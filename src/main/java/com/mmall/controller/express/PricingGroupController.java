@@ -7,8 +7,10 @@ import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.CityMapper;
 import com.mmall.dao.SpecialPricingGroupKeyMapper;
 import com.mmall.model.*;
+import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.params.PricingGroupParam;
+import com.mmall.model.params.keyNameParam;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.BeanValidator;
 import com.mmall.vo.CityVo;
@@ -88,9 +90,10 @@ public class PricingGroupController {
     }
 
     @ApiOperation(value = "添加特殊定价",  notes="需要Authorization")
-    @PostMapping(value = "/{userId}",produces = {"application/json;charest=Utf-8"})
+    @PostMapping(value = "/special/{keyId}/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result saveSpecialPricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,
-                                   @PathVariable("userId")Integer userId){
+                                          @PathVariable("keyId")Integer keyId,
+                                          @PathVariable("userId")Integer userId){
         for(PricingGroupParam pgp :pricingGroups){
             BeanValidator.check(pgp);
         }
@@ -98,7 +101,7 @@ public class PricingGroupController {
             SysUserInfo userInfo = UserInfoConfig.getUserInfo();
             userId = userInfo.getId();
         }
-        return pricingGroupService.saveSpecialPricingGroup(pricingGroups,userId);
+        return pricingGroupService.saveSpecialPricingGroup(pricingGroups,userId,keyId);
     }
 
     @ApiOperation(value = "修改特殊定价",  notes="需要Authorization")
@@ -110,6 +113,26 @@ public class PricingGroupController {
         }
         return pricingGroupService.updateSpecialPricingGroup(pricingGroups,keyId);
     }
+
+    @ApiOperation(value = "添加特殊定价关键字",  notes="需要Authorization")
+    @PostMapping(value = "/special/key/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result saveSpecialPricingGroupKey(@PathVariable("userId")Integer userId,
+                                             @RequestBody keyNameParam keyName){
+        if(userId==0||userId.equals(0)){
+            SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+            userId = userInfo.getId();
+        }
+        SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>().eq("key_name", keyName));
+        if(key_name!=null){
+            return Result.error(InfoEnums.KEY_EXISTENCE);
+        }
+        SpecialPricingGroupKey specialPricingGroupKey = new SpecialPricingGroupKey();
+        specialPricingGroupKey.setKeyName(keyName.getKeyName());
+        specialPricingGroupKey.setUserId(userId);
+        specialPricingGroupKeyMapper.insert(specialPricingGroupKey);
+        return Result.ok(specialPricingGroupKey);
+    }
+
     @ApiOperation(value = "获取用户特殊定价关键字",  notes="需要Authorization")
     @GetMapping(value = "/specialKey/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result<List<SpecialPricingGroupKey>> getSpecialPricingGroup(@PathVariable("userId")Integer userId){

@@ -151,7 +151,7 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     }
 
     @Override
-    public Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId) {
+    public Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId,Integer keyId) {
         if(pricingGroups.isEmpty()){
             return Result.error(InfoEnums.PLEASE_ADD_PRICING);
         }
@@ -162,21 +162,12 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             if(pg.getFirstOrContinued()==2)continuedWeight=false;
         }
 
-        String keyName = pricingGroups.get(0).getKeyName();
         if(firstWeight||continuedWeight) return Result.error(InfoEnums.WEIGHT_NOT_WRITE);
-        SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>().eq("key_name", keyName));
-        if(key_name!=null){
-            return Result.error(InfoEnums.KEY_EXISTENCE);
-        }
-        SpecialPricingGroupKey specialPricingGroupKey = new SpecialPricingGroupKey();
-        specialPricingGroupKey.setKeyName(keyName);
-        specialPricingGroupKey.setUserId(userId);
-        specialPricingGroupKeyMapper.insert(specialPricingGroupKey);
         //specialPricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",userId).eq("city_id",cityId));
         List<SpecialPricingGroup> pricingGroupList = Lists.newArrayList();
         for(PricingGroupParam prp : pricingGroups){
             SpecialPricingGroup pg = SpecialPricingGroup.builder()
-                    .keyId(specialPricingGroupKey.getId())
+                    .keyId(keyId)
                     .areaBegin(prp.getAreaBegin())
                     .areaEnd(prp.getAreaEnd())
                     .weightStandard(prp.getWeightStandard())
