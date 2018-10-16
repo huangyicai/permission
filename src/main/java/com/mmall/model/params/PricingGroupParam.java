@@ -24,9 +24,6 @@ public class PricingGroupParam {
     @ApiModelProperty(value = "价格")
     private Double price;
 
-    @ApiModelProperty(value = "关键字（特殊定价时使用）")
-    private String  keyName;
-
     @ApiModelProperty(value = "续重关联的首重")
     @NotNull(message = "续重关联的首重必须指定")
     private Double firstWeight;

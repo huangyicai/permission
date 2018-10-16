@@ -68,7 +68,7 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @param userId
      * @return
      */
-    Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId);
+    Result saveSpecialPricingGroup(List<PricingGroupParam> pricingGroups, Integer userId,Integer keyId);
 
     /**
      * 修改特殊定价
