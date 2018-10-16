@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -43,10 +44,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -99,7 +97,7 @@ public class XlsxProcessAbstract {
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
     //文件的项目路径
-    private final String ompPath="192.168.1.6:8080/total/";
+    private final String ompPath="10.10.10.114:8080/total/";
 
     /**
      * 根据路径读取数据
@@ -135,6 +133,27 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public void processAllSheet(MultipartFile xlsxFile,String time,String realPath) throws Exception {
+
+        //判断当月是否有数据
+        List<Total> totalList = totalService.selectList(new QueryWrapper<Total>().eq("total_time", time));
+
+        if(totalList!=null && totalList.size()>0){
+            //删除之前的账单
+            totalService.delete(new QueryWrapper<Total>().eq("total_time",time));
+            String idStr="";
+            for(Total total:totalList){
+                idStr+=total.getTotalId()+",";
+            }
+            idStr=idStr.substring(0,idStr.length()-1);
+            weightCalculateMapper.deleteByTotalId(idStr);
+            provinceCalculateMapper.deleteByTotalId(idStr);
+        }
+
+        //判断文件夹是否存在，不存在则创建
+        File file=new File(realPath);
+        if(!file .exists() && !file .isDirectory()){
+            file.mkdir();
+        }
 
         //获取用户信息
 //        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
@@ -328,6 +347,7 @@ public class XlsxProcessAbstract {
      * 重新上传----写入新的Excel
      * @param threadDto
      */
+    @Transactional
     public void updateTatal(final ThreadDto threadDto){
 
         final Total total = totalService.selectById(threadDto.getId());

@@ -1,13 +1,15 @@
 package com.mmall.excel.export;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
+import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
 
 /**
  * 导出执行器
@@ -64,6 +66,7 @@ public class ExcelExportExecutor<T> {
             , DataSheetExecute<T> executorListener
             , boolean watcherRowStatus
             ) {
+
         this(rowHeader, data, executorListener);
         this.watcherRowStatus = watcherRowStatus;
     }
@@ -85,6 +88,16 @@ public class ExcelExportExecutor<T> {
 
 
     public void execute() {
+
+        //设置居中
+        CellStyle style = wb.createCellStyle();
+        style.setAlignment(CENTER);
+
+        //设置字体
+        Font font = wb.createFont();
+        font.setFontName("宋体");
+
+        style.setFont(font);
         List<T> data = this.data;
         pageSize=data.size();
         /**
@@ -98,13 +111,16 @@ public class ExcelExportExecutor<T> {
          */
         Row row = this.sheet.createRow(this.dataRowStart - 1);
         for (int i = 0; i < rowHeader.length; i++) {
-            row.createCell(i).setCellValue(rowHeader[i]);
+            Cell cell=row.createCell(i);
+            cell.setCellStyle(style);
+            cell.setCellValue(rowHeader[i]);
         }
         if (data == null) {
             throw new RuntimeException("无效的数据");
         }
 
         int size = data.size();
+
         /**
          * 导出总条数小于分页条数时，则直接导入，不用分页导入
          */
@@ -112,6 +128,8 @@ public class ExcelExportExecutor<T> {
             Row tmpRow;
             for (int i = 0; i < size; i++) {
                 tmpRow = sheet.createRow(this.dataRowStart + i);
+                Cell cell=tmpRow.createCell(i);
+                cell.setCellStyle(style);
                 this.executorListener.execute(tmpRow, data.get(i));
             }
 //            data.clear();

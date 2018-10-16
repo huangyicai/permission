@@ -14,6 +14,7 @@ import com.mmall.model.WeightCalculate;
 import com.mmall.util.RandomHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+@Transactional
 public class ThreadImport implements Callable<String> {
 
     private ThreadDto threadDto;
@@ -53,11 +55,14 @@ public class ThreadImport implements Callable<String> {
                 String time = new Date().getTime()+"";
                 String keyId=time.substring(9,time.length())+ RandomHelper.getRandNum(3);
 
+                //重名名账单
+                String[] timeStr=threadDto.getTime().split("-");
+                threadDto.setKey(threadDto.getKey()+timeStr[0]+"年"+timeStr[1]);
                 //生成创建路径
-                String path=threadDto.getPathHead()+keyId+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getKey()+"月账单"+".xlsx";
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+keyId+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";
 
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
