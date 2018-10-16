@@ -98,23 +98,19 @@ public class TotalController {
     }
 
     @ApiOperation(value = "上传账单---追加",  notes="需要Authorization")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
-            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer")
-    })
-    @PostMapping(value = "/additional")
-    public Result additional(MultipartFile file,@RequestParam("time") String time) throws Exception {
-
-        //创建文件写入路径
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "query")
+    )
+    @PostMapping(value = "/additional",produces = {"application/json;charest=Utf-8"})
+    public Result additional(MultipartFile file,@RequestParam("time")String time) throws Exception {
         xlsxProcessAbstract.processAllSheet(file,time,1,null);
         return Result.ok();
     }
 
     @ApiOperation(value = "上传账单---替换",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
-            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer"),
-            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String")
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String",paramType = "query")
     })
     @PostMapping(value = "/replace")
     public Result replace(MultipartFile file,
@@ -128,8 +124,8 @@ public class TotalController {
 
     @ApiOperation(value = "替换账单--检测是否有已经发送的订单",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
-            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String")
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String",paramType = "query")
     })
     @PostMapping(value = "/retrieve")
     public Result retrieve(@RequestParam("time") String time,
@@ -141,14 +137,15 @@ public class TotalController {
 
     @ApiOperation(value = "客户追加上传",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String"),
-            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "Integer"),
-            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer"),
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "Integer",paramType = "query"),
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "query"),
     })
     @PostMapping(value = "/additionalSet")
     public Result additionalSet(MultipartFile file,
                                 @RequestParam("time") String time,
-                                @RequestParam("type") Integer type,@RequestParam("userId") Integer userId) throws Exception {
+                                @RequestParam("type") Integer type,
+                                @RequestParam("userId") Integer userId) throws Exception {
         xlsxProcessAbstract.additionalSet(file,userId,type,time);
         return Result.ok();
     }

@@ -2,6 +2,7 @@ package com.mmall.excel.thread;
 
 import com.mmall.component.ApplicationContextHelper;
 import com.mmall.dao.ProvinceCalculateMapper;
+import com.mmall.dao.SumTatalMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dao.WeightCalculateMapper;
 import com.mmall.dto.ThreadDto;
@@ -9,6 +10,7 @@ import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.model.ProvinceCalculate;
+import com.mmall.model.SumTatal;
 import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
 import com.mmall.util.RandomHelper;
@@ -58,15 +60,19 @@ public class ThreadImport implements Callable<String> {
 
                 //重名名账单
                 String[] timeStr=threadDto.getTime().split("-");
-                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
+
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getName()+"/"+threadDto.getKey()+"/";
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+
+                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
+
 
                 File file=new File(path);
-                if(!file .exists() && !file .isDirectory()){
-                    file.mkdir();
+                File fileParent = file.getParentFile();
+                if (!fileParent.exists()) {
+                    fileParent.mkdirs();
                 }
-                path=path+threadDto.getKey()+"月账单"+".xlsx";
+                file.createNewFile();
 
                 //生成下载路径
                 String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";
@@ -103,10 +109,14 @@ public class ThreadImport implements Callable<String> {
 
         //初始化数据
         Total total=new Total();
+
         WeightCalculate weightCalculate=new WeightCalculate();
         ProvinceCalculate provinceCalculate=new ProvinceCalculate();
 
+
+
         //添加账单表数据
+        total.setSumId(threadDto.getSumId());
         total.setName(threadDto.getKey());
         total.setUserId(threadDto.getId());
         total.setSendId(threadDto.getSendId());
@@ -117,7 +127,7 @@ public class ThreadImport implements Callable<String> {
         total.setTotalUrl(threadDto.getPath());
         total.setCdUrl(threadDto.getPathHead());
         total.setCreateTime(new Date());
-        totalMapper.insertTotal(total);
+        totalMapper.insert(total);
 
         //添加重量区间数据
         weightCalculate.setTotalId(total.getTotalId());
