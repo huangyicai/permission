@@ -43,7 +43,6 @@ public class Result<T> {
         this.data = data;
     }
 
-
     public Result(T data) {
         this(InfoEnums.SUCCESS, data);
     }
@@ -76,6 +75,10 @@ public class Result<T> {
         return new Result<T>(data);
     }
 
+    public static <T> Result<T> replaceOk(T data){
+        return new Result<T>(data);
+    }
+
     /**
      * 成功，无data
      * @return
@@ -84,6 +87,7 @@ public class Result<T> {
     public static <T> Result<T> ok() {
         return (Result<T>) ok(null);
     }
+
     /**
      * 失败时候的调用
      * @return

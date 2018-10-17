@@ -141,7 +141,7 @@ public class XlsxProcessAbstract {
         if(type==2){
 
             //获取所替换的账单
-            List<Total> totals = totalService.listTotal(time, sunTotalId);
+            List<Total> totals = totalService.listTotal(time, sunTotalId,0);
 
             //删除总账单
             sumTatalMapper.deleteSumTotal(sunTotalId);

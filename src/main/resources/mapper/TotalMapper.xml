@@ -56,7 +56,20 @@
       select
       total_id as totalId,
       sum_id as sumId
-      from total where sum_id in (${sumId}) and total_time=#{totalTime}
+      from total
+     <where>
+         <if test="sumId!= '' and sumId!=null" >
+             and  sum_id in (${sumId})
+         </if>
+
+         <if test="totalTime!=null and totalTime!=''">
+             and total_time=#{totalTime}
+         </if>
+
+         <if test="state!=0 and state!=null">
+             and total_state in (3,4)
+         </if>
+     </where>
     </select>
 
     <!--根据总账单id删除账单-->
@@ -104,6 +117,10 @@
           <if test="totalTime">
               and total_time =#{totalTime}
           </if>
+
+           <if test="type==2" >
+               and total_state>1
+           </if>
 
           <if test="state!=null and state!=0">
               and total_state=#{state}

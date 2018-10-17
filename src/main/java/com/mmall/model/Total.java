@@ -348,7 +348,7 @@ public class Total implements Serializable {
         return "Total{" +
         ", totalId=" + totalId +
         ", name=" + name +
-        ", totalTime=" + totalTime +
+        ", TotalIsTime=" + totalTime +
         ", totalNumber=" + totalNumber +
         ", totalWeight=" + totalWeight +
         ", totalCost=" + totalCost +
