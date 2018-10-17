@@ -14,4 +14,9 @@
     <sql id="Base_Column_List">
         sum_id, user_id, sum_name, sum_time
     </sql>
+
+    <!--根据总账单id删除总账单-->
+    <delete id="deleteSumTotal">
+       delete from sum_tatal where sum_id in (${sumId})
+    </delete>
 </mapper>

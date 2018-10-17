@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.mmall.config.UserInfoConfig;
-import com.mmall.dao.BillKeywordMapper;
-import com.mmall.dao.ProvinceCalculateMapper;
-import com.mmall.dao.TotalMapper;
-import com.mmall.dao.WeightCalculateMapper;
+import com.mmall.dao.*;
 import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
@@ -79,6 +76,9 @@ public class XlsxProcessAbstract {
     @Autowired
     private TotalMapper totalMapper;
 
+    @Autowired
+    private SumTatalMapper sumTatalMapper;
+
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
 
     //开始读取行数从第0行开始计算
@@ -141,7 +141,10 @@ public class XlsxProcessAbstract {
         if(type==2){
 
             //获取所替换的账单
-            List<Total> totals = totalService.listTotal(time, sunTotalId);
+            List<Total> totals = totalService.listTotal(time, sunTotalId,0);
+
+            //删除总账单
+            sumTatalMapper.deleteSumTotal(sunTotalId);
 
             if(totals!=null && totals.size()>0){
                 //删除之前的账单
@@ -202,6 +205,18 @@ public class XlsxProcessAbstract {
 
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
+
+        //获取上传的文件名字
+        String fName = xlsxFile.getOriginalFilename();
+        String[] str1= fName.split("\\.");
+
+        //向总账单添加数据
+        SumTatal sumTatal=new SumTatal();
+        sumTatal.setSumName(str1[0]);
+        sumTatal.setSumTime(time);
+        sumTatal.setUserId(user.getId());
+        sumTatalMapper.insert(sumTatal);
+
         for (String key:map.keySet()) {
 
             int id=-1;
@@ -256,7 +271,10 @@ public class XlsxProcessAbstract {
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
-            threadDto.setName(xlsxFile.getName().split(".")[0]);
+            threadDto.setName(str1[0]);
+            threadDto.setSumId(sumTatal.getSumId());
+            threadDto.setCompanyName(user.getCompanyName());
+
             ThreadImport threadImport=new ThreadImport(threadDto);
             threadPool.submit(threadImport);
 
@@ -283,8 +301,12 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public void againSet(MultipartFile xlsxFile,Integer totalId) throws Exception {
-        ThreadDto threadDto = getThreadDto(xlsxFile, totalId,"");
-        updateTatal(threadDto);
+        Map threadDto1 = getThreadDto(xlsxFile);
+        ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
+        ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
+        updateTatal(threadDto,totalId);
+
+        map.clear();
         destination.clear();
         weightMap.clear();
     }
@@ -296,8 +318,10 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
+        Map threadDto1 = getThreadDto(xlsxFile);
+        ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
+        ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
 
-        ThreadDto threadDto = getThreadDto(xlsxFile, userId,realPath);
         threadDto.setTime(date);
 
         final Total total = new Total();
@@ -315,7 +339,35 @@ public class XlsxProcessAbstract {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-                outputStream = new FileOutputStream(total.getCdUrl());
+
+                //生成随机码
+                String time = new Date().getTime()+"";
+                String keyId=time.substring(9,time.length())+ RandomHelper.getRandNum(3);
+
+                //重名名账单
+                String[] timeStr=threadDto.getTime().split("-");
+
+                //生成创建路径
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+
+                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
+
+
+                File file=new File(path);
+                File fileParent = file.getParentFile();
+                if (!fileParent.exists()) {
+                    fileParent.mkdirs();
+                }
+                file.createNewFile();
+
+                //生成下载路径
+                String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";
+
+                threadDto.setPath(pathIpUrl);
+                threadDto.setPathHead(path);
+                threadDto.setIdtime(keyId);
+
+                outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();
@@ -326,7 +378,7 @@ public class XlsxProcessAbstract {
 
                 //修改账单表数据
                 total.setName(threadDto.getKey());
-                total.setUserId(threadDto.getId());
+                total.setUserId(userId);
                 total.setSendId(threadDto.getSendId());
                 total.setTotalTime(threadDto.getTime());
                 total.setTotalNumber(threadDto.getTotalNum());
@@ -340,10 +392,10 @@ public class XlsxProcessAbstract {
                 }else{
                     total.setTotalState(-1);
                 }
-                int insert = totalMapper.insert(total);
+                totalMapper.insert(total);
 
                 //修改重量区间数据
-                weightCalculate.setTotalId(insert);
+                weightCalculate.setTotalId(total.getTotalId());
                 weightCalculate.setZero(threadDto.getMw().get(0));
                 weightCalculate.setOne(threadDto.getMw().get(1));
                 weightCalculate.setTwo(threadDto.getMw().get(2));
@@ -369,7 +421,7 @@ public class XlsxProcessAbstract {
                 weightCalculateMapper.insert(weightCalculate);
 
                 //修改省计表数据
-                provinceCalculate.setTotalId(insert);
+                provinceCalculate.setTotalId(total.getTotalId());
                 provinceCalculate.setBeijing(threadDto.getMd().get("北京"));
                 provinceCalculate.setTianjing(threadDto.getMd().get("天津"));
                 provinceCalculate.setHebei(threadDto.getMd().get("河北"));
@@ -413,6 +465,7 @@ public class XlsxProcessAbstract {
         };
 
         new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
+        map.clear();
         destination.clear();
         weightMap.clear();
     }
@@ -420,10 +473,9 @@ public class XlsxProcessAbstract {
     /**
      * 分离数据用户级别账单
      * @param xlsxFile
-     * @param totalId
      * @return
      */
-    public ThreadDto getThreadDto(MultipartFile xlsxFile,Integer totalId,String realPath) throws Exception {
+    public Map getThreadDto(MultipartFile xlsxFile) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -441,6 +493,10 @@ public class XlsxProcessAbstract {
                 stream.close();
             }
         }
+
+        //获取上传的文件名字
+        String fName = xlsxFile.getOriginalFilename();
+        String[] str1= fName.split("\\.");
 
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
@@ -485,9 +541,13 @@ public class XlsxProcessAbstract {
             threadDto.setPathHead(realPath);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
+            threadDto.setName(str1[0]);
+            threadDto.setCompanyName(userInfo.getCompanyName());
         }
-        map.clear();
-        return threadDto;
+        Map m=new HashMap<>();
+        m.put("map",map);
+        m.put("threadDto",threadDto);
+        return m;
     }
 
 
@@ -498,7 +558,7 @@ public class XlsxProcessAbstract {
      * @param threadDto
      */
     @Transactional
-    public void updateTatal(final ThreadDto threadDto){
+    public void updateTatal(final ThreadDto threadDto,Integer totalId){
 
         final Total total = totalService.selectById(threadDto.getId());
 
@@ -525,6 +585,7 @@ public class XlsxProcessAbstract {
                 ProvinceCalculate provinceCalculate=new ProvinceCalculate();
 
                 //修改账单表数据
+                total.setTotalId(totalId);
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(BigDecimal.ZERO);

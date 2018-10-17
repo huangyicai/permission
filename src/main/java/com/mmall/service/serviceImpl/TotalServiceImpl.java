@@ -135,8 +135,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         if(!"".equals(billDetailsParam.getUserId()) && billDetailsParam.getUserId()!=null){
             nameStr=billDetailsParam.getUserId().toString();
         }
-
-        Page<TotalVo> bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,userInfo.getUserId());
+        Page<TotalVo> bill=null;
+        if(type==2){
+            bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,null);
+        }else{
+            bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,userInfo.getUserId());
+        }
         return bill;
     }
 
@@ -261,7 +265,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         list= getCalculate(pricingOffer,map,1,list,special1);
 
         //计算报价
-        list=getCalculate(pricingGroup,map,2,list,special);
+        list=getCalculate(pricingGroup,null,2,list,special);
 
         //写入Excel
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","成本","报价"};

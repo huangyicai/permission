@@ -75,4 +75,14 @@ public class ThreadDto {
      * 总账单名字
      */
     private String name;
+
+    /**
+     * 总账单id
+     */
+    private Integer sumId;
+
+    /**
+     * 公司名
+     */
+    private String companyName;
 }
