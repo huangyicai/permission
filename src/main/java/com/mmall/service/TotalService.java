@@ -1,10 +1,12 @@
 package com.mmall.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
@@ -40,8 +42,18 @@ public interface TotalService extends IService<Total> {
      * @param id
      * @return
      */
-    Result polling(String time, Integer id);
+    Result polling(String time, Integer id,String fileName);
+
+
     Result<String> getPricing(Integer totalId);
 
     String getUserIdStr();
+
+    /**
+     * 获取账单详情
+     * @param userInfo
+     * @param ipage
+     * @return
+     */
+    Result getBillDetails(SysUserInfo userInfo, String userId,String date, Page ipage);
 }

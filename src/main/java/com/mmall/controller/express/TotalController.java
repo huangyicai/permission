@@ -21,6 +21,7 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.model.params.TotalParam;
 import com.mmall.service.TotalService;
+import com.mmall.util.BeanValidator;
 import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -209,9 +210,22 @@ public class TotalController {
 
     @ApiOperation(value = "轮询账单表",  notes="需要Authorization")
     @GetMapping(produces = {"application/json;charest=Utf-8"})
-    public Result polling(@RequestParam("time") String time){
+    public Result polling(@RequestParam("time") String time,
+                          @RequestParam("fileName") String fileName){
         SysUserInfo user = UserInfoConfig.getUserInfo();
-        return totalService.polling(time,user.getId());
+        return totalService.polling(time,user.getId(),fileName);
+    }
+
+
+    @ApiOperation(value = "获取账单详情",  notes="需要Authorization")
+    @GetMapping(value = "/list",produces = {"application/json;charest=Utf-8"})
+    public Result getBillDetails(@RequestParam(name = "userId") String userId,
+                                 @RequestParam(name = "date") String date,
+                                 @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
+                                 @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        Page ipage = new Page(page,size);
+        return totalService.getBillDetails(userInfo,userId,date,ipage);
     }
 }
 

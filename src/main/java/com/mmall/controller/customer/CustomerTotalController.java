@@ -33,7 +33,7 @@ public class CustomerTotalController {
     public Result getNotPaying(){
         SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         List<Total> list = totalService.list(new QueryWrapper<Total>()
-                .eq(user.getId() != null, "user_id", user.getId()).select("name"));
+                .eq(user.getId() != null, "user_id", user.getId()).select("name").eq("total_state",2));
         return Result.ok(list);
     }
 

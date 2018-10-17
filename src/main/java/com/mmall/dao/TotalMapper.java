@@ -40,8 +40,31 @@ public interface TotalMapper extends BaseMapper<Total> {
      * @param time
      * @return
      */
-    List<Total> getTotals(@Param("time") String time,@Param("sendId") Integer sendId);
+    List<Total> getTotals(@Param("time") String time,@Param("sendId") Integer sendId,@Param("fileName")String fileName);
 
     void updateByTotalId(@Param("totalId") String totalId,@Param("totalRemark")String totalRemark,@Param("date") String date);
 
+    /**
+     * 查询账单详情
+     * @param ipage
+     * @param userId 用户id拼接的字符串
+     * @param date 时间
+     * @param id 发送者ID（快递公司ID）
+     * @return
+     */
+    Page<Total> getAllBySendIdAndCreateTimeAndUserIds(Page ipage,
+                                                      @Param("userId")String userId,
+                                                      @Param("date")String date,
+                                                      @Param("id")Integer id);
+
+    /**
+     * 获取账单应收与实收
+     * @param userId
+     * @param date
+     * @param id
+     * @return
+     */
+    Total getSumBiLLDetails(@Param("userId")String userId,
+                            @Param("date")String date,
+                            @Param("id")Integer id);
 }

@@ -309,8 +309,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     }
 
     @Override
-    public Result polling(String time, Integer id) {
-        List<Total> totals = totalMapper.getTotals(time, id);
+    public Result polling(String time, Integer id,String fileName) {
+        fileName = fileName.split(".")[0];
+        List<Total> totals = totalMapper.getTotals(time, id,fileName);
         Multimap<String, Total> totalMap = ArrayListMultimap.create();
         String existence = "existence";//已存在账单
         String other = "other";//其他账单
@@ -352,6 +353,21 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         nameStr=nameStr.substring(0,nameStr.length()-1);
         return nameStr;
+    }
+
+    @Override
+    public Result getBillDetails(SysUserInfo userInfo, String userId,String date, Page ipage) {
+        Total sumBiLLDetails = totalMapper.getSumBiLLDetails(userId, date, userInfo.getId());
+        totalMapper.getAllBySendIdAndCreateTimeAndUserIds(ipage,userId,date,userInfo.getId());
+        Map<String,Object> map = Maps.newHashMap();
+        if(sumBiLLDetails==null){
+            sumBiLLDetails = new Total();
+            sumBiLLDetails.setTotalOffer(BigDecimal.ZERO);
+            sumBiLLDetails.setTotalPaid(BigDecimal.ZERO);
+        }
+        map.put("sum",sumBiLLDetails);
+        map.put("billDetails",ipage);
+        return Result.ok(map);
     }
 
     /**

@@ -125,14 +125,41 @@
 
     <select id="getTotals" resultType="com.mmall.model.Total">
         select
-          user_id as userId,
-          name,
-          total_number as totalNumber,
-          total_url as totalUrl
+          t.user_id as userId,
+          t.name,
+          t.total_number as totalNumber,
+          t.total_url as totalUrl
         from
-          total
+          total t
+          LEFT JOIN sum_tatal s on s.sum_id=t.sum_id
         where
-          send_id=#{sendId} and create_time>#{time}
+          t.send_id=#{sendId} and t.create_time>#{time} and s.sum_name = #{fileName}
+    </select>
+    <select id="getAllBySendIdAndCreateTimeAndUserIds" resultType="com.mmall.vo.BillDtetailVo">
+
+        select
+            t.name as name,
+            t.total_offer as totalOffer,
+            t.total_paid as totalPaid,
+            t.total_state as totalState,
+            u.name as nameNick,
+            u.person_in_charge as personInCharge
+        from
+          total t
+          LEFT JOIN sys_user_info u on u.id=t.user_id
+        where
+          t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId}) and t.total_state>1
+    </select>
+    <select id="getSumBiLLDetails" resultType="com.mmall.model.Total">
+        select
+             SUM(t.total_offer)as totalOffer,
+            SUM(t.total_paid)as totalPaid,
+						count(*)
+        from
+          total t
+          LEFT JOIN sys_user_info u on u.id=t.user_id
+        where
+          t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId}) and t.total_state>1
     </select>
 
     <!--发送订单-->
