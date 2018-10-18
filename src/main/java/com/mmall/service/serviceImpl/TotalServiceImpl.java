@@ -211,6 +211,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
 
+        //判断是否能够定价
+        if(total.getTotalState()>1){
+            return Result.error(InfoEnums.TOATL_IS_PRICING);
+        }
+
         if(total==null){
             return  Result.error(InfoEnums.BILL_IS_NULL);
         }
@@ -465,7 +470,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         //遍历首重
         for(PricingGroupVo pg: first){
-
+            i++;
             //根据城市锁定价格计算规则
             if(bill.getDestination().startsWith(pg.getCity())){
 
@@ -474,7 +479,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                 //和区间结束大小比较
                 int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()).setScale(2,BigDecimal.ROUND_DOWN));
-                i++;
 
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
@@ -488,54 +492,50 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                         return true;
                     }
                 }
+            }
+        }
 
-                //不在区间，计算续重
-                if(i==first.size() && less==1){
+        //遍历续重区间
+        for(PricingGroupVo pp: Continued){
 
-                    //遍历续重区间
-                    for(PricingGroupVo pp: Continued){
+            //和区间开始比较
+            int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
 
-                        //和区间开始比较
-                        int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
+            //和区间结束大小比较
+            int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
 
-                        //和区间结束大小比较
-                        int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
+            if(greaterContinue>=0 && lessContinue<=0){
 
-                        if(greaterContinue>=0 && lessContinue<=0){
+                //获取计算的单位个数
+                BigDecimal bd=bill.getWeight()
+                        .subtract(new BigDecimal(pp.getFirstWeight()))
+                        .divide(new BigDecimal(pp.getWeightStandard()))
+                        .multiply(new BigDecimal(100));
 
-                            //获取计算的单位个数
-                            BigDecimal bd=bill.getWeight()
-                                    .subtract(new BigDecimal(first.get(first.size()-1).getAreaBegin()))
-                                    .divide(new BigDecimal(pp.getWeightStandard()))
-                                    .multiply(new BigDecimal(100));
+                Integer num=bd.intValue();
 
-                            Integer num=bd.intValue();
-
-                            if(num%100!=0){
-                                num=num/100+1;
-                            }else{
-                                num=num/100;
-                            }
-
-                            //获取首重的钱
-                            BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
-
-                            //计算续重的钱
-                            BigDecimal two=new BigDecimal(pp.getCity()).multiply(new BigDecimal(num));
-
-                            if(type==1){
-                                bill.setCost(fist.add(two));
-                                totalCost=totalCost.add(fist.add(two));
-                                return true;
-                            }else{
-                                bill.setOffer(fist.add(two));
-                                totalOffer=totalOffer.add(fist.add(two));
-                                return true;
-                            }
-
-                        }
-                    }
+                if(num%100!=0){
+                    num=num/100+1;
+                }else{
+                    num=num/100;
                 }
+
+                //获取首重的钱
+                BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
+
+                //计算续重的钱
+                BigDecimal two=new BigDecimal(pp.getFirstWeightPrice()).multiply(new BigDecimal(num));
+
+                if(type==1){
+                    bill.setCost(fist.add(two));
+                    totalCost=totalCost.add(fist.add(two));
+                    return true;
+                }else{
+                    bill.setOffer(fist.add(two));
+                    totalOffer=totalOffer.add(fist.add(two));
+                    return true;
+                }
+
             }
         }
 

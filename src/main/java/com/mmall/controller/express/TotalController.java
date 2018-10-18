@@ -190,10 +190,10 @@ public class TotalController {
 
     @ApiOperation(value = "重新上传",  notes="需要Authorization")
     @PostMapping(value = "/againSet/{totalId}")
-    public Result<String> againSet(@PathVariable("totalId")Integer totalId,
+    public Result againSet(@PathVariable("totalId")Integer totalId,
                                    MultipartFile file) throws Exception {
-        xlsxProcessAbstract.againSet(file,totalId);
-        return Result.ok();
+
+        return xlsxProcessAbstract.againSet(file,totalId);
     }
 
     @ApiOperation(value = "轮询账单表",  notes="需要Authorization")

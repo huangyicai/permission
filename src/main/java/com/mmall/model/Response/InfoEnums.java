@@ -33,6 +33,8 @@ public enum InfoEnums {
 	BILL_IS_NULL(120002,"账单不存在"),
 	SEND_FAILURE(120003,"发送失败，清确认是否定价，或者已经发送过"),
 	TOATL_EXISTS(120004,"账单已存在"),
+	TOATL_IS_PRICING(120005,"订单已经发送"),
+	NOT_UPDATE(120006,"账单已发送给客户，无法修改"),
 
 	;
 

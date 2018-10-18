@@ -11,6 +11,8 @@ import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.excel.thread.ThreadImport;
 import com.mmall.model.*;
+import com.mmall.model.Response.InfoEnums;
+import com.mmall.model.Response.Result;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
@@ -300,15 +302,16 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void againSet(MultipartFile xlsxFile,Integer totalId) throws Exception {
+    public Result againSet(MultipartFile xlsxFile, Integer totalId) throws Exception {
         Map threadDto1 = getThreadDto(xlsxFile);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
-        updateTatal(threadDto,totalId);
+        Result result = updateTatal(threadDto, totalId);
 
         map.clear();
         destination.clear();
         weightMap.clear();
+        return result;
     }
 
     /**
@@ -558,9 +561,13 @@ public class XlsxProcessAbstract {
      * @param threadDto
      */
     @Transactional
-    public void updateTatal(final ThreadDto threadDto,Integer totalId){
+    public Result updateTatal(final ThreadDto threadDto,Integer totalId){
 
-        final Total total = totalService.selectById(threadDto.getId());
+        final Total total = totalService.selectById(totalId);
+
+        if(total!=null && total.getTotalState()>1){
+            return Result.error(InfoEnums.NOT_UPDATE);
+        }
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
@@ -663,6 +670,7 @@ public class XlsxProcessAbstract {
         };
 
         new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
+        return Result.ok();
     }
 
     /**
