@@ -42,13 +42,15 @@
       SUM(total_offer) as totalOffer,
       SUM(total_paid) as totalPaid,
       SUM(total_cost) as totalCost
-      from total where user_id in (${userId}) and total_time=#{totalTime}
+      from total
+
+      where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime}
     </select>
 
     <!--根据用户id获取账单id-->
     <select id="listToal" resultType="com.mmall.model.Total">
       select total_id as totalId
-      from total where user_id in (${userId}) and total_time=#{totalTime}
+      from total where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime}
     </select>
 
     <!--根据总账单id获取账单-->

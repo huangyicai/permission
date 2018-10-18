@@ -139,7 +139,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         if(type==2){
             bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,null);
         }else{
-            bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,userInfo.getUserId());
+            bill = totalMapper.getBill(page,billDetailsParam.getDate(),nameStr, billDetailsParam.getState(),type,userInfo.getId());
         }
         return bill;
     }
@@ -355,7 +355,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             nameStr+=sysUserInfo.getId()+",";
         }
 
-        nameStr=nameStr.substring(0,nameStr.length()-1);
+        nameStr=nameStr.substring(0,nameStr.length()!=0?nameStr.length()-1:0);
         return nameStr;
     }
 

@@ -100,8 +100,8 @@ public class XlsxProcessAbstract {
     private final String ompPath="10.10.10.114:80/total/";
 
     //创建文件写入路径
-    private final String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
-
+    //private final String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
+    private final String realPath = "D:\\GDW\\kill\\";
     /**
      * 根据路径读取数据
      * @param filename

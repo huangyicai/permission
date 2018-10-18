@@ -122,7 +122,9 @@ public class PricingGroupController {
             SysUserInfo userInfo = UserInfoConfig.getUserInfo();
             userId = userInfo.getId();
         }
-        SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>().eq("key_name", keyName));
+        SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>()
+                .eq("key_name", keyName.getKeyName())
+                .eq("user_id",userId));
         if(key_name!=null){
             return Result.error(InfoEnums.KEY_EXISTENCE);
         }
