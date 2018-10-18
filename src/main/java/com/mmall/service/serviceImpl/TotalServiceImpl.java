@@ -498,44 +498,62 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //遍历续重区间
         for(PricingGroupVo pp: Continued){
 
-            //和区间开始比较
-            int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
+            //根据城市锁定价格计算规则
+            if(bill.getDestination().startsWith(pp.getCity())){
 
-            //和区间结束大小比较
-            int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
+                //和区间开始比较
+                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
 
-            if(greaterContinue>=0 && lessContinue<=0){
+                //和区间结束大小比较
+                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
 
-                //获取计算的单位个数
-                BigDecimal bd=bill.getWeight()
-                        .subtract(new BigDecimal(pp.getFirstWeight()))
-                        .divide(new BigDecimal(pp.getWeightStandard()))
-                        .multiply(new BigDecimal(100));
+                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight()));
 
-                Integer num=bd.intValue();
+                if(greaterContinue>=0 && lessContinue<=0){
 
-                if(num%100!=0){
-                    num=num/100+1;
-                }else{
-                    num=num/100;
+                    if(firstOne<=0){
+                        if(type==1){
+                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice()));
+                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice()));
+                            return true;
+                        }else{
+                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice()));
+                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice()));
+                            return true;
+                        }
+                    }
+
+                    //获取计算的单位个数
+                    BigDecimal bd=bill.getWeight()
+                            .subtract(new BigDecimal(pp.getFirstWeight()))
+                            .divide(new BigDecimal(pp.getWeightStandard()))
+                            .multiply(new BigDecimal(100));
+
+                    Integer num=bd.intValue();
+
+                    if(num%100!=0){
+                        num=num/100+1;
+                    }else{
+                        num=num/100;
+                    }
+
+                    //获取首重的钱
+                    BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
+
+                    //计算续重的钱
+                    BigDecimal two=new BigDecimal(pp.getFirstWeightPrice()).multiply(new BigDecimal(num));
+
+                    if(type==1){
+                        bill.setCost(fist.add(two));
+                        totalCost=totalCost.add(fist.add(two));
+                        return true;
+                    }else{
+                        bill.setOffer(fist.add(two));
+                        totalOffer=totalOffer.add(fist.add(two));
+                        return true;
+                    }
+
                 }
-
-                //获取首重的钱
-                BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
-
-                //计算续重的钱
-                BigDecimal two=new BigDecimal(pp.getFirstWeightPrice()).multiply(new BigDecimal(num));
-
-                if(type==1){
-                    bill.setCost(fist.add(two));
-                    totalCost=totalCost.add(fist.add(two));
-                    return true;
-                }else{
-                    bill.setOffer(fist.add(two));
-                    totalOffer=totalOffer.add(fist.add(two));
-                    return true;
-                }
-
             }
         }
 
