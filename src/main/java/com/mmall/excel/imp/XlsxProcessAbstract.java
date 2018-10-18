@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
@@ -98,12 +99,6 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
-    //文件的项目路径
-    private final String ompPath="10.10.10.114:80/total/";
-
-    //创建文件写入路径
-    //private final String realPath = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
-    private final String realPath = "D:\\GDW\\kill\\";
     /**
      * 根据路径读取数据
      * @param filename
@@ -162,7 +157,7 @@ public class XlsxProcessAbstract {
         }
 
         //判断文件夹是否存在，不存在则创建
-        File file=new File(realPath);
+        File file=new File(LevelConstants.REALPATH);
         if(!file .exists() && !file .isDirectory()){
             file.mkdir();
         }
@@ -268,8 +263,8 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPath(ompPath);
-            threadDto.setPathHead(realPath);
+            threadDto.setPath(LevelConstants.OMPPATH);
+            threadDto.setPathHead(LevelConstants.REALPATH);
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
@@ -540,8 +535,8 @@ public class XlsxProcessAbstract {
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);
-            threadDto.setPath(ompPath);
-            threadDto.setPathHead(realPath);
+            threadDto.setPath(LevelConstants.OMPPATH);
+            threadDto.setPathHead(LevelConstants.REALPATH);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             threadDto.setName(str1[0]);
