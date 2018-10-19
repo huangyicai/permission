@@ -215,5 +215,12 @@ public class TotalController {
         Page ipage = new Page(page,size);
         return totalService.getBillDetails(userInfo,userId,date,ipage);
     }
+
+    @ApiOperation(value = "其他账单转发",  notes="需要Authorization")
+    @GetMapping(value = "/bill/forward/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result othersBillForward(@PathVariable("userId") Integer userId,
+                                    @RequestParam("billIds") String billIds){
+        return totalService.othersBillForward(billIds,userId);
+    }
 }
 

@@ -67,4 +67,6 @@ public interface TotalMapper extends BaseMapper<Total> {
     Total getSumBiLLDetails(@Param("userId")String userId,
                             @Param("date")String date,
                             @Param("id")Integer id);
+
+    List<Total> getAllBillByIds(String billIds);
 }

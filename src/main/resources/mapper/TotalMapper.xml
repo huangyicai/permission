@@ -180,6 +180,14 @@
         where
           t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId}) and t.total_state>1
     </select>
+    <select id="getAllBillByIds" resultType="com.mmall.model.Total">
+        select
+            t.total_id as totalId
+        from
+          total t
+        where
+          FIND_IN_SET(t.total_id,#{billIds})
+    </select>
 
     <!--发送订单-->
     <update id="updateByTotalId">

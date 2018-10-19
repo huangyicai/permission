@@ -39,6 +39,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -319,7 +320,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
     @Override
     public Result polling(String time, Integer id,String fileName) {
-        fileName = fileName.split(".")[0];
+        fileName = fileName.split("\\.")[0];
         List<Total> totals = totalMapper.getTotals(time, id,fileName);
         Multimap<String, Total> totalMap = ArrayListMultimap.create();
         String existence = "existence";//已存在账单
@@ -377,6 +378,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         map.put("sum",sumBiLLDetails);
         map.put("billDetails",ipage);
         return Result.ok(map);
+    }
+
+    @Override
+    @Transactional
+    public Result othersBillForward(String billIds, Integer userId) {
+        List<Total> allBillByIds = totalMapper.getAllBillByIds(billIds);
+        for(Total total:allBillByIds){
+            total.setUserId(userId);
+            totalMapper.updateById(total);
+        }
+        return Result.ok();
     }
 
     /**

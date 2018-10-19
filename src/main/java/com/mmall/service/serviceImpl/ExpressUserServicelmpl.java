@@ -53,7 +53,6 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .level(LevelUtil.calculateLevel(parent.getLevel(), parent.getId()))
                 .platformId(-1)
                 .build();
-
         sysUserInfoMapper.insert(userInfo);
         PaymentMethod paymentMethod = PaymentMethod.builder()
                 .userId(userInfo.getId())
