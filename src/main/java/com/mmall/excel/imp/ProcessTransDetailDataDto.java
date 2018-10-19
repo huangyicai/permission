@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.mmall.excel.Bill;
 import com.mmall.model.SysUserInfo;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,11 +16,15 @@ import java.util.List;
 public class ProcessTransDetailDataDto {
 
     private int readRowTitleIndex = 0; //读取标题汇总行
+
     public String time;//时间
 
 
     //根据店铺分离数据
     public ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
+
+    //获取整个数据集合
+//    public List<Bill> bills=new ArrayList<>();
 
     /**
      * Excel每一列数据的处理
@@ -42,36 +47,9 @@ public class ProcessTransDetailDataDto {
             bill.setSerialNumber(cellStrs[2]);
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
-//
-//            //目的地是否合法
-//            boolean province = province(cellStrs[3]);
-//            if(!province){
-//                nameStr="未识别地址账单";
-//            }
             map.put(nameStr,bill);
+//            bills.add(bill);
         }
-    }
-
-
-    /**
-     * 获取城市单件：http://www.tcmap.com.cn/list/jiancheng_list.html
-     * @param province
-     */
-    public boolean province(String province){
-
-        boolean a=false;
-
-        String[] proStr={"北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建",
-                "江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃",
-                "青海","宁夏","新疆","台湾","香港","澳门"};
-
-        for (String str:proStr){
-            if(province.startsWith(str)){
-                a=true;
-                break;
-            }
-        }
-        return a;
     }
 
     public String getTime() {
