@@ -292,7 +292,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 row.createCell(3).setCellValue(personUser.getDestination());
                 row.createCell(4).setCellValue(personUser.getWeight().toString());
 //                row.createCell(5).setCellValue(personUser.getCost().toString());
-                row.createCell(6).setCellValue(personUser.getOffer().toString());
+                row.createCell(5).setCellValue(personUser.getOffer().toString());
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
