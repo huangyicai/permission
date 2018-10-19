@@ -24,4 +24,11 @@ public class LevelConstants {
     //客户
     public static final Integer CUSTOMER = 5;
 
+    //文件的项目路径
+    public static String OMPPATH="10.10.10.114:80/total/";
+
+    //创建文件写入路径
+    public static String REALPATH = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
+
+
 }
