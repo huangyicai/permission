@@ -45,7 +45,7 @@ public interface TotalService extends IService<Total> {
     Result polling(String time, Integer id,String fileName);
 
 
-    Result<String> getPricing(Integer totalId);
+    Result<String> getPricing(Integer totalId,Integer type);
 
     String getUserIdStr();
 

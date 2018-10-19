@@ -208,7 +208,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param totalId
      * @return
      */
-    public Result<String> getPricing(Integer totalId) {
+    public Result<String> getPricing(Integer totalId,Integer type) {
 
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
@@ -225,15 +225,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //獲取报价表
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(total.getUserId());
 
-        //获取成本表
-//        SysUserInfo user = UserInfoConfig.getUserInfo();
-        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(total.getSendId());
-
         //获取特殊报价表
         List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(total.getUserId());
-
-        //获取特殊成本表
-        List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
 
         //定价表是否数据存在
         List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(total.getUserId());
@@ -268,14 +261,28 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //创建bill集合
         List<Bill> list=new ArrayList<Bill>();
 
-        //计算成本
-        list= getCalculate(pricingOffer,map,1,list,special1);
+        for (String key:map.keySet()) {
+            list.addAll(map.get(key));
+            break;
+        }
+
+        if(type==2){
+            //获取成本表
+            List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(total.getSendId());
+
+            //获取特殊成本表
+            List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
+
+            //计算成本
+            list= getCalculate(pricingOffer,1,list,special1);
+
+        }
 
         //计算报价
-        list=getCalculate(pricingGroup,null,2,list,special);
+        list=getCalculate(pricingGroup,2,list,special);
 
         //写入Excel
-        String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","成本","报价"};
+        String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","报价"};
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
 
@@ -285,7 +292,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 row.createCell(2).setCellValue(personUser.getSerialNumber());
                 row.createCell(3).setCellValue(personUser.getDestination());
                 row.createCell(4).setCellValue(personUser.getWeight().toString());
-                row.createCell(5).setCellValue(personUser.getCost().toString());
+//                row.createCell(5).setCellValue(personUser.getCost().toString());
                 row.createCell(6).setCellValue(personUser.getOffer().toString());
             }
 
@@ -398,22 +405,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     /**
      * 计算价格
      * @param pricingGroupVo 计算表
-     * @param map 账单数据
      * @param type  计算类型
      * @param list  计算后的数据
      * @return
      */
     public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
-                                   ArrayListMultimap<String, Bill> map,
                                    Integer type,
                                    List<Bill> list,
                                    List<PricingGroupVo> special){
-        //确定遍历的账单集合
-        if(type==1){
-            for (String key:map.keySet()) {
-                list=map.get(key);
-            }
-        }
 
         //首重集合
         List<PricingGroupVo> first=new ArrayList<PricingGroupVo>();
@@ -460,15 +459,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //获取每一条账单数据
         for (Bill bill:list) {
 
-            //计数，判断首重是否循环完毕
-            int i=1;
-
             //遍历特殊定价组
-            Boolean traverse = traverse(bill, i, specialFirst, specialContinued, type);
+            Boolean traverse = traverse(bill,specialFirst, specialContinued, type);
 
             if(!traverse){
                 //遍历定价组
-                traverse(bill,i,first,Continued,type);
+                traverse(bill,first,Continued,type);
             }
         }
 
@@ -478,15 +474,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     /**
      * 计算首重和续重
      * @param bill
-     * @param i
      * @param first
      * @param Continued
      */
-    public Boolean traverse(Bill bill,Integer i,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
+    public Boolean traverse(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
 
         //遍历首重
         for(PricingGroupVo pg: first){
-            i++;
+
             //根据城市锁定价格计算规则
             if(bill.getDestination().startsWith(pg.getCity())){
 

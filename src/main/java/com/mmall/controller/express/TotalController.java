@@ -182,16 +182,19 @@ public class TotalController {
     }
 
     @ApiOperation(value = "定价",  notes="需要Authorization")
-    @GetMapping(value = "/getPricing/{totalId}")
-    public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
-        return totalService.getPricing(totalId);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type",value = "类型：1-计算应付费用，2-都计算",dataType = "Integer",paramType = "path")
+    })
+    @GetMapping(value = "/getPricing/{totalId}/{type}")
+    public Result<String> getPricing(@PathVariable("totalId")Integer totalId,
+                                     @PathVariable("type")Integer type){
+        return totalService.getPricing(totalId,type);
     }
 
     @ApiOperation(value = "重新上传",  notes="需要Authorization")
     @PostMapping(value = "/againSet/{totalId}")
     public Result againSet(@PathVariable("totalId")Integer totalId,
                                    MultipartFile file) throws Exception {
-
         return xlsxProcessAbstract.againSet(file,totalId);
     }
 
