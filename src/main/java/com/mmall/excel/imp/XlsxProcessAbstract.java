@@ -145,7 +145,7 @@ public class XlsxProcessAbstract {
 
             if(totals!=null && totals.size()>0){
                 //删除之前的账单
-                totalService.delete(new QueryWrapper<Total>().eq("total_time",time).eq("sum_id",sunTotalId));
+                totalService.deleteTotal(time,sunTotalId);
                 String idStr="";
                 for(Total total:totals){
                     idStr+=total.getTotalId()+",";
@@ -350,7 +350,8 @@ public class XlsxProcessAbstract {
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
 
-
+                //final String encoding = System.getProperty("file.encoding");
+                //String newp = new String(path.getBytes("gbk"),encoding);
                 File file=new File(path);
                 File fileParent = file.getParentFile();
                 if (!fileParent.exists()) {
@@ -359,8 +360,7 @@ public class XlsxProcessAbstract {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";
-
+                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
                 threadDto.setIdtime(keyId);
@@ -802,4 +802,14 @@ public class XlsxProcessAbstract {
 
         return false;
     }
+
+    public static void main(String[] args) {
+        try {
+            String pathIpUrl = new String("哈哈哈".getBytes("gbk"));
+            System.out.println("哈哈哈");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 }
+

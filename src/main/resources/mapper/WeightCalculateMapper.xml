@@ -93,6 +93,6 @@
 
     <!--删除重量区间数据-->
     <delete id="deleteByTotalId">
-        delete from weight_calculate where total_id in (${idStr})
+        delete from weight_calculate where FIND_IN_SET(total_id,#{idStr})
     </delete>
 </mapper>

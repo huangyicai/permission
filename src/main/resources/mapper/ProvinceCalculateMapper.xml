@@ -89,6 +89,6 @@
 
     <!--删除省计数据-->
     <delete id="deleteByTotalId">
-        delete from province_calculate where total_id in (${idStr})
+        delete from province_calculate where FIND_IN_SET(total_id,#{idStr})
     </delete>
 </mapper>

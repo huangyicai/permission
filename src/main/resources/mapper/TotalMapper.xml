@@ -75,7 +75,7 @@
 
     <!--根据总账单id删除账单-->
     <delete id="deleteTotal">
-       delete from total where sum_id in (${sumId}) and total_time=#{totalTime}
+       delete from total where FIND_IN_SET(sum_id,#{sumId}) and total_time=#{totalTime}
     </delete>
 
     <!--获取账单列表（数据分析）-->

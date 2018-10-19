@@ -25,10 +25,10 @@ public class LevelConstants {
     public static final Integer CUSTOMER = 5;
 
     //文件的项目路径
-    public static String OMPPATH="10.10.10.114:80/total/";
+    public static String OMPPATH="http://116.62.190.216:8090/total/";
 
     //创建文件写入路径
     //public static String REALPATH = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
-    public static String REALPATH = "D:\\GDW\\kill";
+    public static String REALPATH = "/usr/local/tomcat/apache-tomcat-9.0.12/webapps/total/";
 
 }
