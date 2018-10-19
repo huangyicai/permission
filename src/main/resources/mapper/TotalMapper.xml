@@ -43,8 +43,7 @@
       SUM(total_paid) as totalPaid,
       SUM(total_cost) as totalCost
       from total
-
-      where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime}
+      where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime} and send_id=#{sendId}
     </select>
 
     <!--根据用户id获取账单id-->

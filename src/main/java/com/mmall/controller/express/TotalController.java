@@ -95,10 +95,10 @@ public class TotalController {
 
     @ApiOperation(value = "上传账单---追加",  notes="需要Authorization")
     @ApiImplicitParams(
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path")
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path  ")
     )
-    @PostMapping(value = "/additional",produces = {"application/json;charest=Utf-8"})
-    public Result additional(MultipartFile file,@RequestParam("time")String time) throws Exception {
+    @PostMapping(value = "/additional/{time}",produces = {"application/json;charest=Utf-8"})
+    public Result additional(MultipartFile file,@PathVariable("time")String time) throws Exception {
         xlsxProcessAbstract.processAllSheet(file,time,1,null);
         return Result.ok();
     }
@@ -177,7 +177,6 @@ public class TotalController {
     @ApiOperation(value = "利润分析",  notes="需要Authorization")
     @PostMapping(value = "/getProfits")
     public Result<ProfitsDto> getProfits(@RequestBody BillParam billParam){
-
         ProfitsDto profits = totalService.getProfits(billParam);
         return Result.ok(profits);
     }

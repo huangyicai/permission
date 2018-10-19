@@ -89,10 +89,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public BillDto getBillData(BillParam billParam) {
 
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
-            billParam.setUserId(getUserIdStr());
+            billParam.setUserId(getUserIdStr()+",-1");
         }
-
-        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId());
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId());
 
         if(one==null){
             return new BillDto();
@@ -175,10 +175,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public ProfitsDto getProfits(BillParam billParam) {
 
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
-            billParam.setUserId(getUserIdStr());
+            billParam.setUserId(getUserIdStr()+",-1");
         }
 
-        Total one = totalMapper.getToal( billParam.getDate(), billParam.getUserId());
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        Total one = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId());
 
         if(one==null){
             return null;
@@ -314,6 +315,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         total1.setUpdateTime(new Date());
 
         totalMapper.updateById(total1);
+        totalCost=BigDecimal.ZERO;
+        totalOffer=BigDecimal.ZERO;
+        map.clear();
         return Result.ok(upload);
     }
 
@@ -541,7 +545,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
 
                     //计算续重的钱
-                    BigDecimal two=new BigDecimal(pp.getFirstWeightPrice()).multiply(new BigDecimal(num));
+                    BigDecimal two=new BigDecimal(pp.getPrice()).multiply(new BigDecimal(num));
 
                     if(type==1){
                         bill.setCost(fist.add(two));

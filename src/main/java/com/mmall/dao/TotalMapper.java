@@ -23,7 +23,7 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     Integer insertTotal(Total total);
 
-    Total getToal(@Param("totalTime") String totalTime, @Param("userId") String userId);
+    Total getToal(@Param("totalTime") String totalTime, @Param("userId") String userId,@Param("sendId") Integer sendId);
 
     List<Total> listToal(@Param("totalTime")String totalTime, @Param("userId")String userId);
 
