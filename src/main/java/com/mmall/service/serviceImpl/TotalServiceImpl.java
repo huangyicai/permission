@@ -233,11 +233,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             return Result.error(InfoEnums.PROCING_IS_NULL);
         }
 
-        //校验成本表是否存在数据
-        List<Integer> ag = pricingGroupMapper.getAllPricingGroups(total.getSendId());
-        if(ag.size()!=34){
-            return Result.error(InfoEnums.COST_IS_NULL);
-        }
+
 
         String[] str=total.getTotalUrl().split("/");
 //        final String ompPath=path+str[str.length-1];
@@ -255,8 +251,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             return null;
         }
 
-
-
         //创建bill集合
         List<Bill> list=new ArrayList<Bill>();
 
@@ -266,6 +260,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         if(type==2){
+
+            //校验成本表是否存在数据
+            List<Integer> ag = pricingGroupMapper.getAllPricingGroups(total.getSendId());
+            if(ag.size()!=34){
+                return Result.error(InfoEnums.COST_IS_NULL);
+            }
+
             //获取成本表
             List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(total.getSendId());
 
