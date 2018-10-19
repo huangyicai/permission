@@ -95,7 +95,7 @@ public class TotalController {
 
     @ApiOperation(value = "上传账单---追加",  notes="需要Authorization")
     @ApiImplicitParams(
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path  ")
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path")
     )
     @PostMapping(value = "/additional/{time}",produces = {"application/json;charest=Utf-8"})
     public Result additional(MultipartFile file,@PathVariable("time")String time) throws Exception {

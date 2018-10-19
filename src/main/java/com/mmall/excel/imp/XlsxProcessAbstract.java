@@ -145,7 +145,7 @@ public class XlsxProcessAbstract {
 
             if(totals!=null && totals.size()>0){
                 //删除之前的账单
-                totalService.delete(new QueryWrapper<Total>().eq("total_time",time));
+                totalService.delete(new QueryWrapper<Total>().eq("total_time",time).eq("sum_id",sunTotalId));
                 String idStr="";
                 for(Total total:totals){
                     idStr+=total.getTotalId()+",";

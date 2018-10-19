@@ -17,6 +17,6 @@
 
     <!--根据总账单id删除总账单-->
     <delete id="deleteSumTotal">
-       delete from sum_tatal where sum_id in (${sumId})
+       delete from sum_tatal where FIND_IN_SET(sum_id,#{sumId})
     </delete>
 </mapper>
