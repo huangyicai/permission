@@ -202,3 +202,13 @@ CREATE TABLE `special_pricing_group_key` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
+
+CREATE TABLE `work_reply` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(30) NOT NULL DEFAULT '0' COMMENT '回复的用户id',
+  `service_id` int(30) NOT NULL DEFAULT '0' COMMENT '工单id',
+ `content` varchar(20) NOT NULL DEFAULT '' COMMENT '回复内容',
+ `status` int(30) NOT NULL DEFAULT '0' COMMENT '是否已读',
+ `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

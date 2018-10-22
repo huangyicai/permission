@@ -350,8 +350,6 @@ public class XlsxProcessAbstract {
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
 
-                //final String encoding = System.getProperty("file.encoding");
-                //String newp = new String(path.getBytes("gbk"),encoding);
                 File file=new File(path);
                 File fileParent = file.getParentFile();
                 if (!fileParent.exists()) {
@@ -363,6 +361,7 @@ public class XlsxProcessAbstract {
                 String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
+
                 threadDto.setIdtime(keyId);
 
                 outputStream = new FileOutputStream(path);
@@ -382,8 +381,8 @@ public class XlsxProcessAbstract {
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setOrderNo(threadDto.getIdtime());
-                total.setTotalUrl(threadDto.getPath());
-                total.setCdUrl(threadDto.getPathHead());
+                total.setTotalUrl(pathIpUrl);
+                total.setCdUrl(path);
                 total.setCreateTime(new Date());
                 if(type==1){
                     total.setTotalState(1);

@@ -56,4 +56,19 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber);
+
+    /**
+     * 回复工单
+     * @param handleId
+     * @param content
+     * @return
+     */
+    Result reply(Integer userId,Integer handleId, String content);
+
+    /**
+     * 获取工单回复记录
+     * @param handleId
+     * @return
+     */
+    Result getReplys(Integer page,Integer size,Integer handleId);
 }

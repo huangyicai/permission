@@ -9,7 +9,9 @@ import com.mmall.dto.SysUserInfoDto;
 import com.mmall.model.CustomerService;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
+import com.mmall.model.params.WorkReplyParam;
 import com.mmall.service.CustomerServiceService;
+import com.mmall.util.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +96,23 @@ public class ExpressServiceController {
         byId.setStatus(3);
         customerServiceService.saveOrUpdate(byId);
         return Result.ok();
+    }
+
+    @ApiOperation(value = "回复工单",  notes="需要Authorization")
+    @PostMapping(value = "/reply/{handleId}",produces = {"application/json;charest=Utf-8"})
+    public Result saveReply(@PathVariable("handleId") Integer handleId,
+                        @RequestBody WorkReplyParam workReplyParam){
+        BeanValidator.check(workReplyParam);
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        return customerServiceService.reply(user.getId(),handleId,workReplyParam.getContent());
+    }
+
+    @ApiOperation(value = "获取工单回复记录",  notes="需要Authorization")
+    @GetMapping(value = "/reply/{handleId}",produces = {"application/json;charest=Utf-8"})
+    public Result getReplys(@PathVariable("handleId") Integer handleId,
+                            @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
+                            @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
+        return customerServiceService.getReplys(page,size,handleId);
     }
 
 }

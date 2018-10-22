@@ -60,9 +60,13 @@ public class ThreadImport implements Callable<String> {
 
                 //重名名账单
                 String[] timeStr=threadDto.getTime().split("-");
-
+                String pubUrl = threadDto.getTime()+"/"
+                        +threadDto.getCompanyName()+"/"
+                        +threadDto.getName()+"/"
+                        +threadDto.getKey()+"/"
+                        +threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String path=threadDto.getPathHead()+pubUrl;
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
 
@@ -75,7 +79,7 @@ public class ThreadImport implements Callable<String> {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getKey()+"月账单"+".xlsx";
+                String pathIpUrl=threadDto.getPath()+pubUrl;
 
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
