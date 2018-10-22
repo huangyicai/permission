@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.DailyTotalMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.DailyTotal">
+        <id column="daily_id" property="dailyId" />
+        <result column="total_id" property="totalId" />
+        <result column="daily_time" property="dailyTime" />
+        <result column="daily_text" property="dailyText" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        daily_id, total_id, daily_time, daily_text
+    </sql>
+
+    <!--根据账单id获取每日单量-->
+    <select id="getDailyTotalListByTotalId" resultType="com.mmall.model.DailyTotal">
+      select <include refid="Base_Column_List"/> from daily_total where FIND_SET_IN(total_id,#{userIdStr}) and daily_time=#{time}
+    </select>
+</mapper>

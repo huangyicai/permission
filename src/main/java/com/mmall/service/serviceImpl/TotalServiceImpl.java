@@ -208,6 +208,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param totalId
      * @return
      */
+    @Transactional
     public Result<String> getPricing(Integer totalId,Integer type) {
 
         //获取账单信息
@@ -233,8 +234,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         if(allPricingGroups.size()!=34){
             return Result.error(InfoEnums.PROCING_IS_NULL);
         }
-
-
 
         String[] str=total.getTotalUrl().split("/");
 //        final String ompPath=path+str[str.length-1];
@@ -294,7 +293,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 row.createCell(3).setCellValue(personUser.getDestination());
                 row.createCell(4).setCellValue(personUser.getWeight().toString());
 //                row.createCell(5).setCellValue(personUser.getCost().toString());
-                row.createCell(5).setCellValue(personUser.getOffer().toString());
+                row.createCell(5).setCellValue(personUser.getOffer().doubleValue());
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
@@ -410,6 +409,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param list  计算后的数据
      * @return
      */
+    @Transactional
     public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
                                    Integer type,
                                    List<Bill> list,
@@ -478,6 +478,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param first
      * @param Continued
      */
+    @Transactional
     public Boolean traverse(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
 
         //遍历首重
@@ -487,20 +488,20 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().startsWith(pg.getCity())){
 
                 //和区间开始比较
-                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin()).setScale(2,BigDecimal.ROUND_DOWN));
+                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
 
                 //和区间结束大小比较
-                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd()).setScale(2,BigDecimal.ROUND_DOWN));
+                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()));
 
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(new BigDecimal(pg.getPrice()));
-                        totalCost=totalCost.add(new BigDecimal(pg.getPrice()));
+                        totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
                         return true;
                     }else{
                         bill.setOffer(new BigDecimal(pg.getPrice()));
-                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice()));
+                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
                         return true;
                     }
                 }
@@ -514,46 +515,46 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().startsWith(pp.getCity())){
 
                 //和区间开始比较
-                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin()));
+                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
 
                 //和区间结束大小比较
-                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd()));
+                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()));
 
-                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight()));
+                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()));
 
                 if(greaterContinue>=0 && lessContinue<=0){
 
                     if(firstOne<=0){
                         if(type==1){
-                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice()));
-                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice()));
+                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
                             return true;
                         }else{
-                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice()));
-                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice()));
+                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
                             return true;
                         }
                     }
 
                     //获取计算的单位个数
                     BigDecimal bd=bill.getWeight()
-                            .subtract(new BigDecimal(pp.getFirstWeight()))
-                            .divide(new BigDecimal(pp.getWeightStandard()))
-                            .multiply(new BigDecimal(100));
+                            .subtract(new BigDecimal(pp.getFirstWeight().toString()))
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()))
+                            .multiply(new BigDecimal(1000));
 
                     Integer num=bd.intValue();
 
-                    if(num%100!=0){
-                        num=num/100+1;
+                    if(num%1000!=0){
+                        num=num/1000+1;
                     }else{
-                        num=num/100;
+                        num=num/1000;
                     }
 
                     //获取首重的钱
-                    BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice());
+                    BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice().toString());
 
                     //计算续重的钱
-                    BigDecimal two=new BigDecimal(pp.getPrice()).multiply(new BigDecimal(num));
+                    BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
 
                     if(type==1){
                         bill.setCost(fist.add(two));

@@ -15,6 +15,7 @@ import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.service.SysUserInfoService;
+import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
 import org.apache.poi.ooxml.util.SAXHelper;
@@ -46,12 +47,16 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *  读取Excel
@@ -98,6 +103,9 @@ public class XlsxProcessAbstract {
 
     //根据省份分离数据
     public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
+
+    //根据省份分离数据
+    public ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
 
     /**
      * 根据路径读取数据
@@ -234,6 +242,7 @@ public class XlsxProcessAbstract {
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
+//                daily(bill.getSweepTime(),bill.getSerialNumber());
 
                 //计算每个月份的单量，总重量
                 total+=1;
@@ -508,7 +517,7 @@ public class XlsxProcessAbstract {
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
-
+//                daily(bill.getSweepTime(),bill.getSerialNumber());
                 //计算每个月份的单量，总重量
                 total+=1;
                 weightOne=weightOne.add(bill.getWeight());
@@ -528,6 +537,12 @@ public class XlsxProcessAbstract {
             Map<String,Integer> md=new HashMap<String,Integer>();
             for(String str:destination.keySet()){
                 md.put(str,destination.get(str).size());
+            }
+
+            //根据时间分离数据
+           String dyStr="";
+            for(String str:dailyMap.keySet()){
+                dyStr+=dailyMap.get(str).size()+",";
             }
 
             threadDto.setSendId(userInfo.getId());
@@ -577,6 +592,7 @@ public class XlsxProcessAbstract {
             }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
+//                outputStream = new FileOutputStream(total.getCdUrl());
                 outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
@@ -761,7 +777,7 @@ public class XlsxProcessAbstract {
      * @param weight
      */
     public void weightInterval(BigDecimal weight){
-
+//        weight=weight.setScale(2,BigDecimal.ROUND_DOWN).add(new BigDecimal(0.01));
         Integer intervalNum=0;
         Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
 
@@ -803,6 +819,7 @@ public class XlsxProcessAbstract {
         return false;
     }
 
+<<<<<<< Updated upstream
     public static void main(String[] args) {
         try {
             String pathIpUrl = new String("哈哈哈".getBytes("gbk"));
@@ -810,6 +827,50 @@ public class XlsxProcessAbstract {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+=======
+    /**
+     * 根据每日数据进行分离
+     */
+    public void daily(String sweepTime,String serialNumber) throws ParseException {
+        if (sweepTime!=null) {
+            Pattern p = Pattern.compile("\t|\r|\n");
+            Matcher m = p.matcher(sweepTime);
+            sweepTime = m.replaceAll("");
+        }
+        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sweepTime);
+        String format = new SimpleDateFormat("yyyy-MM-dd").format(date);
+        String format1 = new SimpleDateFormat("MM").format(date);
+
+        String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
+                ,"23","24","25","26","27","28","29","30","31"};
+        String[] arr=dailyOriginal;
+        int days = DateUtils.getDays(format);
+        switch (days){
+            case 30:arr=daily(dailyOriginal,1);
+                break;
+            case 29:arr=daily(dailyOriginal,2);
+                break;
+            case 28:arr=daily(dailyOriginal,3);
+                break;
+        }
+        dailyMap.put(format,serialNumber);
+    }
+
+    /**
+     * 截取时间数组
+     * @param dailyOriginal
+     * @param length
+     * @return
+     */
+    public String[] daily(String[] dailyOriginal,Integer length){
+        //新建数组,对原数组扩容
+        String[] arr = new String[dailyOriginal.length-length];
+        //将原数组数据赋值给新数组
+        for(int j = 0;j<dailyOriginal.length;j++){
+            arr[j] = dailyOriginal[j];
+        }
+        return arr;
+>>>>>>> Stashed changes
     }
 }
 
