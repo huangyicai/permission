@@ -819,15 +819,6 @@ public class XlsxProcessAbstract {
         return false;
     }
 
-<<<<<<< Updated upstream
-    public static void main(String[] args) {
-        try {
-            String pathIpUrl = new String("哈哈哈".getBytes("gbk"));
-            System.out.println("哈哈哈");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-=======
     /**
      * 根据每日数据进行分离
      */
@@ -870,7 +861,15 @@ public class XlsxProcessAbstract {
             arr[j] = dailyOriginal[j];
         }
         return arr;
->>>>>>> Stashed changes
+    }
+
+    public static void main(String[] args) {
+        try {
+            String pathIpUrl = new String("哈哈哈".getBytes("gbk"));
+            System.out.println("哈哈哈");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 }
 
