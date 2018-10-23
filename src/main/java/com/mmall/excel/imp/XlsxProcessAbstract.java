@@ -147,11 +147,9 @@ public class XlsxProcessAbstract {
 
             //获取所替换的账单
             List<Total> totals = totalService.listTotal(time, sunTotalId,0);
-
-            //删除总账单
-            sumTatalMapper.deleteSumTotal(sunTotalId);
-
             if(totals!=null && totals.size()>0){
+                //删除总账单
+                sumTatalMapper.deleteSumTotal(sunTotalId);
                 //删除之前的账单
                 totalService.deleteTotal(time,sunTotalId);
                 String idStr="";
@@ -541,10 +539,10 @@ public class XlsxProcessAbstract {
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
         ThreadDto threadDto=new ThreadDto();
-        for (String key:map.keySet()) {
 
-            Integer total=0;//总单量
-            BigDecimal weightOne=BigDecimal.ZERO;//总重
+        Integer total=0;//总单量
+        BigDecimal weightOne=BigDecimal.ZERO;//总重
+        for (String key:map.keySet()) {
 
             //分离数据
             for (Bill bill:map.get(key)) {
@@ -596,7 +594,7 @@ public class XlsxProcessAbstract {
             threadDto.setDaily(dyStr);
             threadDto.setDailyTime(time);
             threadDto.setSendId(userInfo.getId());
-            threadDto.setKey(key);
+            threadDto.setKey(str1[0]);
             threadDto.setList(map.get(key));
             threadDto.setMd(md);
             threadDto.setMw(mw);

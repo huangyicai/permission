@@ -20,6 +20,9 @@ public class ProcessTransDetailDataDto {
     //根据店铺分离数据
     public ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
 
+    //获取整个数据集合
+//    public List<Bill> bills=new ArrayList<>();
+
     /**
      * Excel每一列数据的处理
      * @param rowStrs
@@ -42,6 +45,8 @@ public class ProcessTransDetailDataDto {
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
             map.put(nameStr,bill);
+//            bills.add(bill);
         }
     }
+
 }
