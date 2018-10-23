@@ -30,6 +30,7 @@
                  /public/register = anon
                  /public/403 = anon
                  /fn/** = roles[SUPER]
+                 /express/service/reply/** = roles["ADMIN,OPERATE,SERVICE,CUSTOMER"]
                  /express/provinceCalculate/getProvinceCalculate = roles["ADMIN,OPERATE,CUSTOMER"]<!--省计-->
                  /express/total/getBillData = roles["ADMIN,OPERATE,CUSTOMER"]<!--月计-->
                  /express/weightCalculate/getWeightCalculate = roles["ADMIN,OPERATE,CUSTOMER"]<!--重量区间-->

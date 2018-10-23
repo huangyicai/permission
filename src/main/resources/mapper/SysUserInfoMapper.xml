@@ -55,7 +55,7 @@
         FROM
             sys_user_info i
         WHERE
-            i.level like #{level} AND i.platform_id = 3
+            i.level like #{level} AND i.platform_id = 3 and i.status=1
     </select>
 
 

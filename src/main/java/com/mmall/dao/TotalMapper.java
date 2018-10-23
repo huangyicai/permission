@@ -53,6 +53,7 @@ public interface TotalMapper extends BaseMapper<Total> {
      * @return
      */
     Page<Total> getAllBySendIdAndCreateTimeAndUserIds(Page ipage,
+                                                      @Param("status")Integer status,
                                                       @Param("userId")String userId,
                                                       @Param("date")String date,
                                                       @Param("id")Integer id);
@@ -64,7 +65,8 @@ public interface TotalMapper extends BaseMapper<Total> {
      * @param id
      * @return
      */
-    Total getSumBiLLDetails(@Param("userId")String userId,
+    Total getSumBiLLDetails(@Param("status")Integer status,
+                            @Param("userId")String userId,
                             @Param("date")String date,
                             @Param("id")Integer id);
 

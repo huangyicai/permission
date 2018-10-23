@@ -165,8 +165,17 @@
         from
           total t
           LEFT JOIN sys_user_info u on u.id=t.user_id
-        where
-          t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId}) and t.total_state>1
+        <where>
+            t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId})
+            <if test="status>1">
+                and t.total_state=#{status}
+            </if>
+            <if test="status &lt;= 1">
+                and t.total_state>1
+            </if>
+        </where>
+
+
     </select>
     <select id="getSumBiLLDetails" resultType="com.mmall.model.Total">
         select
@@ -176,8 +185,15 @@
         from
           total t
           LEFT JOIN sys_user_info u on u.id=t.user_id
-        where
-          t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId}) and t.total_state>1
+        <where>
+            t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId})
+            <if test="status>1">
+                and t.total_state=#{status}
+            </if>
+            <if test="status &lt;= 1">
+                and t.total_state>1
+            </if>
+        </where>
     </select>
     <select id="getAllBillByIds" resultType="com.mmall.model.Total">
         select

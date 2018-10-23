@@ -55,7 +55,7 @@ public interface TotalService extends IService<Total> {
      * @param ipage
      * @return
      */
-    Result getBillDetails(SysUserInfo userInfo, String userId,String date, Page ipage);
+    Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date, Page ipage);
 
     /**
      * 其他账单转发

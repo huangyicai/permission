@@ -208,14 +208,15 @@ public class TotalController {
 
 
     @ApiOperation(value = "获取账单详情",  notes="需要Authorization")
-    @GetMapping(value = "/list",produces = {"application/json;charest=Utf-8"})
+    @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
     public Result getBillDetails(@RequestParam(name = "userId") String userId,
                                  @RequestParam(name = "date") String date,
+                                 @PathVariable("status")Integer status,
                                  @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                  @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
-        return totalService.getBillDetails(userInfo,userId,date,ipage);
+        return totalService.getBillDetails( status,userInfo,userId,date,ipage);
     }
 
     @ApiOperation(value = "其他账单转发",  notes="需要Authorization")
