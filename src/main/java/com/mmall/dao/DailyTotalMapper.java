@@ -2,6 +2,7 @@ package com.mmall.dao;
 
 import com.mmall.model.DailyTotal;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,5 +15,7 @@ import java.util.List;
  * @since 2018-10-19
  */
 public interface DailyTotalMapper extends BaseMapper<DailyTotal> {
-    List<DailyTotal> getDailyTotalListByTotalId(String userIdStr,String time);
+    List<DailyTotal> getDailyTotalListByTotalId(@Param("userIdStr") String userIdStr,@Param("time") String time);
+
+    void deleteByTotalId(@Param("idStr") String idStr);
 }

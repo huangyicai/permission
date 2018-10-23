@@ -131,7 +131,7 @@ public class TotalController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "Integer",paramType = "path"),
             @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
-            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path"),
     })
     @PostMapping(value = "/additionalSet/{type}/{userId}/{time}")
     public Result additionalSet(MultipartFile file,

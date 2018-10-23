@@ -17,9 +17,6 @@ public class ProcessTransDetailDataDto {
 
     private int readRowTitleIndex = 0; //读取标题汇总行
 
-    public String time;//时间
-
-
     //根据店铺分离数据
     public ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
 
@@ -52,11 +49,4 @@ public class ProcessTransDetailDataDto {
         }
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
 }
