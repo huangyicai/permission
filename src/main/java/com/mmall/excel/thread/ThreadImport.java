@@ -1,18 +1,12 @@
 package com.mmall.excel.thread;
 
 import com.mmall.component.ApplicationContextHelper;
-import com.mmall.dao.ProvinceCalculateMapper;
-import com.mmall.dao.SumTatalMapper;
-import com.mmall.dao.TotalMapper;
-import com.mmall.dao.WeightCalculateMapper;
+import com.mmall.dao.*;
 import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
-import com.mmall.model.ProvinceCalculate;
-import com.mmall.model.SumTatal;
-import com.mmall.model.Total;
-import com.mmall.model.WeightCalculate;
+import com.mmall.model.*;
 import com.mmall.util.RandomHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -64,7 +58,7 @@ public class ThreadImport implements Callable<String> {
                 //生成创建路径
                 String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
-                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
+                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
 
                 File file=new File(path);
@@ -106,13 +100,14 @@ public class ThreadImport implements Callable<String> {
         TotalMapper totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
         WeightCalculateMapper weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);
         ProvinceCalculateMapper provinceCalculateMapper = ApplicationContextHelper.getBeanClass(ProvinceCalculateMapper.class);
+        DailyTotalMapper dailyTotalMapper = ApplicationContextHelper.getBeanClass(DailyTotalMapper.class);
 
         //初始化数据
         Total total=new Total();
 
         WeightCalculate weightCalculate=new WeightCalculate();
         ProvinceCalculate provinceCalculate=new ProvinceCalculate();
-
+        DailyTotal dailyTotal=new DailyTotal();
 
 
         //添加账单表数据
@@ -192,5 +187,10 @@ public class ThreadImport implements Callable<String> {
         provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
         provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
         provinceCalculateMapper.insert(provinceCalculate);
+
+        dailyTotal.setTotalId(total.getTotalId());
+        dailyTotal.setDailyTime(threadDto.getDailyTime());
+        dailyTotal.setDailyText(threadDto.getDaily());
+        dailyTotalMapper.insert(dailyTotal);
     }
 }

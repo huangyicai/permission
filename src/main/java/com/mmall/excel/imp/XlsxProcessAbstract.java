@@ -14,10 +14,12 @@ import com.mmall.excel.thread.ThreadImport;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
+import com.mmall.service.DailyTotalService;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
+import com.mmall.util.StringToDateUtil;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -32,7 +34,6 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandl
 import org.apache.poi.xssf.model.StylesTable;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFComment;
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,8 @@ import org.xml.sax.XMLReader;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -86,6 +83,9 @@ public class XlsxProcessAbstract {
 
     @Autowired
     private SumTatalMapper sumTatalMapper;
+
+    @Autowired
+    private DailyTotalMapper dailyTotalMapper;
 
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
 
@@ -161,6 +161,8 @@ public class XlsxProcessAbstract {
                 idStr=idStr.substring(0,idStr.length()-1);
                 weightCalculateMapper.deleteByTotalId(idStr);
                 provinceCalculateMapper.deleteByTotalId(idStr);
+                dailyTotalMapper.deleteByTotalId(idStr);
+
             }
         }
 
@@ -185,6 +187,7 @@ public class XlsxProcessAbstract {
         }
 
         nameStr=nameStr.substring(0,nameStr.length()-1);
+
         //獲取姓名集合
         List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
 
@@ -228,8 +231,6 @@ public class XlsxProcessAbstract {
             Integer total=0;//总单量
             BigDecimal weightOne=BigDecimal.ZERO;//总重
 
-//            String ompPath=path+key+".xlsx";
-
             //判斷是否存在該用戶
             for(BillKeyword name:list){
                 if(key.equals(name.getKeyword())){
@@ -242,7 +243,7 @@ public class XlsxProcessAbstract {
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
-//                daily(bill.getSweepTime(),bill.getSerialNumber());
+                daily(bill.getSweepTime(),bill.getSerialNumber());
 
                 //计算每个月份的单量，总重量
                 total+=1;
@@ -265,7 +266,29 @@ public class XlsxProcessAbstract {
                 md.put(str,destination.get(str).size());
             }
 
+            //根据时间分离数据
+            String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
+                    ,"23","24","25","26","27","28","29","30","31"};
+            String dyStr="";
+            Integer day=DateUtils.getDays(time);
+            String[] arr=dailyOriginal;
+            switch (day){
+                case 30:arr=daily(dailyOriginal,1);
+                    break;
+                case 29:arr=daily(dailyOriginal,2);
+                    break;
+                case 28:arr=daily(dailyOriginal,3);
+                    break;
+            }
+            for(String str:arr){
+                String sss= time+"-"+str;
+                dyStr+=dailyMap.get(sss).size()+",";
+            }
+            dyStr=dyStr.substring(0,dyStr.length()-1);
+
             ThreadDto threadDto=new ThreadDto();
+            threadDto.setDaily(dyStr);
+            threadDto.setDailyTime(time);
             threadDto.setId(id);
             threadDto.setSendId(user.getId());
             threadDto.setKey(key);
@@ -286,6 +309,7 @@ public class XlsxProcessAbstract {
 
             destination.clear();
             weightMap.clear();
+            dailyMap.clear();
         }
 
         //判断线程是否执行完毕
@@ -307,14 +331,16 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public Result againSet(MultipartFile xlsxFile, Integer totalId) throws Exception {
-        Map threadDto1 = getThreadDto(xlsxFile);
+        Total total = totalService.selectById(totalId);
+        Map threadDto1 = getThreadDto(xlsxFile,total.getTotalTime());
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
-        Result result = updateTatal(threadDto, totalId);
+        Result result = updateTatal(threadDto, total);
 
         map.clear();
         destination.clear();
         weightMap.clear();
+        dailyMap.clear();
         return result;
     }
 
@@ -325,7 +351,7 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
-        Map threadDto1 = getThreadDto(xlsxFile);
+        Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
 
@@ -357,7 +383,7 @@ public class XlsxProcessAbstract {
                 //生成创建路径
                 String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
-                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]);
+                threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
                 //final String encoding = System.getProperty("file.encoding");
                 //String newp = new String(path.getBytes("gbk"),encoding);
@@ -382,6 +408,7 @@ public class XlsxProcessAbstract {
                 //初始化数据
                 WeightCalculate weightCalculate=new WeightCalculate();
                 ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+                DailyTotal dailyTotal=new DailyTotal();
 
                 //修改账单表数据
                 total.setName(threadDto.getKey());
@@ -464,6 +491,11 @@ public class XlsxProcessAbstract {
                 provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
                 provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
                 provinceCalculateMapper.insert(provinceCalculate);
+
+                dailyTotal.setTotalId(total.getTotalId());
+                dailyTotal.setDailyTime(threadDto.getDailyTime());
+                dailyTotal.setDailyText(threadDto.getDaily());
+                dailyTotalMapper.insert(dailyTotal);
             }
 
             public void listen(Row row, int rows) {
@@ -475,6 +507,7 @@ public class XlsxProcessAbstract {
         map.clear();
         destination.clear();
         weightMap.clear();
+        dailyMap.clear();
     }
 
     /**
@@ -482,7 +515,7 @@ public class XlsxProcessAbstract {
      * @param xlsxFile
      * @return
      */
-    public Map getThreadDto(MultipartFile xlsxFile) throws Exception {
+    public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -517,7 +550,7 @@ public class XlsxProcessAbstract {
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
-//                daily(bill.getSweepTime(),bill.getSerialNumber());
+                daily(bill.getSweepTime(),bill.getSerialNumber());
                 //计算每个月份的单量，总重量
                 total+=1;
                 weightOne=weightOne.add(bill.getWeight());
@@ -540,11 +573,28 @@ public class XlsxProcessAbstract {
             }
 
             //根据时间分离数据
-           String dyStr="";
-            for(String str:dailyMap.keySet()){
-                dyStr+=dailyMap.get(str).size()+",";
+            String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
+                    ,"23","24","25","26","27","28","29","30","31"};
+            String dyStr="";
+            Integer day=DateUtils.getDays(time);
+            String[] arr=dailyOriginal;
+            switch (day){
+                case 30:arr=daily(dailyOriginal,1);
+                    break;
+                case 29:arr=daily(dailyOriginal,2);
+                    break;
+                case 28:arr=daily(dailyOriginal,3);
+                    break;
             }
 
+            for(String str:arr){
+                String sss= time+"-"+str;
+                dyStr+=dailyMap.get(sss).size()+",";
+            }
+
+            dyStr=dyStr.substring(0,dyStr.length()-1);
+            threadDto.setDaily(dyStr);
+            threadDto.setDailyTime(time);
             threadDto.setSendId(userInfo.getId());
             threadDto.setKey(key);
             threadDto.setList(map.get(key));
@@ -571,9 +621,7 @@ public class XlsxProcessAbstract {
      * @param threadDto
      */
     @Transactional
-    public Result updateTatal(final ThreadDto threadDto,Integer totalId){
-
-        final Total total = totalService.selectById(totalId);
+    public Result updateTatal(final ThreadDto threadDto,Total total){
 
         if(total!=null && total.getTotalState()>1){
             return Result.error(InfoEnums.NOT_UPDATE);
@@ -601,9 +649,10 @@ public class XlsxProcessAbstract {
                 //初始化数据
                 WeightCalculate weightCalculate=new WeightCalculate();
                 ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+                DailyTotal dailyTotal=new DailyTotal();
 
                 //修改账单表数据
-                total.setTotalId(totalId);
+                total.setTotalId(total.getTotalId());
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(BigDecimal.ZERO);
@@ -673,6 +722,10 @@ public class XlsxProcessAbstract {
                 provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
                 provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
                 provinceCalculateMapper.update(provinceCalculate,new UpdateWrapper<ProvinceCalculate>().eq("total_id",total.getTotalId()));
+
+                dailyTotal.setDailyText(threadDto.getDaily());
+                dailyTotal.setDailyTime(threadDto.getDailyTime());
+                dailyTotalMapper.update(dailyTotal,new UpdateWrapper<DailyTotal>().eq("total_id",total.getTotalId()));
             }
 
             public void listen(Row row, int rows) {
@@ -822,29 +875,26 @@ public class XlsxProcessAbstract {
     /**
      * 根据每日数据进行分离
      */
-    public void daily(String sweepTime,String serialNumber) throws ParseException {
+    public void daily(String sweepTime,String num){
+
         if (sweepTime!=null) {
             Pattern p = Pattern.compile("\t|\r|\n");
             Matcher m = p.matcher(sweepTime);
             sweepTime = m.replaceAll("");
         }
-        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(sweepTime);
-        String format = new SimpleDateFormat("yyyy-MM-dd").format(date);
-        String format1 = new SimpleDateFormat("MM").format(date);
-
-        String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
-                ,"23","24","25","26","27","28","29","30","31"};
-        String[] arr=dailyOriginal;
-        int days = DateUtils.getDays(format);
-        switch (days){
-            case 30:arr=daily(dailyOriginal,1);
-                break;
-            case 29:arr=daily(dailyOriginal,2);
-                break;
-            case 28:arr=daily(dailyOriginal,3);
-                break;
+        Date date=null;
+        String format="";
+        String days="";
+        try{
+            date = StringToDateUtil.stringToDate(sweepTime);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            format = sdf.format(date);
+            days = DateUtils.getDays(format)+"";
+        }catch (Exception e){
+            format="未识别时间单号";
+            days=num;
         }
-        dailyMap.put(format,serialNumber);
+        dailyMap.put(format,days);
     }
 
     /**
@@ -854,10 +904,10 @@ public class XlsxProcessAbstract {
      * @return
      */
     public String[] daily(String[] dailyOriginal,Integer length){
-        //新建数组,对原数组扩容
+        //新建数组
         String[] arr = new String[dailyOriginal.length-length];
         //将原数组数据赋值给新数组
-        for(int j = 0;j<dailyOriginal.length;j++){
+        for(int j = 0;j<dailyOriginal.length-length;j++){
             arr[j] = dailyOriginal[j];
         }
         return arr;

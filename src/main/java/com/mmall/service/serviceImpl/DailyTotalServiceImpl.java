@@ -60,6 +60,11 @@ public class DailyTotalServiceImpl extends ServiceImpl<DailyTotalMapper, DailyTo
         for(Total total:list){
             totalIdStr+=total.getTotalId()+",";
         }
+
+        //空值处理
+        if(list==null || list.size()<=0){
+            return dailyTotalDtos;
+        }
         totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
 
         //获取公司某一月的每日賬單
@@ -67,7 +72,7 @@ public class DailyTotalServiceImpl extends ServiceImpl<DailyTotalMapper, DailyTo
 
         for(DailyTotal dailyTotal1:dailyTotalListByTotalId){
             String[] split = dailyTotal1.getDailyText().split(",");
-            for (int i = 0; i < split.length-1; i++) {
+            for (int i = 0; i <split.length; i++) {
                 for (DailyTotalDto dd:dailyTotalDtos){
                     if((i+1+"日").equals(dd.getDay())){
                         dd.setNum(dd.getNum()+Integer.parseInt(split[i]));

@@ -12,11 +12,16 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        daily_id, total_id, daily_time, daily_text
+        daily_id as dailyId, total_id as totalId, daily_time as dailyTime, daily_text as dailyText
     </sql>
 
     <!--根据账单id获取每日单量-->
     <select id="getDailyTotalListByTotalId" resultType="com.mmall.model.DailyTotal">
-      select <include refid="Base_Column_List"/> from daily_total where FIND_SET_IN(total_id,#{userIdStr}) and daily_time=#{time}
+      select <include refid="Base_Column_List"/> from daily_total where FIND_IN_SET(total_id,#{userIdStr}) and daily_time=#{time}
     </select>
+
+    <!--删除每日单量-->
+    <delete id="deleteByTotalId">
+        delete from daily_total where FIND_IN_SET(total_id,#{idStr})
+    </delete>
 </mapper>

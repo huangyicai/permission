@@ -17,14 +17,8 @@ public class ProcessTransDetailDataDto {
 
     private int readRowTitleIndex = 0; //读取标题汇总行
 
-    public String time;//时间
-
-
     //根据店铺分离数据
     public ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
-
-    //获取整个数据集合
-//    public List<Bill> bills=new ArrayList<>();
 
     /**
      * Excel每一列数据的处理
@@ -48,15 +42,6 @@ public class ProcessTransDetailDataDto {
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
             map.put(nameStr,bill);
-//            bills.add(bill);
         }
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
     }
 }

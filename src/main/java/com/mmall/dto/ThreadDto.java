@@ -85,4 +85,14 @@ public class ThreadDto {
      * 公司名
      */
     private String companyName;
+
+    /**
+     * 每日单量
+     */
+    private String daily;
+
+    /**
+     * 每日单量的时间
+     */
+    private String dailyTime;
 }
