@@ -143,15 +143,6 @@ public class ThreadImport implements Callable<String> {
         weightCalculate.setTen(threadDto.getMw().get(10));
         weightCalculate.setEleven(threadDto.getMw().get(11));
         weightCalculate.setTwelve(threadDto.getMw().get(12));
-        weightCalculate.setThirteen(threadDto.getMw().get(13));
-        weightCalculate.setFourteen(threadDto.getMw().get(14));
-        weightCalculate.setFifteen(threadDto.getMw().get(15));
-        weightCalculate.setSixteen(threadDto.getMw().get(16));
-        weightCalculate.setSeventeen(threadDto.getMw().get(17));
-        weightCalculate.setEighteen(threadDto.getMw().get(18));
-        weightCalculate.setNineteen(threadDto.getMw().get(19));
-        weightCalculate.setTwenty(threadDto.getMw().get(20));
-        weightCalculate.setTwentyOne(threadDto.getMw().get(21));
         weightCalculateMapper.insert(weightCalculate);
 
         //添加省计表数据
