@@ -107,6 +107,13 @@ public class Total implements Serializable {
     private BigDecimal totalPaid;
 
     /**
+     * 额外金额
+     */
+    @ApiModelProperty(value = "额外金额")
+    @TableField("total_additional")
+    private BigDecimal totalAdditional;
+
+    /**
      *凭证路径
      */
     @ApiModelProperty(value = "凭证路径")
@@ -174,6 +181,14 @@ public class Total implements Serializable {
     @ApiModelProperty(value = "修改ip")
     @TableField("update_ip")
     private String updateIp;
+
+    public BigDecimal getTotalAdditional() {
+        return totalAdditional;
+    }
+
+    public void setTotalAdditional(BigDecimal totalAdditional) {
+        this.totalAdditional = totalAdditional;
+    }
 
     public String getCdUrl() {
         return cdUrl;

@@ -41,15 +41,29 @@
       SUM(total_weight) as totalWeight,
       SUM(total_offer) as totalOffer,
       SUM(total_paid) as totalPaid,
+      SUM(total_additional) as totalAdditional,
       SUM(total_cost) as totalCost
       from total
-      where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime} and send_id=#{sendId}
+      <where>
+          total_state &gt;=2
+          <if test="totalTime!=null and totalTime!=''">
+              and total_time=#{totalTime}
+          </if>
+
+          <if test="userId!=null and userId!=''">
+              and FIND_IN_SET(user_id,#{userId})
+          </if>
+
+          <if test="sendId!=null and sendId!=0">
+              and send_id=#{sendId}
+          </if>
+      </where>
     </select>
 
     <!--根据用户id获取账单id-->
     <select id="listToal" resultType="com.mmall.model.Total">
       select total_id as totalId
-      from total where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime}
+      from total where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime} and total_state &gt;=2
     </select>
 
     <!--根据总账单id获取账单-->
@@ -60,15 +74,15 @@
       from total
      <where>
          <if test="sumId!= '' and sumId!=null" >
-             and  sum_id in (${sumId})
+             and FIND_IN_SET(sum_id,#{sumId})
          </if>
 
-         <if test="totalTime!=null and totalTime!=''">
+         <if test="totalTime!=null">
              and total_time=#{totalTime}
          </if>
 
          <if test="state!=0 and state!=null">
-             and total_state in (3,4)
+             and total_state &gt;= #{state}
          </if>
      </where>
     </select>
@@ -143,6 +157,7 @@
 
     <select id="getTotals" resultType="com.mmall.model.Total">
         select
+          t.total_id as totalId,
           t.user_id as userId,
           t.name,
           t.total_number as totalNumber,
@@ -207,6 +222,6 @@
 
     <!--发送订单-->
     <update id="updateByTotalId">
-      update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date} where total_id in (${totalId})
+      update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date},total_additional=#{totalAdditional} where total_id in (${totalId})
     </update>
 </mapper>

@@ -1,6 +1,7 @@
 package com.mmall.service.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,17 +18,13 @@ import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.excel.imp.XlsxProcessAbstract;
-import com.mmall.model.PricingGroup;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUserInfo;
-import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
-import com.mmall.service.PricingGroupService;
-import com.mmall.service.SysUserInfoService;
-import com.mmall.service.TotalService;
+import com.mmall.service.*;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
@@ -72,7 +69,19 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     private PricingGroupMapper pricingGroupMapper;
 
     @Autowired
+    private ProvinceCalculateService provinceCalculateService;
+
+    @Autowired
     private SpecialPricingGroupMapper specialPricingGroupMapper;
+
+    @Autowired
+    private TotalService totalService;
+
+    @Autowired
+    private WeightCalculateService weightCalculateService;
+
+    @Autowired
+    private DailyTotalService dailyTotalService;
 
     //成本
     private static  BigDecimal totalCost=BigDecimal.ZERO;
@@ -92,7 +101,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         if(billParam.getUserId()==null||"".equals(billParam.getUserId())){
             billParam.setUserId(getUserIdStr()+",-1");
         }
+
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+
+        if(userInfo.getPlatformId()==3){
+            userInfo.setId(0);
+        }
+
         Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId());
 
         if(one==null){
@@ -191,9 +206,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         billDto.setTotalWeight(one.getTotalWeight());
         billDto.setAverageWeight(one.getTotalWeight().divide(new BigDecimal(one.getTotalNumber()),2, RoundingMode.DOWN));
         billDto.setTotalOffer(one.getTotalOffer());
-        billDto.setTotalPaid(one.getTotalPaid());
+        billDto.setTotalPaid(one.getTotalPaid().add(one.getTotalAdditional()));
         billDto.setTotalCost(one.getTotalCost());
-        billDto.setProfits(one.getTotalPaid().subtract(one.getTotalCost()));
+        billDto.setProfits(billDto.getTotalPaid().subtract(one.getTotalCost()));
         billDto.setPrice(one.getTotalOffer().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
         billDto.setCostPrice(one.getTotalCost().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
 
@@ -398,6 +413,23 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(Total total:allBillByIds){
             total.setUserId(userId);
             totalMapper.updateById(total);
+        }
+        return Result.ok();
+    }
+
+    /**
+     * 删除订单
+     * @param totalId
+     * @return
+     */
+    @Override
+    @Transactional
+    public Result deleteTotal(Integer totalId) {
+        boolean totalId1 = totalService.remove(new UpdateWrapper<Total>().eq("total_id", totalId));
+        if(totalId1){
+            weightCalculateService.remove(new UpdateWrapper<WeightCalculate>().eq("total_id", totalId));
+            provinceCalculateService.remove(new UpdateWrapper<ProvinceCalculate>().eq("total_id", totalId));
+            dailyTotalService.remove(new UpdateWrapper<DailyTotal>().eq("total_id", totalId));
         }
         return Result.ok();
     }

@@ -18,6 +18,9 @@ public class TotalParam {
     @ApiModelProperty(value = "备注")
     private String totalRemark;
 
+    @ApiModelProperty(value = "额外收费")
+    private String totalAdditional="0";
+
     @ApiModelProperty(value = "付款截止时间")
     @NotBlank(message = "用户ID不能为空")
     private String Date;

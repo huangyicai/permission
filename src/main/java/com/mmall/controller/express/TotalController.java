@@ -2,6 +2,7 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.config.UserInfoConfig;
@@ -23,7 +24,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,16 +62,29 @@ public class TotalController {
     private  XlsxProcessAbstract xlsxProcessAbstract;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
-    @GetMapping(value = "/update/{totalId}/{money}")
+    @GetMapping(value = "/update/{totalId}")
     public Result updateSatte(@PathVariable(value = "totalId") Integer totalId,
-                              @PathVariable(value = "money") Double money){
+                              @RequestParam(value = "money") String money){
+
+        Total byId = totalService.getById(totalId);
+
+        if(byId==null || byId.getTotalState()!=3){
+            return Result.error(InfoEnums.NO_PAYMENT);
+        }
+
         Total total=new Total();
         total.setTotalId(totalId);
-        total.setTotalPaid(new BigDecimal(money).setScale(2,ROUND_DOWN));
+        total.setTotalPaid(new BigDecimal(money));
         total.setTotalState(4);
         total.setUpdateTime(new Date());
         totalService.updateById(total);
         return Result.ok();
+    }
+
+    @ApiOperation(value = "删除订单",  notes="需要Authorization")
+    @DeleteMapping(value = "/deleteTotal/{totalId}")
+    public Result deleteTotal(@PathVariable(value = "totalId") Integer totalId){
+        return totalService.deleteTotal(totalId);
     }
 
     @ApiOperation(value = "修改账单(暂时不适用)",  notes="需要Authorization")
@@ -85,7 +101,7 @@ public class TotalController {
     public Result send(@RequestBody TotalParam totalParam){
         Total byId = totalService.getById(totalParam.getTotalId());
         if(byId.getTotalState()==1){
-            totalMapper.updateByTotalId(totalParam.getTotalId(),totalParam.getTotalRemark(),totalParam.getDate());
+            totalMapper.updateByTotalId(totalParam.getTotalId(),totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
             return Result.ok();
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);
@@ -117,9 +133,6 @@ public class TotalController {
     }
 
     @ApiOperation(value = "替换账单--检测是否有已经发送的订单",  notes="需要Authorization")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "sumId",value = "总账单id",dataType = "String",paramType = "query")
-    })
     @PostMapping(value = "/retrieve/{sumId}")
     public Result retrieve(@RequestBody TotalIsTime totalIsTime,
                           @PathVariable("sumId") String sumId){
@@ -129,7 +142,7 @@ public class TotalController {
 
     @ApiOperation(value = "客户追加上传",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "Integer",paramType = "path"),
+            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "long",paramType = "path"),
             @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
             @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path"),
     })
@@ -225,5 +238,6 @@ public class TotalController {
                                     @RequestParam("billIds") String billIds){
         return totalService.othersBillForward(billIds,userId);
     }
+
 }
 

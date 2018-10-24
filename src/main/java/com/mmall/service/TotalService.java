@@ -64,4 +64,6 @@ public interface TotalService extends IService<Total> {
      * @return
      */
     Result othersBillForward(String billIds, Integer userId);
+
+    Result deleteTotal(Integer totalId);
 }

@@ -9,6 +9,7 @@ import com.mmall.vo.TotalVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public interface TotalMapper extends BaseMapper<Total> {
      */
     List<Total> getTotals(@Param("time") String time,@Param("sendId") Integer sendId,@Param("fileName")String fileName);
 
-    void updateByTotalId(@Param("totalId") String totalId,@Param("totalRemark")String totalRemark,@Param("date") String date);
+    void updateByTotalId(@Param("totalId") String totalId, @Param("totalRemark")String totalRemark, @Param("date") String date, @Param("totalAdditional") BigDecimal totalAdditional);
 
     /**
      * 查询账单详情

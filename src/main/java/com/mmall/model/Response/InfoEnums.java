@@ -35,7 +35,7 @@ public enum InfoEnums {
 	TOATL_EXISTS(120004,"账单已存在"),
 	TOATL_IS_PRICING(120005,"订单已经发送"),
 	NOT_UPDATE(120006,"账单已发送给客户，无法修改"),
-
+	NO_PAYMENT(120007,"没有付款"),
 	;
 
 	private Integer code;
