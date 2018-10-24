@@ -48,6 +48,17 @@ public class SumTatal implements Serializable {
     @TableField("sum_time")
     private String sumTime;
 
+    @ApiModelProperty(value = "创建时间")
+    @TableField("create_time")
+    private String createTime;
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
 
     public Integer getSumId() {
         return sumId;

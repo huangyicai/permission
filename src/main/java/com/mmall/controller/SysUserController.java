@@ -18,6 +18,7 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -103,8 +104,16 @@ public class SysUserController {
         Serializable id = subject.getSession().getId();
         return Result.ok();
     }
-    @GetMapping(value = "/403",produces = {"application/json;charest=Utf-8"})
-    public Map<String ,String> unAuthenticated(){
+
+
+    @ApiOperation(value = "未认证")
+    @GetMapping(value = "/unAuthorized",produces = {"application/json;charest=Utf-8"})
+    public Map<String ,String> unAuthorized(){
+        throw new UnauthorizedException();
+    }
+    @ApiOperation(value = "token过期或未登录")
+    @GetMapping(value = "/unAuthenticated",produces = {"application/json;charest=Utf-8"})
+    public Map<String ,String> loginUrl(){
         throw new UnauthenticatedException();
     }
 

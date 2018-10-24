@@ -8,11 +8,12 @@
         <result column="user_id" property="userId" />
         <result column="sum_name" property="sumName" />
         <result column="sum_time" property="sumTime" />
+        <result column="create_time" property="createTime" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        sum_id, user_id, sum_name, sum_time
+        sum_id, user_id, sum_name, sum_time,create_time
     </sql>
 
     <!--根据总账单id删除总账单-->

@@ -21,4 +21,8 @@ public class BillDtetailVo extends Total {
     @ApiModelProperty(value = "负责人")
     @TableField("person_in_charge")
     private String personInCharge;
+
+    @ApiModelProperty(value = "负责人电话")
+    @TableField("telephone")
+    private String telephone;
 }

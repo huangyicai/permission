@@ -161,7 +161,8 @@
             t.total_paid as totalPaid,
             t.total_state as totalState,
             u.name as nameNick,
-            u.person_in_charge as personInCharge
+            u.person_in_charge as personInCharge,
+            u.telephone
         from
           total t
           LEFT JOIN sys_user_info u on u.id=t.user_id

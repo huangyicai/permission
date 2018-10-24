@@ -9,8 +9,8 @@
 
      <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
          <property name="securityManager" ref="securityManager"/>
-         <property name="loginUrl" value="/public/403"/>
-         <property name="unauthorizedUrl" value="/public/403"/>
+         <property name="loginUrl" value="/public/unAuthenticated"/><!--在  SysUserController  文件中-->
+         <property name="unauthorizedUrl" value="/public/unAuthorized"/>
 
          <property name="filters">
              <util:map>
@@ -31,6 +31,7 @@
                  /public/403 = anon
                  /fn/** = roles[SUPER]
                  /express/service/reply/** = roles["ADMIN,OPERATE,SERVICE,CUSTOMER"]
+                 /express/dailyTotal/getDailyTotalList = roles["ADMIN,OPERATE,CUSTOMER"]
                  /express/provinceCalculate/getProvinceCalculate = roles["ADMIN,OPERATE,CUSTOMER"]<!--省计-->
                  /express/total/getBillData = roles["ADMIN,OPERATE,CUSTOMER"]<!--月计-->
                  /express/weightCalculate/getWeightCalculate = roles["ADMIN,OPERATE,CUSTOMER"]<!--重量区间-->
