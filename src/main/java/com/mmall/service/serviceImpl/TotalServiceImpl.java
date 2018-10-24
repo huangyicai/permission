@@ -205,8 +205,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         billDto.setTotalNumber(one.getTotalNumber());
         billDto.setTotalWeight(one.getTotalWeight());
         billDto.setAverageWeight(one.getTotalWeight().divide(new BigDecimal(one.getTotalNumber()),2, RoundingMode.DOWN));
-        billDto.setTotalOffer(one.getTotalOffer());
-        billDto.setTotalPaid(one.getTotalPaid().add(one.getTotalAdditional()));
+        billDto.setTotalOffer(one.getTotalOffer().add(one.getTotalAdditional()));
+        billDto.setTotalPaid(one.getTotalPaid());
         billDto.setTotalCost(one.getTotalCost());
         billDto.setProfits(billDto.getTotalPaid().subtract(one.getTotalCost()));
         billDto.setPrice(one.getTotalOffer().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));

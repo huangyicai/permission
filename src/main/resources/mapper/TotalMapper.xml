@@ -107,6 +107,7 @@
         <if test="type!=2">
             total_cost as totalCost,
         </if>
+        total_additional as totalAdditional,
         total_paid as totalPaid,
         total_credentials_url as totalCredentialsUrl,
         total_url as totalUrl,
@@ -169,7 +170,6 @@
           t.send_id=#{sendId} and t.create_time>#{time} and s.sum_name = #{fileName}
     </select>
     <select id="getAllBySendIdAndCreateTimeAndUserIds" resultType="com.mmall.vo.BillDtetailVo">
-
         select
             t.name as name,
             t.total_offer as totalOffer,

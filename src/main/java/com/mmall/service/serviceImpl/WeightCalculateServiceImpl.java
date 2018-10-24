@@ -94,7 +94,12 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
                     continue;
                 }
 
-                map.put(interval[i-4]+"到"+interval[i-3],value[i]==null?"0.00":value[i].toString());
+                if(i==4){
+                    map.put("0.01到0.5",value[i]==null?"0":value[i].toString());
+                    continue;
+                }else {
+                    map.put(interval[i-4]+"到"+interval[i-3],value[i]==null?"0.00":value[i].toString());
+                }
 //                System.out.println(interval[i-4]+"到"+interval[i-3]+"-------"+name[i]+"-------"+value[i]);
             }
         } catch (Exception e) {
