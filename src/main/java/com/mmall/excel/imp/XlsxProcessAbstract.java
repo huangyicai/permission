@@ -328,6 +328,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
+    @Transactional
     public Result againSet(MultipartFile xlsxFile, Integer totalId) throws Exception {
         Total total = totalService.selectById(totalId);
         Map threadDto1 = getThreadDto(xlsxFile,total.getTotalTime());
@@ -348,6 +349,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
+    @Transactional
     public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
         Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
@@ -512,6 +514,7 @@ public class XlsxProcessAbstract {
      * @param xlsxFile
      * @return
      */
+    @Transactional
     public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
