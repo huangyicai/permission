@@ -108,6 +108,8 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     private ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
 
+    private Integer pricing=-1;
+
     /**
      * 根据路径读取数据
      * @param filename
@@ -356,7 +358,7 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     @Transactional
-    synchronized public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
+    synchronized public void additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
         Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
@@ -426,11 +428,7 @@ public class XlsxProcessAbstract {
                 total.setTotalUrl(pathIpUrl);
                 total.setCdUrl(path);
                 total.setCreateTime(new Date());
-                if(type==1){
-                    total.setTotalState(1);
-                }else{
-                    total.setTotalState(-1);
-                }
+                total.setTotalState(pricing);
                 totalMapper.insert(total);
 
                 //添加重量区间数据
@@ -506,6 +504,7 @@ public class XlsxProcessAbstract {
 
         Integer total=0;//总单量
         BigDecimal weightOne=BigDecimal.ZERO;//总重
+        BigDecimal pri=BigDecimal.ZERO;
         for (String key:map.keySet()) {
 
             //分离数据
@@ -516,6 +515,9 @@ public class XlsxProcessAbstract {
                 //计算每个月份的单量，总重量
                 total+=1;
                 weightOne=weightOne.add(bill.getWeight());
+                if(pricing==-1){
+                    pri=pri.add(bill.getCost());
+                }
             }
 
             //根据重量分离数据
@@ -558,6 +560,7 @@ public class XlsxProcessAbstract {
             }
 
             dyStr=dyStr.substring(0,dyStr.length()-1);
+            threadDto.setCost(pri);
             threadDto.setDaily(dyStr);
             threadDto.setDailyTime(time);
             threadDto.setSendId(userInfo.getId());
@@ -621,7 +624,7 @@ public class XlsxProcessAbstract {
 
                 //修改账单表数据
                 total.setTotalId(total.getTotalId());
-                total.setName(threadDto.getKey());
+//                total.setName(threadDto.getKey());
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(BigDecimal.ZERO);
@@ -725,8 +728,9 @@ public class XlsxProcessAbstract {
 //                processTransDetailData.processTransTotalData(endRowStrs, currentRowNumber);
                 String[] cellStrs = endRowStrs.split("\\|@\\|");
 
-                // 读取第二行汇总行
-                if (currentRowNumber != 0) {
+                if(currentRowNumber==0){
+                    pricing=1;
+                }else{
                     String nameStr=cellStrs[0];
 
                     //分表--为相应表格添加数据

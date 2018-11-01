@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.OutputStream;
+import java.math.BigDecimal;
 
 /**
  * 数据导出
@@ -23,6 +24,11 @@ public abstract class DataSheetExecute<T> {
         row.createCell(2).setCellValue(personUser.getSerialNumber());
         row.createCell(3).setCellValue(personUser.getDestination());
         row.createCell(4).setCellValue(personUser.getWeight().toString());
+        int i = personUser.getOffer().compareTo(new BigDecimal(0));
+        if(i!=0){
+            row.createCell(5).setCellValue(personUser.getOffer().doubleValue());
+        }
+
 //        // 内容字体样式
 //        Font contFont =  workbook.createFont();
 //        // 加粗

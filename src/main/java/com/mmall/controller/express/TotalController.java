@@ -146,12 +146,11 @@ public class TotalController {
             @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
             @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path"),
     })
-    @PostMapping(value = "/additionalSet/{type}/{userId}/{time}")
+    @PostMapping(value = "/additionalSet/{userId}/{time}")
     public Result additionalSet(MultipartFile file,
                                 @PathVariable("time") String time,
-                                @PathVariable("type") Integer type,
                                 @PathVariable("userId") Integer userId) throws Exception {
-        xlsxProcessAbstract.additionalSet(file,userId,type,time);
+        xlsxProcessAbstract.additionalSet(file,userId,time);
         return Result.ok();
     }
 

@@ -96,6 +96,16 @@ public class ThreadDto {
      */
     private String dailyTime;
 
+    private BigDecimal cost;
+
+    public BigDecimal getCost() {
+        return cost;
+    }
+
+    public void setCost(BigDecimal cost) {
+        this.cost = cost;
+    }
+
     public String getKey() {
         return key;
     }
