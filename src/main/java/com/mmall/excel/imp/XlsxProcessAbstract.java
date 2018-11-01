@@ -562,7 +562,12 @@ public class XlsxProcessAbstract {
             threadDto.setDailyTime(time);
             threadDto.setSendId(userInfo.getId());
             threadDto.setKey(str1[0]);
-            threadDto.setList(map.get(key));
+            List<Bill> list = threadDto.getList();
+            if(list==null || list.size()<=0){
+                list=new ArrayList<>();
+            }
+            list.addAll((map.get(key)));
+            threadDto.setList(list);
             threadDto.setMd(mdStr);
             threadDto.setMw(mw);
             threadDto.setPath(LevelConstants.OMPPATH);
@@ -616,6 +621,7 @@ public class XlsxProcessAbstract {
 
                 //修改账单表数据
                 total.setTotalId(total.getTotalId());
+                total.setName(threadDto.getKey());
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(BigDecimal.ZERO);

@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-@Getter
-@Setter
+//@Getter
+//@Setter
 public class ThreadDto {
     /**
      * 账单名
@@ -95,4 +95,140 @@ public class ThreadDto {
      * 每日单量的时间
      */
     private String dailyTime;
+
+    public String getKey() {
+        return key;
+    }
+
+    synchronized public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Map<Integer, BigDecimal> getMw() {
+        return mw;
+    }
+
+    public void setMw(Map<Integer, BigDecimal> mw) {
+        this.mw = mw;
+    }
+
+    public String getMd() {
+        return md;
+    }
+
+    public void setMd(String md) {
+        this.md = md;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public Integer getTotalNum() {
+        return totalNum;
+    }
+
+    public void setTotalNum(Integer totalNum) {
+        this.totalNum = totalNum;
+    }
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getSendId() {
+        return sendId;
+    }
+
+    public void setSendId(Integer sendId) {
+        this.sendId = sendId;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    synchronized public void setPath(String path) {
+        this.path = path;
+    }
+
+    public List<Bill> getList() {
+        return list;
+    }
+
+    public void setList(List<Bill> list) {
+        this.list = list;
+    }
+
+    public String getPathHead() {
+        return pathHead;
+    }
+
+    synchronized public void setPathHead(String pathHead) {
+        this.pathHead = pathHead;
+    }
+
+    public String getIdtime() {
+        return Idtime;
+    }
+
+    synchronized public void setIdtime(String idtime) {
+        Idtime = idtime;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getSumId() {
+        return sumId;
+    }
+
+    public void setSumId(Integer sumId) {
+        this.sumId = sumId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getDaily() {
+        return daily;
+    }
+
+    public void setDaily(String daily) {
+        this.daily = daily;
+    }
+
+    public String getDailyTime() {
+        return dailyTime;
+    }
+
+    public void setDailyTime(String dailyTime) {
+        this.dailyTime = dailyTime;
+    }
 }
