@@ -59,7 +59,7 @@ public class TotalController {
     private SumTatalMapper sumTatalMapper;
 
     @Autowired
-    private  XlsxProcessAbstract xlsxProcessAbstract;
+    private XlsxProcessAbstract xlsxProcessAbstract;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
     @GetMapping(value = "/update/{totalId}")

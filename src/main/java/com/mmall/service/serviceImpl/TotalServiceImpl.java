@@ -31,8 +31,15 @@ import com.mmall.util.RandomHelper;
 import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -301,25 +308,19 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
 
-            public void execute(Row row, Bill personUser) {
-                row.createCell(0).setCellValue(personUser.getBillName());
-                row.createCell(1).setCellValue(personUser.getSweepTime());
-                row.createCell(2).setCellValue(personUser.getSerialNumber());
-                row.createCell(3).setCellValue(personUser.getDestination());
-                row.createCell(4).setCellValue(personUser.getWeight().toString());
-//                row.createCell(5).setCellValue(personUser.getCost().toString());
-                row.createCell(5).setCellValue(personUser.getOffer().doubleValue());
-            }
+//            public void execute(Row row, Bill personUser) {
+//                row.createCell(0).setCellValue(personUser.getBillName());
+//                row.createCell(1).setCellValue(personUser.getSweepTime());
+//                row.createCell(2).setCellValue(personUser.getSerialNumber());
+//                row.createCell(3).setCellValue(personUser.getDestination());
+//                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
                 outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
                 workbook.close();
-            }
-
-            public void listen(Row row, int rows) {
-//                System.out.println("执行到了：<" + rows + "> 这一行");
             }
         };
 
