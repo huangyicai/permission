@@ -1,8 +1,12 @@
 package com.mmall.excel.export;
 
+import com.mmall.excel.Bill;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +30,7 @@ public class ExcelExportExecutor<T> {
     /**
      * 原始数据list
      */
-    private List<T> data;
+    private List<Bill> data;
     /**
      * 分批次写入数据，分页条数
      */
@@ -49,19 +53,19 @@ public class ExcelExportExecutor<T> {
     private boolean watcherRowStatus;
 
 
-    ExcelExportExecutor(String[] rowHeader, List<T> data) {
+    ExcelExportExecutor(String[] rowHeader, List<Bill> data) {
         this();
         this.rowHeader = rowHeader;
         this.data = data;
     }
 
-    ExcelExportExecutor(String[] rowHeader, List<T> data, DataSheetExecute<T> executorListener) {
+    ExcelExportExecutor(String[] rowHeader, List<Bill> data, DataSheetExecute<T> executorListener) {
         this(rowHeader, data);
         this.executorListener = executorListener;
     }
 
     public ExcelExportExecutor(String[] rowHeader
-            , List<T> data
+            , List<Bill> data
             , DataSheetExecute<T> executorListener
             , boolean watcherRowStatus
             ) {
@@ -87,17 +91,30 @@ public class ExcelExportExecutor<T> {
 
 
     public void execute() {
+        // 字体样式
+        XSSFFont xssfFont = (XSSFFont) wb.createFont();
+        // 加粗
+        xssfFont.setBold(true);
+        // 字体名称
+        xssfFont.setFontName("楷体");
+        // 字体大小
+        xssfFont.setFontHeight(12);
 
-        //设置居中
-        CellStyle style = wb.createCellStyle();
-        style.setAlignment(CENTER);
+        // 表头样式
+        CellStyle headStyle =  wb.createCellStyle();
+        // 设置字体css
+        headStyle.setFont(xssfFont);
+        // 竖向居中
+        headStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        // 横向居中
+        headStyle.setAlignment(HorizontalAlignment.CENTER);
+        // 边框
+        headStyle.setBorderBottom(BorderStyle.THIN);
+        headStyle.setBorderLeft(BorderStyle.THIN);
+        headStyle.setBorderRight(BorderStyle.THIN);
+        headStyle.setBorderTop(BorderStyle.THIN);
 
-        //设置字体
-        Font font = wb.createFont();
-        font.setFontName("宋体");
-
-        style.setFont(font);
-        List<T> data = this.data;
+        List<Bill> data = this.data;
         pageSize=data.size();
         /**
          * 处理表头
@@ -109,9 +126,11 @@ public class ExcelExportExecutor<T> {
          * 设置表头
          */
         Row row = this.sheet.createRow(this.dataRowStart - 1);
+        Integer[] width={60*70,60*70,60*80,60*120,60*50};
         for (int i = 0; i < rowHeader.length; i++) {
             Cell cell=row.createCell(i);
-            cell.setCellStyle(style);
+            cell.setCellStyle(headStyle);
+            sheet.setColumnWidth(cell.getColumnIndex(), width[i]);
             cell.setCellValue(rowHeader[i]);
         }
         if (data == null) {
@@ -128,8 +147,8 @@ public class ExcelExportExecutor<T> {
             for (int i = 0; i < size; i++) {
                 tmpRow = sheet.createRow(this.dataRowStart + i);
                 Cell cell=tmpRow.createCell(i);
-                cell.setCellStyle(style);
-                this.executorListener.execute(tmpRow, data.get(i));
+//                cell.setCellStyle(style);
+                this.executorListener.execute(tmpRow, data.get(i),wb);
             }
 //            data.clear();
         } else if (pageSize > 0 && size >= pageSize) {
@@ -145,7 +164,7 @@ public class ExcelExportExecutor<T> {
              * 分批次后，剩余的记录条数
              */
             int remain = listSize % pageSize;
-            List<T> tmp;
+            List<Bill> tmp;
 
             for (int i = 0; i < batchSize; i++) {
                 /*
@@ -175,7 +194,7 @@ public class ExcelExportExecutor<T> {
                     /*
                      * 将list中的数据对象设置到指定的row中
                      */
-                    this.executorListener.execute(tmpRow, tmp.get(j));
+                    this.executorListener.execute(tmpRow, tmp.get(j),wb);
                 }
                 /**
                  * 清除缓存list，优化内存
@@ -188,7 +207,7 @@ public class ExcelExportExecutor<T> {
                 Row tmpRow;
                 for (int j = 0; j < len; j++) {
                     tmpRow = sheet.createRow(currentRow + j + 1);
-                    this.executorListener.execute(tmpRow, tmp.get(j));
+                    this.executorListener.execute(tmpRow, tmp.get(j),wb);
                 }
                 /**
                  * 清除缓存list，优化内存

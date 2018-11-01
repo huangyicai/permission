@@ -8,8 +8,15 @@ import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.model.*;
 import com.mmall.util.RandomHelper;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -39,13 +46,13 @@ public class ThreadImport implements Callable<String> {
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
 
-            public void execute(Row row, Bill personUser) {
-                row.createCell(0).setCellValue(personUser.getBillName());
-                row.createCell(1).setCellValue(personUser.getSweepTime());
-                row.createCell(2).setCellValue(personUser.getSerialNumber());
-                row.createCell(3).setCellValue(personUser.getDestination());
-                row.createCell(4).setCellValue(personUser.getWeight().toString());
-            }
+//            public void execute(Row row, Bill personUser) {
+//                row.createCell(0).setCellValue(personUser.getBillName());
+//                row.createCell(1).setCellValue(personUser.getSweepTime());
+//                row.createCell(2).setCellValue(personUser.getSerialNumber());
+//                row.createCell(3).setCellValue(personUser.getDestination());
+//                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
                 //生成随机码
@@ -84,10 +91,6 @@ public class ThreadImport implements Callable<String> {
                 workbook.close();
                 record(threadDto);
             }
-
-            public void listen(Row row, int rows) {
-//                System.out.println("执行到了：<" + rows + "> 这一行");
-            }
         };
 
         new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
@@ -103,16 +106,15 @@ public class ThreadImport implements Callable<String> {
         //获取相应的bean
         TotalMapper totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
         WeightCalculateMapper weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);
-        ProvinceCalculateMapper provinceCalculateMapper = ApplicationContextHelper.getBeanClass(ProvinceCalculateMapper.class);
+        ProvincialMeterMapper provincialMeterMapper = ApplicationContextHelper.getBeanClass(ProvincialMeterMapper.class);
         DailyTotalMapper dailyTotalMapper = ApplicationContextHelper.getBeanClass(DailyTotalMapper.class);
 
         //初始化数据
         Total total=new Total();
 
         WeightCalculate weightCalculate=new WeightCalculate();
-        ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+        ProvincialMeter provincialMeter=new ProvincialMeter();
         DailyTotal dailyTotal=new DailyTotal();
-
 
         //添加账单表数据
         total.setSumId(threadDto.getSumId());
@@ -146,42 +148,9 @@ public class ThreadImport implements Callable<String> {
         weightCalculateMapper.insert(weightCalculate);
 
         //添加省计表数据
-        provinceCalculate.setTotalId(total.getTotalId());
-        provinceCalculate.setBeijing(threadDto.getMd().get("北京"));
-        provinceCalculate.setTianjing(threadDto.getMd().get("天津"));
-        provinceCalculate.setHebei(threadDto.getMd().get("河北"));
-        provinceCalculate.setShanxi(threadDto.getMd().get("山西"));
-        provinceCalculate.setNeimenggu(threadDto.getMd().get("内蒙古"));
-        provinceCalculate.setLiaoning(threadDto.getMd().get("辽宁"));
-        provinceCalculate.setJiling(threadDto.getMd().get("吉林"));
-        provinceCalculate.setHeilongjiang(threadDto.getMd().get("黑龙江"));
-        provinceCalculate.setShanghai(threadDto.getMd().get("上海"));
-        provinceCalculate.setJiangsu(threadDto.getMd().get("江苏"));
-        provinceCalculate.setZhejaing(threadDto.getMd().get("浙江"));
-        provinceCalculate.setAnhui(threadDto.getMd().get("安徽"));
-        provinceCalculate.setFujian(threadDto.getMd().get("福建"));
-        provinceCalculate.setJaingxi(threadDto.getMd().get("江西"));
-        provinceCalculate.setShandong(threadDto.getMd().get("山东"));
-        provinceCalculate.setHenan(threadDto.getMd().get("河南"));
-        provinceCalculate.setHubei(threadDto.getMd().get("湖北"));
-        provinceCalculate.setHunan(threadDto.getMd().get("湖南"));
-        provinceCalculate.setGuangdong(threadDto.getMd().get("广东"));
-        provinceCalculate.setGuangxi(threadDto.getMd().get("广西"));
-        provinceCalculate.setHainan(threadDto.getMd().get("海南"));
-        provinceCalculate.setChongqing(threadDto.getMd().get("重庆"));
-        provinceCalculate.setSichuan(threadDto.getMd().get("四川"));
-        provinceCalculate.setGuizhou(threadDto.getMd().get("贵州"));
-        provinceCalculate.setYunnan(threadDto.getMd().get("云南"));
-        provinceCalculate.setXizang(threadDto.getMd().get("西藏"));
-        provinceCalculate.setShanxi(threadDto.getMd().get("陕西"));
-        provinceCalculate.setGansu(threadDto.getMd().get("甘肃"));
-        provinceCalculate.setQinghai(threadDto.getMd().get("青海"));
-        provinceCalculate.setNingxia(threadDto.getMd().get("宁夏"));
-        provinceCalculate.setXinjang(threadDto.getMd().get("新疆"));
-        provinceCalculate.setTaiwan(threadDto.getMd().get("台湾"));
-        provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
-        provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
-        provinceCalculateMapper.insert(provinceCalculate);
+        provincialMeter.setTotalId(total.getTotalId());
+        provincialMeter.setMeterText(threadDto.getMd());
+        provincialMeterMapper.insert(provincialMeter);
 
         dailyTotal.setTotalId(total.getTotalId());
         dailyTotal.setDailyTime(threadDto.getDailyTime());

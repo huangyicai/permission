@@ -44,6 +44,8 @@ public class ProcessTransDetailDataDto {
             bill.setSerialNumber(cellStrs[2]);
             bill.setDestination(cellStrs[3]);
             bill.setWeight(new BigDecimal(cellStrs[4]));
+
+            //todo 后续分表按照名字+时间，可实现按用户和时间的分表
             map.put(nameStr,bill);
 //            bills.add(bill);
         }

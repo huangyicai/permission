@@ -14,7 +14,6 @@ import com.mmall.excel.thread.ThreadImport;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.service.DailyTotalService;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
@@ -23,8 +22,7 @@ import com.mmall.util.StringToDateUtil;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -32,8 +30,13 @@ import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFComment;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +76,7 @@ public class XlsxProcessAbstract {
     private WeightCalculateMapper weightCalculateMapper;
 
     @Autowired
-    private ProvinceCalculateMapper provinceCalculateMapper;
+    private ProvincialMeterMapper provincialMeterMapper;
 
     @Autowired
     private BillKeywordMapper billKeywordMapper;
@@ -113,7 +116,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public ArrayListMultimap<String, Bill>  processAllSheet(String filename) throws Exception {
+    synchronized public ArrayListMultimap<String, Bill> processAllSheet(String filename) throws Exception {
         OPCPackage pkg = OPCPackage.open(filename, PackageAccess.READ);
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -140,7 +143,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
+     synchronized public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
 
         //替换
         if(type==2){
@@ -158,7 +161,7 @@ public class XlsxProcessAbstract {
                 }
                 idStr=idStr.substring(0,idStr.length()-1);
                 weightCalculateMapper.deleteByTotalId(idStr);
-                provinceCalculateMapper.deleteByTotalId(idStr);
+                provincialMeterMapper.deleteByTotalId(idStr);
                 dailyTotalMapper.deleteByTotalId(idStr);
 
             }
@@ -171,7 +174,6 @@ public class XlsxProcessAbstract {
         }
 
         //获取用户信息
-//        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         SysUserInfo user = UserInfoConfig.getUserInfo();
         String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
         List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
@@ -207,7 +209,7 @@ public class XlsxProcessAbstract {
         }
 
         //创建线程池
-        ExecutorService threadPool = Executors.newFixedThreadPool(4);
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
         //根据用户分表
         ArrayListMultimap<String, Bill> map = processTransDetailData.map;
@@ -259,16 +261,20 @@ public class XlsxProcessAbstract {
             }
 
             //根据省份分离数据
-            Map<String,Integer> md=new HashMap<String,Integer>();
-            for(String str:destination.keySet()){
-                md.put(str,destination.get(str).size());
+            String[] proStr=LevelConstants.PROSTR;
+
+            String mdStr="";
+            for(String str:proStr){
+                mdStr+=destination.get(str).size()+",";
             }
+            //得到省计字符串
+            mdStr=mdStr.substring(0,mdStr.length()-1);
+
 
             //根据时间分离数据
-            String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
-                    ,"23","24","25","26","27","28","29","30","31"};
+            String[] dailyOriginal=LevelConstants.DAILY_ORIGINAL;
             String dyStr="";
-            Integer day=DateUtils.getDays(time);
+                Integer day=DateUtils.getDays(time);
             String[] arr=dailyOriginal;
             switch (day){
                 case 30:arr=daily(dailyOriginal,1);
@@ -291,7 +297,7 @@ public class XlsxProcessAbstract {
             threadDto.setSendId(user.getId());
             threadDto.setKey(key);
             threadDto.setList(map.get(key));
-            threadDto.setMd(md);
+            threadDto.setMd(mdStr);
             threadDto.setMw(mw);
             threadDto.setPath(LevelConstants.OMPPATH);
             threadDto.setPathHead(LevelConstants.REALPATH);
@@ -350,7 +356,7 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     @Transactional
-    public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
+    synchronized public void additionalSet(MultipartFile xlsxFile,Integer userId,Integer type,String date) throws Exception {
         Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
@@ -363,13 +369,13 @@ public class XlsxProcessAbstract {
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
 
-            public void execute(Row row, Bill personUser) {
-                row.createCell(0).setCellValue(personUser.getBillName());
-                row.createCell(1).setCellValue(personUser.getSweepTime());
-                row.createCell(2).setCellValue(personUser.getSerialNumber());
-                row.createCell(3).setCellValue(personUser.getDestination());
-                row.createCell(4).setCellValue(personUser.getWeight().toString());
-            }
+//            public void execute(Row row, Bill personUser) {
+//                row.createCell(0).setCellValue(personUser.getBillName());
+//                row.createCell(1).setCellValue(personUser.getSweepTime());
+//                row.createCell(2).setCellValue(personUser.getSerialNumber());
+//                row.createCell(3).setCellValue(personUser.getDestination());
+//                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
 
@@ -406,10 +412,10 @@ public class XlsxProcessAbstract {
 
                 //初始化数据
                 WeightCalculate weightCalculate=new WeightCalculate();
-                ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+                ProvincialMeter provincialMeter=new ProvincialMeter();
                 DailyTotal dailyTotal=new DailyTotal();
 
-                //修改账单表数据
+                //添加账单表数据
                 total.setName(threadDto.getKey());
                 total.setUserId(userId);
                 total.setSendId(threadDto.getSendId());
@@ -427,7 +433,7 @@ public class XlsxProcessAbstract {
                 }
                 totalMapper.insert(total);
 
-                //修改重量区间数据
+                //添加重量区间数据
                 weightCalculate.setTotalId(total.getTotalId());
                 weightCalculate.setZero(threadDto.getMw().get(0));
                 weightCalculate.setOne(threadDto.getMw().get(1));
@@ -442,64 +448,20 @@ public class XlsxProcessAbstract {
                 weightCalculate.setTen(threadDto.getMw().get(10));
                 weightCalculate.setEleven(threadDto.getMw().get(11));
                 weightCalculate.setTwelve(threadDto.getMw().get(12));
-                weightCalculate.setThirteen(threadDto.getMw().get(13));
-                weightCalculate.setFourteen(threadDto.getMw().get(14));
-                weightCalculate.setFifteen(threadDto.getMw().get(15));
-                weightCalculate.setSixteen(threadDto.getMw().get(16));
-                weightCalculate.setSeventeen(threadDto.getMw().get(17));
-                weightCalculate.setEighteen(threadDto.getMw().get(18));
-                weightCalculate.setNineteen(threadDto.getMw().get(19));
-                weightCalculate.setTwenty(threadDto.getMw().get(20));
-                weightCalculate.setTwentyOne(threadDto.getMw().get(21));
                 weightCalculateMapper.insert(weightCalculate);
 
-                //修改省计表数据
-                provinceCalculate.setTotalId(total.getTotalId());
-                provinceCalculate.setBeijing(threadDto.getMd().get("北京"));
-                provinceCalculate.setTianjing(threadDto.getMd().get("天津"));
-                provinceCalculate.setHebei(threadDto.getMd().get("河北"));
-                provinceCalculate.setShanxi(threadDto.getMd().get("山西"));
-                provinceCalculate.setNeimenggu(threadDto.getMd().get("内蒙古"));
-                provinceCalculate.setLiaoning(threadDto.getMd().get("辽宁"));
-                provinceCalculate.setJiling(threadDto.getMd().get("吉林"));
-                provinceCalculate.setHeilongjiang(threadDto.getMd().get("黑龙江"));
-                provinceCalculate.setShanghai(threadDto.getMd().get("上海"));
-                provinceCalculate.setJiangsu(threadDto.getMd().get("江苏"));
-                provinceCalculate.setZhejaing(threadDto.getMd().get("浙江"));
-                provinceCalculate.setAnhui(threadDto.getMd().get("安徽"));
-                provinceCalculate.setFujian(threadDto.getMd().get("福建"));
-                provinceCalculate.setJaingxi(threadDto.getMd().get("江西"));
-                provinceCalculate.setShandong(threadDto.getMd().get("山东"));
-                provinceCalculate.setHenan(threadDto.getMd().get("河南"));
-                provinceCalculate.setHubei(threadDto.getMd().get("湖北"));
-                provinceCalculate.setHunan(threadDto.getMd().get("湖南"));
-                provinceCalculate.setGuangdong(threadDto.getMd().get("广东"));
-                provinceCalculate.setGuangxi(threadDto.getMd().get("广西"));
-                provinceCalculate.setHainan(threadDto.getMd().get("海南"));
-                provinceCalculate.setChongqing(threadDto.getMd().get("重庆"));
-                provinceCalculate.setSichuan(threadDto.getMd().get("四川"));
-                provinceCalculate.setGuizhou(threadDto.getMd().get("贵州"));
-                provinceCalculate.setYunnan(threadDto.getMd().get("云南"));
-                provinceCalculate.setXizang(threadDto.getMd().get("西藏"));
-                provinceCalculate.setShanxi(threadDto.getMd().get("陕西"));
-                provinceCalculate.setGansu(threadDto.getMd().get("甘肃"));
-                provinceCalculate.setQinghai(threadDto.getMd().get("青海"));
-                provinceCalculate.setNingxia(threadDto.getMd().get("宁夏"));
-                provinceCalculate.setXinjang(threadDto.getMd().get("新疆"));
-                provinceCalculate.setTaiwan(threadDto.getMd().get("台湾"));
-                provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
-                provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
-                provinceCalculateMapper.insert(provinceCalculate);
+                //添加省计表数据
+                provincialMeter.setTotalId(total.getTotalId());
+                provincialMeter.setMeterText(threadDto.getMd());
+                provincialMeterMapper.insert(provincialMeter);
 
+                //添加每日单量数据
                 dailyTotal.setTotalId(total.getTotalId());
                 dailyTotal.setDailyTime(threadDto.getDailyTime());
                 dailyTotal.setDailyText(threadDto.getDaily());
                 dailyTotalMapper.insert(dailyTotal);
             }
 
-            public void listen(Row row, int rows) {
-//                System.out.println("执行到了：<" + rows + "> 这一行");
-            }
         };
 
         new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
@@ -515,7 +477,7 @@ public class XlsxProcessAbstract {
      * @return
      */
     @Transactional
-    public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
+    synchronized public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -567,14 +529,17 @@ public class XlsxProcessAbstract {
             }
 
             //根据省份分离数据
-            Map<String,Integer> md=new HashMap<String,Integer>();
-            for(String str:destination.keySet()){
-                md.put(str,destination.get(str).size());
+            String[] proStr=LevelConstants.PROSTR;
+
+            String mdStr="";
+            for(String str:proStr){
+                mdStr+=destination.get(str).size()+",";
             }
+            //得到省计字符串
+            mdStr=mdStr.substring(0,mdStr.length()-1);
 
             //根据时间分离数据
-            String[] dailyOriginal={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22"
-                    ,"23","24","25","26","27","28","29","30","31"};
+            String[] dailyOriginal=LevelConstants.DAILY_ORIGINAL;
             String dyStr="";
             Integer day=DateUtils.getDays(time);
             String[] arr=dailyOriginal;
@@ -598,7 +563,7 @@ public class XlsxProcessAbstract {
             threadDto.setSendId(userInfo.getId());
             threadDto.setKey(str1[0]);
             threadDto.setList(map.get(key));
-            threadDto.setMd(md);
+            threadDto.setMd(mdStr);
             threadDto.setMw(mw);
             threadDto.setPath(LevelConstants.OMPPATH);
             threadDto.setPathHead(LevelConstants.REALPATH);
@@ -621,7 +586,7 @@ public class XlsxProcessAbstract {
      * @param threadDto
      */
     @Transactional
-    public Result updateTatal(final ThreadDto threadDto,Total total){
+    synchronized public Result updateTatal(final ThreadDto threadDto,Total total){
 
         if(total!=null && total.getTotalState()>1){
             return Result.error(InfoEnums.NOT_UPDATE);
@@ -630,17 +595,15 @@ public class XlsxProcessAbstract {
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
-
-            public void execute(Row row, Bill personUser) {
-                row.createCell(0).setCellValue(personUser.getBillName());
-                row.createCell(1).setCellValue(personUser.getSweepTime());
-                row.createCell(2).setCellValue(personUser.getSerialNumber());
-                row.createCell(3).setCellValue(personUser.getDestination());
-                row.createCell(4).setCellValue(personUser.getWeight().toString());
-            }
+//            public void execute(Row row, Bill personUser) {
+//                row.createCell(0).setCellValue(personUser.getBillName());
+//                row.createCell(1).setCellValue(personUser.getSweepTime());
+//                row.createCell(2).setCellValue(personUser.getSerialNumber());
+//                row.createCell(3).setCellValue(personUser.getDestination());
+//                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
-//                outputStream = new FileOutputStream(total.getCdUrl());
                 outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
@@ -648,7 +611,7 @@ public class XlsxProcessAbstract {
 
                 //初始化数据
                 WeightCalculate weightCalculate=new WeightCalculate();
-                ProvinceCalculate provinceCalculate=new ProvinceCalculate();
+                ProvincialMeter provincialMeter=new ProvincialMeter();
                 DailyTotal dailyTotal=new DailyTotal();
 
                 //修改账单表数据
@@ -675,61 +638,17 @@ public class XlsxProcessAbstract {
                 weightCalculate.setTen(threadDto.getMw().get(10));
                 weightCalculate.setEleven(threadDto.getMw().get(11));
                 weightCalculate.setTwelve(threadDto.getMw().get(12));
-                weightCalculate.setThirteen(threadDto.getMw().get(13));
-                weightCalculate.setFourteen(threadDto.getMw().get(14));
-                weightCalculate.setFifteen(threadDto.getMw().get(15));
-                weightCalculate.setSixteen(threadDto.getMw().get(16));
-                weightCalculate.setSeventeen(threadDto.getMw().get(17));
-                weightCalculate.setEighteen(threadDto.getMw().get(18));
-                weightCalculate.setNineteen(threadDto.getMw().get(19));
-                weightCalculate.setTwenty(threadDto.getMw().get(20));
-                weightCalculate.setTwentyOne(threadDto.getMw().get(21));
                 weightCalculateMapper.update(weightCalculate,new UpdateWrapper<WeightCalculate>().eq("total_id",total.getTotalId()));
 
                 //修改省计表数据
-                provinceCalculate.setBeijing(threadDto.getMd().get("北京"));
-                provinceCalculate.setTianjing(threadDto.getMd().get("天津"));
-                provinceCalculate.setHebei(threadDto.getMd().get("河北"));
-                provinceCalculate.setShanxi(threadDto.getMd().get("山西"));
-                provinceCalculate.setNeimenggu(threadDto.getMd().get("内蒙古"));
-                provinceCalculate.setLiaoning(threadDto.getMd().get("辽宁"));
-                provinceCalculate.setJiling(threadDto.getMd().get("吉林"));
-                provinceCalculate.setHeilongjiang(threadDto.getMd().get("黑龙江"));
-                provinceCalculate.setShanghai(threadDto.getMd().get("上海"));
-                provinceCalculate.setJiangsu(threadDto.getMd().get("江苏"));
-                provinceCalculate.setZhejaing(threadDto.getMd().get("浙江"));
-                provinceCalculate.setAnhui(threadDto.getMd().get("安徽"));
-                provinceCalculate.setFujian(threadDto.getMd().get("福建"));
-                provinceCalculate.setJaingxi(threadDto.getMd().get("江西"));
-                provinceCalculate.setShandong(threadDto.getMd().get("山东"));
-                provinceCalculate.setHenan(threadDto.getMd().get("河南"));
-                provinceCalculate.setHubei(threadDto.getMd().get("湖北"));
-                provinceCalculate.setHunan(threadDto.getMd().get("湖南"));
-                provinceCalculate.setGuangdong(threadDto.getMd().get("广东"));
-                provinceCalculate.setGuangxi(threadDto.getMd().get("广西"));
-                provinceCalculate.setHainan(threadDto.getMd().get("海南"));
-                provinceCalculate.setChongqing(threadDto.getMd().get("重庆"));
-                provinceCalculate.setSichuan(threadDto.getMd().get("四川"));
-                provinceCalculate.setGuizhou(threadDto.getMd().get("贵州"));
-                provinceCalculate.setYunnan(threadDto.getMd().get("云南"));
-                provinceCalculate.setXizang(threadDto.getMd().get("西藏"));
-                provinceCalculate.setShanxi(threadDto.getMd().get("陕西"));
-                provinceCalculate.setGansu(threadDto.getMd().get("甘肃"));
-                provinceCalculate.setQinghai(threadDto.getMd().get("青海"));
-                provinceCalculate.setNingxia(threadDto.getMd().get("宁夏"));
-                provinceCalculate.setXinjang(threadDto.getMd().get("新疆"));
-                provinceCalculate.setTaiwan(threadDto.getMd().get("台湾"));
-                provinceCalculate.setXianggang(threadDto.getMd().get("香港"));
-                provinceCalculate.setAomen(threadDto.getMd().get("澳门"));
-                provinceCalculateMapper.update(provinceCalculate,new UpdateWrapper<ProvinceCalculate>().eq("total_id",total.getTotalId()));
+                provincialMeter.setTotalId(total.getTotalId());
+                provincialMeter.setMeterText(threadDto.getMd());
+                provincialMeterMapper.update(provincialMeter,new UpdateWrapper<ProvincialMeter>().eq("total_id",total.getTotalId()));
 
+                //修改每日单量数据
                 dailyTotal.setDailyText(threadDto.getDaily());
                 dailyTotal.setDailyTime(threadDto.getDailyTime());
                 dailyTotalMapper.update(dailyTotal,new UpdateWrapper<DailyTotal>().eq("total_id",total.getTotalId()));
-            }
-
-            public void listen(Row row, int rows) {
-//                System.out.println("执行到了：<" + rows + "> 这一行");
             }
         };
 
@@ -833,7 +752,7 @@ public class XlsxProcessAbstract {
 //        weight=weight.setScale(2,BigDecimal.ROUND_DOWN).add(new BigDecimal(0.01));
         Integer intervalNum=0;
 //        Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
-        Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0};
+        Double[] interval=LevelConstants.INTERVAL;
 
         //判断重量所在区间
         for (int i = 0; i < interval.length; i++) {
@@ -859,9 +778,7 @@ public class XlsxProcessAbstract {
      */
     public boolean province(String province){
 
-        String[] proStr={"北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建",
-                "江西","山东","河南","湖北","湖南","广东","广西","海南","重庆","四川","贵州","云南","西藏","陕西","甘肃",
-                "青海","宁夏","新疆","台湾","香港","澳门"};
+        String[] proStr=LevelConstants.PROSTR;
 
         for (String str:proStr){
             if(province.startsWith(str)){

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.model.Total;
 import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.vo.TotalVo;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -20,6 +21,7 @@ import java.util.List;
  * @author qty
  * @since 2018-09-25
  */
+@Mapper
 public interface TotalMapper extends BaseMapper<Total> {
 
     Integer insertTotal(Total total);

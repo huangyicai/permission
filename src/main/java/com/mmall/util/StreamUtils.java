@@ -4,8 +4,15 @@ import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import net.sf.json.JSONArray;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.xssf.streaming.SXSSFCell;
+import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,23 +49,17 @@ public class StreamUtils{
         final String path="E:/GDW"+ File.separator + "百万级数据导出.xlsx";
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
-
-            public void execute(Row row, Bill personUser) {
-                row.createCell(0).setCellValue(personUser.getBillName());
-                row.createCell(1).setCellValue(personUser.getSweepTime());
-                row.createCell(2).setCellValue(personUser.getSerialNumber());
-                row.createCell(3).setCellValue(personUser.getDestination());
-                row.createCell(4).setCellValue(personUser.getWeight().toString());
-//                row.createCell(5).setCellValue(personUser.getWeight().toString());
-            }
+//            public void execute(Row row, Bill personUser) {
+//                row.createCell(0).setCellValue(personUser.getBillName());
+//                row.createCell(1).setCellValue(personUser.getSweepTime());
+//                row.createCell(2).setCellValue(personUser.getSerialNumber());
+//                row.createCell(3).setCellValue(personUser.getDestination());
+//                row.createCell(4).setCellValue(personUser.getWeight().toString());
+//            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
                 outputStream = new FileOutputStream(path);
                 workbook.write(outputStream);
-            }
-
-            public void listen(Row row, int rows) {
-//                System.out.println("执行到了：<" + rows + "> 这一行");
             }
         };
 
