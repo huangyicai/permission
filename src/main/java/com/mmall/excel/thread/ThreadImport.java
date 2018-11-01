@@ -8,26 +8,17 @@ import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.model.*;
 import com.mmall.util.RandomHelper;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 
-public class ThreadImport implements Callable<String> {
+public class ThreadImport extends Thread {
 
     private ThreadDto threadDto;
 
@@ -40,7 +31,7 @@ public class ThreadImport implements Callable<String> {
      * @return
      * @throws Exception
      */
-    public String call()  {
+    public void run()  {
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
@@ -94,15 +85,13 @@ public class ThreadImport implements Callable<String> {
         };
 
         new ExcelExportExecutor<Bill>(strings, threadDto.getList(), dataSheetExecute, true).execute();
-
-        return "ok";
     }
 
     /**
      * 向数据库记录数据
      * @param threadDto
      */
-    public void record(ThreadDto threadDto){
+    private void record(ThreadDto threadDto){
         //获取相应的bean
         TotalMapper totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
         WeightCalculateMapper weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);

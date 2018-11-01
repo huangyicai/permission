@@ -30,13 +30,8 @@ import org.apache.poi.xssf.eventusermodel.XSSFReader;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler.SheetContentsHandler;
 import org.apache.poi.xssf.model.StylesTable;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFComment;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,17 +93,20 @@ public class XlsxProcessAbstract {
     //储存每一行数据
     private final StringBuffer rowStrs = new StringBuffer();
 
+    //根据店铺分离数据
+    private ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
+
     //获取Excel每一行的执行类
-    ProcessTransDetailDataDto processTransDetailData = new ProcessTransDetailDataDto();
+//    private ProcessTransDetailDataDto processTransDetailData = new ProcessTransDetailDataDto();
 
     //根据重量分离
-    public ArrayListMultimap<Integer, BigDecimal> weightMap = ArrayListMultimap.create();
+    private ArrayListMultimap<Integer, BigDecimal> weightMap = ArrayListMultimap.create();
 
     //根据省份分离数据
-    public ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
+    private ArrayListMultimap<String, String> destination = ArrayListMultimap.create();
 
     //根据省份分离数据
-    public ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
+    private ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
 
     /**
      * 根据路径读取数据
@@ -133,8 +131,10 @@ public class XlsxProcessAbstract {
             }
         }
 
-        return processTransDetailData.map;
+//        return processTransDetailData.map;
+        return map;
     }
+
 
     /**
      * 支持遍历同一个excle文件下多个sheet的解析
@@ -143,7 +143,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-     synchronized public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
+    synchronized public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
 
         //替换
         if(type==2){
@@ -212,7 +212,7 @@ public class XlsxProcessAbstract {
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
         //根据用户分表
-        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
+//        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
 
         //获取上传的文件名字
         String fName = xlsxFile.getOriginalFilename();
@@ -501,7 +501,7 @@ public class XlsxProcessAbstract {
         String[] str1= fName.split("\\.");
 
         //根据用户分表
-        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
+//        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
         ThreadDto threadDto=new ThreadDto();
 
         Integer total=0;//总单量
@@ -666,7 +666,7 @@ public class XlsxProcessAbstract {
      * @throws IOException
      * @throws SAXException
      */
-    public void parserSheetXml(StylesTable styles, ReadOnlySharedStringsTable strings, SheetContentsHandler sheetHandler, InputStream sheetInputStream) throws IOException, SAXException {
+    private void parserSheetXml(StylesTable styles, ReadOnlySharedStringsTable strings, SheetContentsHandler sheetHandler, InputStream sheetInputStream) throws IOException, SAXException {
         DataFormatter formatter = new DataFormatter();
         InputSource sheetSource = new InputSource(sheetInputStream);
         try {
@@ -682,7 +682,7 @@ public class XlsxProcessAbstract {
     /**
      * 读取excel行、列值（这里可以分成其他页面）
      */
-    private class SheetToCSV implements SheetContentsHandler {
+     public class SheetToCSV implements SheetContentsHandler {
         private boolean firstCellOfRow = false;
         private int currentRowNumber = -1;
         private int currentColNumber = -1;
@@ -715,7 +715,25 @@ public class XlsxProcessAbstract {
             String endRowStrs=rowStrs.toString();
 
             if(!rowStrs.toString().equals("|@|")) {
-                processTransDetailData.processTransTotalData(endRowStrs, currentRowNumber);
+
+//                processTransDetailData.processTransTotalData(endRowStrs, currentRowNumber);
+                String[] cellStrs = endRowStrs.split("\\|@\\|");
+
+                // 读取第二行汇总行
+                if (currentRowNumber != 0) {
+                    String nameStr=cellStrs[0];
+
+                    //分表--为相应表格添加数据
+                    Bill bill=new Bill();
+                    bill.setBillName(cellStrs[0]);
+                    bill.setSweepTime(cellStrs[1]);
+                    bill.setSerialNumber(cellStrs[2]);
+                    bill.setDestination(cellStrs[3]);
+                    bill.setWeight(new BigDecimal(cellStrs[4]));
+
+                    //todo 后续分表按照名字+时间，可实现按用户和时间的分表
+                    map.put(nameStr,bill);
+                }
             }
             rowStrs.delete(0, rowStrs.length());// 清空buffer
         }
@@ -748,7 +766,7 @@ public class XlsxProcessAbstract {
      * 获取重量区间
      * @param weight
      */
-    public void weightInterval(BigDecimal weight){
+    private void weightInterval(BigDecimal weight){
 //        weight=weight.setScale(2,BigDecimal.ROUND_DOWN).add(new BigDecimal(0.01));
         Integer intervalNum=0;
 //        Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
@@ -776,7 +794,7 @@ public class XlsxProcessAbstract {
      * 获取城市单件：http://www.tcmap.com.cn/list/jiancheng_list.html
      * @param province
      */
-    public boolean province(String province){
+    private boolean province(String province){
 
         String[] proStr=LevelConstants.PROSTR;
 
@@ -793,7 +811,7 @@ public class XlsxProcessAbstract {
     /**
      * 根据每日数据进行分离
      */
-    public void daily(String sweepTime,String num){
+    private void daily(String sweepTime,String num){
 
         if (sweepTime!=null) {
             Pattern p = Pattern.compile("\t|\r|\n");
@@ -821,7 +839,7 @@ public class XlsxProcessAbstract {
      * @param length
      * @return
      */
-    public String[] daily(String[] dailyOriginal,Integer length){
+    private String[] daily(String[] dailyOriginal,Integer length){
         //新建数组
         String[] arr = new String[dailyOriginal.length-length];
         //将原数组数据赋值给新数组
