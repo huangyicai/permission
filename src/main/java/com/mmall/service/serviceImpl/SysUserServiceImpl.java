@@ -8,6 +8,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
@@ -20,6 +21,7 @@ import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoServiceParm;
 import com.mmall.model.params.UserPasswordParam;
 import com.mmall.service.SysUserService;
+import com.mmall.util.DateTimeUtil;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.SmsUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +64,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private CodeRecordMapper codeRecordMapper;
     @Autowired
     private CourierCompanyMapper courierCompanyMapper;
+    @Autowired
+    private UseTermMapper useTermMapper;
 
     public Comparator<SysMenuDto> menusSeqComparator = new Comparator<SysMenuDto>() {
         public int compare(SysMenuDto o1, SysMenuDto o2) {
@@ -70,6 +74,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     };
 
     public Result<List<SysMenuDto>> findAllMenuByUser(SysUserInfo user,Integer platId) {
+        List<SysMenuDto> dtoList = Lists.newArrayList();
+
+        if(user.getPlatformId()!=1) {
+            SysUserInfo user1 = UserInfoConfig.getExpressByUser(user);
+            UseTerm useTerm = useTermMapper.selectOne(new QueryWrapper<UseTerm>().eq("user_id", user1.getId()));
+            long currentTime = System.currentTimeMillis();
+            if (useTerm == null || currentTime > Long.parseLong(useTerm.getClosingDate())) {
+                SysMenu sysMenu = sysMenuMapper.selectOne(new QueryWrapper<SysMenu>().eq("id", 18));
+                dtoList.add(SysMenuDto.adapt(sysMenu));
+                return Result.ok(dtoList);
+            }
+        }
+
         if(platId!=0&&platId!=null){
             if(!user.getPlatformId().equals(platId)){
                 throw new UnauthorizedException();
@@ -77,7 +94,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         Integer id = user.getId();
         List<SysMenu> sysMenus = sysMenuMapper.findAllMenuByUser(id);
-        List<SysMenuDto> dtoList = Lists.newArrayList();
+
         for (SysMenu sysMenu : sysMenus) {
             dtoList.add(SysMenuDto.adapt(sysMenu));
         }
@@ -126,6 +143,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if(sysUserInfo.getStatus()==-1){
             return Result.error(InfoEnums.USER_NOT_EXISTENCE);
         }
+
+        if(sysUserInfo.getPlatformId()!=1){
+            SysUserInfo user = UserInfoConfig.getExpressByUser(sysUserInfo);
+            UseTerm useTerm = useTermMapper.selectOne(new QueryWrapper<UseTerm>().eq("user_id", user.getId()));
+            long currentTime = System.currentTimeMillis();
+            if(useTerm==null||currentTime>Long.parseLong(useTerm.getClosingDate()))sysUserInfo.setStatus(0);//账号过期，需要充值
+            else sysUserInfo.setStatus(1);//无需充值
+        }else {
+            sysUserInfo.setStatus(1);
+        }
         if(!subject.isAuthenticated()){
             CourierCompany courierCompany = courierCompanyMapper.selectById(sysUserInfo.getCourierId());
             SysUserInfoTypeDto adapt = SysUserInfoTypeDto.adapt(sysUserInfo);
@@ -159,14 +186,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
     @Transactional
     public Result fnRegister(UserInfoExpressParm user,SysUserInfo parent) {
-        return register(user,parent, LevelConstants.EXPRESS,2);
+        SysUserInfo sysUserInfo = (SysUserInfo)register(user, parent, LevelConstants.EXPRESS, 2).getData();
+        UseTerm useTerm = new UseTerm();
+        useTerm.setUserId(sysUserInfo.getId());
+        long sysTime = System.currentTimeMillis();
+        useTerm.setClosingDate(DateTimeUtil.addDateNum(sysTime,2)+"");
+        useTermMapper.insert(useTerm);
+        return Result.ok();
     }
 
     @Transactional
     public  Result register(UserInfoExpressParm user,SysUserInfo parent,Integer platformId,Integer roleId){
         SysUser userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",user.getUsername()));
         if(userByusername!=null){
-            return Result.error(InfoEnums.USERNAME_EXISTENCE);
+            SysUserInfo sysUserInfo = sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id", userByusername.getId()).in("status", 0, 1));
+            if(sysUserInfo!=null){
+                return Result.error(InfoEnums.USERNAME_EXISTENCE);
+            }
         }
         Md5Hash md = new Md5Hash(user.getPassword(),user.getUsername(),1024);
         SysUser sysUser = SysUser.builder().password(md.toString()).username(user.getUsername()).build();
@@ -224,7 +260,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         sysUserRole.setRoleId(roleId);
         sysUserRole.setUserId(userInfo.getId());
         sysUserRoleMapper.insert(sysUserRole);
-        return Result.ok();
+        return Result.ok(userInfo);
     }
 
     public Result<List<SysUserInfo>> getCompanys(SysUserInfo user) {

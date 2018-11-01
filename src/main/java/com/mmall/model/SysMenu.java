@@ -1,5 +1,6 @@
 package com.mmall.model;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.model.Response.Result;
@@ -48,6 +49,7 @@ public class SysMenu extends Model<SysMenu> {
     @ApiModelProperty(value = "等级")
     private String level;
     @ApiModelProperty(value = "上级菜单ID")
+    @TableField("parent_id")
     private Integer parentId;
     @JsonView(Result.ResultMenus.class)
     @ApiModelProperty(value = "路径")

@@ -24,6 +24,7 @@
         i.id,
         i.name,
         i.company_name as companyName,
+        i.display,
         i.telephone,
         i.user_id as userId,
         i.platform_id as platformId,

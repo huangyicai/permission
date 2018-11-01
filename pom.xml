@@ -281,6 +281,14 @@
       <artifactId>jiguang-common</artifactId>
       <version>1.1.0</version>
     </dependency>
+
+    <!--支付宝支付 https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
+    <dependency>
+      <groupId>com.alipay.sdk</groupId>
+      <artifactId>alipay-sdk-java</artifactId>
+      <version>3.3.49.ALL</version>
+    </dependency>
+
   </dependencies>
 
   <build>

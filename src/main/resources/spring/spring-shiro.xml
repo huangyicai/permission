@@ -26,6 +26,7 @@
                  /v2/api-docs = anon
                  /swagger-resources/** = anon
                  /webjars/** =anon
+                 /public/alipay/** = anon
                  /public/login = anon
                  /public/register = anon
                  /public/403 = anon

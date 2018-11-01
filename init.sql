@@ -212,3 +212,32 @@ CREATE TABLE `work_reply` (
  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `use_term` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(30) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `closing_date` varchar(35) NOT NULL DEFAULT '' COMMENT '截止日期时间戳',
+  `start_date` varchar(35) NOT NULL DEFAULT '' COMMENT '开始日期时间戳',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `system_price` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `month_num` int(30) NOT NULL DEFAULT '1' COMMENT '月数',
+  `original_price` double NOT NULL DEFAULT '1.00' COMMENT '原价',
+  `actual_name` varchar(35) NOT NULL DEFAULT '1.00' COMMENT '优惠名称',
+  `actual_price` varchar(35) NOT NULL DEFAULT '1.00' COMMENT '实际价格',
+  `status` varchar(35) NOT NULL DEFAULT '' COMMENT '1=可用，2=不可用，3=删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '百里百里系统价格';
+
+CREATE TABLE `purchase_record` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `order_no` int(30) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `user_id` int(30) NOT NULL DEFAULT '0' COMMENT '用户id',
+  `sp_id` int(30) NOT NULL DEFAULT '0' COMMENT '价格系统ID',
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT '0=未付款，1=已付款',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '快递企业购买记录';

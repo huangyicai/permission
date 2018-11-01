@@ -82,6 +82,7 @@ public class ExpressServiceController {
     public Result getCustomers(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .eq("parent_id", userInfo.getId())
                 .eq("platform_id", userInfo.getPlatformId())
                 .eq("display", 0));
         return Result.ok(sysUserInfos);
