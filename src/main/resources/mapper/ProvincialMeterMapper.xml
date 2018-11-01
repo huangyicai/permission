@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mmall.dao.ProvincialMeterMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.mmall.model.ProvincialMeter">
+        <id column="meter_id" property="meterId" />
+        <result column="total_id" property="totalId" />
+        <result column="meter_text" property="meterText" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        meter_id as meterId, total_id as totalId, meter_text as meterText
+    </sql>
+
+    <!--删除省计数据-->
+    <delete id="deleteByTotalId">
+        delete from provincial_meter where FIND_IN_SET(total_id,#{idStr})
+    </delete>
+
+    <!--根据账单id获取省计数据-->
+    <select id="getDailyTotalByTotalId" resultType="com.mmall.model.ProvincialMeter">
+        select <include refid="Base_Column_List"/> from provincial_meter where FIND_IN_SET(total_id,#{userIdStr})
+    </select>
+</mapper>
