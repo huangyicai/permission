@@ -8,6 +8,7 @@ import com.google.common.collect.Multimap;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysUserInfoDto;
+import com.mmall.excel.thread.ThreadInsert;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
@@ -16,14 +17,22 @@ import com.mmall.model.params.UserInfoOperateParam;
 import com.mmall.service.ExpressUserService;
 import com.mmall.util.BeanValidator;
 import com.mmall.util.LevelUtil;
+import com.mmall.util.ReadExcel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
+@Slf4j
 public class ExpressUserServicelmpl implements ExpressUserService {
 
     @Autowired
@@ -60,6 +69,36 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .paymentAccount(user.getPaymentAccount())
                 .typeName(user.getTypeName()).build();
         paymentMethodMapper.insert(paymentMethod);
+        return Result.ok();
+    }
+
+    @Override
+    public Result importUser(MultipartFile file,SysUserInfo parent, Integer id) throws IOException, InterruptedException {
+
+        if(id!=0) parent= sysUserInfoMapper.selectById(id);
+        ReadExcel re=new ReadExcel();
+
+        List<UserInfoExpressParm> userInfoExpressParms = re.readExcel(file);
+
+        //创建线程池
+        ExecutorService threadPool = Executors.newFixedThreadPool(30);
+
+        //执行
+        for (UserInfoExpressParm ui:userInfoExpressParms){
+            ThreadInsert ti=new ThreadInsert(ui,parent,id);
+            threadPool.submit(ti);
+        }
+
+        //判断线程是否执行完毕
+        threadPool.shutdown();
+        while (true){
+            if (threadPool.isTerminated()) {
+                log.info("线程已执行完毕");
+                break;
+            }
+            Thread.sleep(200);
+        }
+
         return Result.ok();
     }
 

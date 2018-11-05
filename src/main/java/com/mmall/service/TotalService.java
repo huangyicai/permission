@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
+import com.mmall.excel.Bill;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
@@ -66,4 +67,8 @@ public interface TotalService extends IService<Total> {
     Result othersBillForward(String billIds, Integer userId);
 
     Result deleteTotal(Integer totalId);
+
+    List<SysUserInfo> getCollection();
+
+    Result<List<Bill>> getBudget(Double weight, Integer userId);
 }

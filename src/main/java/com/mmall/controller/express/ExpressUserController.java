@@ -22,7 +22,9 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Api(value = "ExpressUserController", description = "快递用户管理")
@@ -43,6 +45,13 @@ public class ExpressUserController {
                                   @PathVariable("level") Integer level){
         SysUserInfo parent = UserInfoConfig.getUserInfo();
         return expressUserService.expressRegister(user,parent,id,level);
+    }
+
+    @ApiOperation(value = "快递公司注册(导入)",  notes="需要Authorization")
+    @PostMapping(value = "/importUser/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result importUser(@RequestParam("file") MultipartFile file,@PathVariable("id") Integer id) throws IOException, InterruptedException {
+        SysUserInfo parent = UserInfoConfig.getUserInfo();
+        return expressUserService.importUser(file,parent,id);
     }
 
     @ApiOperation(value = "为分支添加/修改付款机构",  notes="需要Authorization")

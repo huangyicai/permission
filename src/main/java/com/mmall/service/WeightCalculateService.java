@@ -1,9 +1,11 @@
 package com.mmall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mmall.dto.WeightCalculateDto;
 import com.mmall.model.WeightCalculate;
 import com.mmall.model.params.BillParam;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,5 +17,5 @@ import java.util.Map;
  * @since 2018-09-25
  */
 public interface WeightCalculateService extends IService<WeightCalculate> {
-    Map<String,String> getWeightCalculate(BillParam billParam);
+    List<WeightCalculateDto> getWeightCalculate(BillParam billParam);
 }

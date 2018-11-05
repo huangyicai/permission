@@ -6,7 +6,9 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoOperateParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +21,13 @@ public interface ExpressUserService {
      * @return
      */
     Result expressRegister(UserInfoExpressParm user,SysUserInfo parent,Integer id,Integer level);
+
+    /**
+     * exress注册(导入)
+     * @param parent
+     * @return
+     */
+    Result importUser(MultipartFile file,SysUserInfo parent, Integer id) throws IOException, InterruptedException;
 
     /**
      * 获取用户列表

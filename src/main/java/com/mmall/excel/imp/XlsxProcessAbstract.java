@@ -19,6 +19,7 @@ import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
 import com.mmall.util.StringToDateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -232,6 +233,8 @@ public class XlsxProcessAbstract {
             int id=-1;
             Integer total=0;//总单量
             BigDecimal weightOne=BigDecimal.ZERO;//总重
+
+            key=key.replace("\u00A0", "");
 
             //判斷是否存在該用戶
             for(BillKeyword name:list){
@@ -612,6 +615,19 @@ public class XlsxProcessAbstract {
 //            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
+
+                File file=new File(total.getCdUrl());
+
+                //获取父目录
+                File fileParent = file.getParentFile();
+
+                //判断父目录是否存在，不存在则创建
+                if (!fileParent.exists()) {
+                    fileParent.mkdirs();
+                }
+
+                file.createNewFile();
+
                 outputStream = new FileOutputStream(total.getCdUrl());
                 workbook.write(outputStream);
                 outputStream.close();
@@ -724,10 +740,7 @@ public class XlsxProcessAbstract {
             String endRowStrs=rowStrs.toString();
 
             if(!rowStrs.toString().equals("|@|")) {
-
-//                processTransDetailData.processTransTotalData(endRowStrs, currentRowNumber);
                 String[] cellStrs = endRowStrs.split("\\|@\\|");
-
                 if(currentRowNumber==0){
                     pricing=1;
                 }else{
@@ -735,7 +748,7 @@ public class XlsxProcessAbstract {
 
                     //分表--为相应表格添加数据
                     Bill bill=new Bill();
-                    bill.setBillName(cellStrs[0]);
+                    bill.setBillName(cellStrs[0].replaceAll("\\s{2,}", ""));
                     bill.setSweepTime(cellStrs[1]);
                     bill.setSerialNumber(cellStrs[2]);
                     bill.setDestination(cellStrs[3]);
