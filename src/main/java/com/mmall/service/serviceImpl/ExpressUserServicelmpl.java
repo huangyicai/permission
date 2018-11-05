@@ -34,6 +34,8 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     private BillKeywordMapper billKeywordMapper;
     @Autowired
     private PaymentMethodMapper paymentMethodMapper;
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     public Result expressRegister(UserInfoExpressParm user, SysUserInfo parent,Integer id,Integer level) {
 
@@ -51,6 +53,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .name(user.getName())
                 .personInCharge(user.getPersonInCharge())
                 .level(LevelUtil.calculateLevel(parent.getLevel(), parent.getId()))
+                .courierId(parent.getCourierId())
                 .platformId(-1)
                 .build();
         sysUserInfoMapper.insert(userInfo);
@@ -135,9 +138,15 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         return Result.ok();
     }
 
-    public Result<SysUserInfo> getCusmotersInfo(Integer id) {
-        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(id);
-        return Result.ok(sysUserInfo);
+    public Result getCusmotersInfo(Integer id) {
+        SysUserInfo user = sysUserInfoMapper.selectById(id);
+        SysUser sysUser = sysUserMapper.selectById(user.getUserId());
+        sysUser.setPassword("***********");
+
+        Map<String,Object> map = Maps.newHashMap();
+        map.put("user",sysUser);
+        map.put("userInfo",user);
+        return Result.ok(map);
     }
 
     public Result registerOperate(UserInfoOperateParam user, Integer level, SysUserInfo parent) {

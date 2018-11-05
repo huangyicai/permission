@@ -220,4 +220,40 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         specialPricingGroupMapper.delete(new QueryWrapper<SpecialPricingGroup>().eq("key_id",keyId));
         return Result.ok();
     }
+
+    @Override
+    @Transactional
+    public Result saveAllExistingPricingGroups(String pgsId, Integer cityId,Integer userId) {
+        List<PricingGroup> pricingGroups = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>()
+                .eq("user_id", userId)
+                .eq("city_id", cityId));
+
+        List<PricingGroup> allByUserAndCitys = pricingGroupMapper.getAllByUserAndCitys(pgsId, cityId, userId);
+        for(PricingGroup pg :allByUserAndCitys){
+            pricingGroupMapper.deleteById(pg);
+        }
+        String[] a = pgsId.split(",");
+        for(String i :a){
+            if(i.isEmpty()){
+                continue;
+            }
+            for(PricingGroup pg:pricingGroups){
+                pg.setCityId(Integer.parseInt(i));
+                pricingGroupMapper.insert(pg);
+            }
+        }
+
+        return Result.ok();
+    }
+
+    public static void main(String[] args) {
+        String s = ",1,2,3";
+        String[] a = s.split(",");
+        for(String i :a){
+            if(i.isEmpty()){
+                continue;
+            }
+            System.out.println(i);
+        }
+    }
 }

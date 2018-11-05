@@ -66,7 +66,7 @@ public interface ExpressUserService {
      * @param id
      * @return
      */
-    Result<SysUserInfo> getCusmotersInfo(Integer id);
+    Result getCusmotersInfo(Integer id);
 
     /**
      * 快递公司注册(1=运营号,2=客服)

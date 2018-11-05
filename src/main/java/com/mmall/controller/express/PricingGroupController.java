@@ -184,6 +184,14 @@ public class PricingGroupController {
         return pricingGroupService.getAllCustomers(userInfo);
     }
 
+    @ApiOperation(value = "批量添加定价组",  notes="需要Authorization")
+    @PostMapping(value = "/customer/{pgsId}/{cityId}/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result saveExistingPricingGroups(@PathVariable("pgsId")String pgsId,
+                                            @PathVariable("cityId")Integer cityId,
+                                            @PathVariable("userId")Integer userId){
+        return pricingGroupService.saveAllExistingPricingGroups(pgsId,cityId,userId);
+    }
+
     @ApiOperation(value = "添加客户相同定价组",  notes="需要Authorization")
     @PostMapping(value = "/customer/{selfId}/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result saveExistingPricingGroups(@PathVariable("userId")Integer userId,

@@ -65,4 +65,10 @@
         on city.id=pricing_group.city_id and user_id=#{userId}
         ORDER BY first_or_continued,area_end ASC
     </select>
+    <select id="getAllByUserAndCitys" resultType="com.mmall.model.PricingGroup">
+        select
+          *
+        from pricing_group
+        WHERE  user_id=#{userId} and FIND_IN_SET(city_id,#{pgsId})
+    </select>
 </mapper>

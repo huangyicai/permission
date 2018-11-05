@@ -84,4 +84,12 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @return
      */
     Result deleteSpecialPricingGroup(Integer keyId);
+
+    /**
+     * 批量添加定价组
+     * @param pgsId
+     * @param cityId
+     * @return
+     */
+    Result saveAllExistingPricingGroups(String pgsId, Integer cityId,Integer userId);
 }

@@ -73,7 +73,7 @@ public class ExpressUserController {
 
     @ApiOperation(value = "获取用户信息",  notes="需要Authorization")
     @GetMapping(value = "/cusmoters/{id}",produces = {"application/json;charest=Utf-8"})
-    public Result<SysUserInfo> getCusmotersInfo(@PathVariable Integer id){
+    public Result getCusmotersInfo(@PathVariable Integer id){
         return expressUserService.getCusmotersInfo(id);
     }
     @ApiOperation(value = "获取用户列表", notes="需要Authorization")

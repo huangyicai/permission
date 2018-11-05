@@ -7,6 +7,7 @@ import com.mmall.constants.LevelConstants;
 import com.mmall.dao.WeightCalculateMapper;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SysUser;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
@@ -91,12 +92,12 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
                 value[i] = fields[i].get(weightCalculate);
 
                 if(i==3){
-                    map.put("10以上",value[i]==null?"0":value[i].toString());
+                    map.put("10以上",value[i]==null?"0.00":value[i].toString());
                     continue;
                 }
 
                 if(i==4){
-                    map.put("0.01到0.5",value[i]==null?"0":value[i].toString());
+                    map.put("0.0到0.5",value[i]==null?"0.00":value[i].toString());
                 }else {
                     map.put(interval[i-4]+"到"+interval[i-3],value[i]==null?"0.00":value[i].toString());
                 }
@@ -106,6 +107,9 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
             e.printStackTrace();
         }
 
+
+
         return map;
     }
+
 }
