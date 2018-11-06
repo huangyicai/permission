@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.SumTatalMapper;
 import com.mmall.dao.TotalMapper;
@@ -50,7 +51,6 @@ import static java.math.BigDecimal.ROUND_DOWN;
 @Api(value = "TotalController", description = "账单管理")
 @RestController
 @RequestMapping("/express/total")
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TotalController {
 
     @Autowired

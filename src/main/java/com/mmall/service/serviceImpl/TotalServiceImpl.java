@@ -523,7 +523,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
             if(p.getFirstOrContinued()==2){
                 Continued.add(p);
-                continue;
             }
         }
 
@@ -538,7 +537,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
             if(p.getFirstOrContinued()==2){
                 specialContinued.add(p);
-                continue;
             }
         }
 
@@ -552,6 +550,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 //遍历定价组
                 traverse(bill,first,Continued,type);
             }
+
+            //todo 遍历追加的城市
+
         }
 
         return list;

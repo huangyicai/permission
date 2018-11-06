@@ -87,7 +87,6 @@ public class ExpressUserController {
     }
     @ApiOperation(value = "获取用户列表", notes="需要Authorization")
     @GetMapping(value = "/cusmoters",produces = {"application/json;charest=Utf-8"})
-    @JsonView(SysUserInfoDto.UserInfoView.class)
     public Result<List<SysUserInfoDto>> getCusmoters(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return expressUserService.getCusmoters(user);

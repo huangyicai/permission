@@ -8,7 +8,6 @@ import com.google.common.collect.Multimap;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysUserInfoDto;
-import com.mmall.excel.thread.ThreadInsert;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
@@ -20,7 +19,6 @@ import com.mmall.util.LevelUtil;
 import com.mmall.util.ReadExcel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -80,9 +76,18 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     public Result importUser(MultipartFile file,SysUserInfo parent, Integer id) throws IOException, InterruptedException {
 
         if(id!=0) parent= sysUserInfoMapper.selectById(id);
-        ReadExcel re=new ReadExcel();
 
-        List<UserInfoExpressParm> userInfoExpressParms = re.readExcel(file);
+        ReadExcel re=new ReadExcel();
+        Map<String, List> stringListMap = re.readExcel(file);
+
+        List list = stringListMap.get("listError");
+        if(list.size()!=0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,list);
+        }
+
+        List<UserInfoExpressParm> userInfoExpressParms = stringListMap.get("list");
+
+        //执行
         for (UserInfoExpressParm ui:userInfoExpressParms){
             Result register = sysUserService.register(ui, parent, LevelConstants.SERVICE, 5);
             if(register.getCode()!=0){

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Maps;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -106,6 +107,9 @@ public class Result<T> {
         return new Result<T>(cm);
     }
 
+    public static <T> Result<T> error(InfoEnums cm, T data) {
+        return new Result<T>(cm,data);
+    }
 
     public  Map<String,Object> toMap(){
         HashMap<String ,Object> map = Maps.newHashMap();

@@ -36,6 +36,10 @@ public enum InfoEnums {
 	TOATL_IS_PRICING(120005,"订单已经发送"),
 	NOT_UPDATE(120006,"账单已发送给客户，无法修改"),
 	NO_PAYMENT(120007,"没有付款"),
+
+	//导入用户相关
+	TABLE_FORMAT_ERROR(130000,"表格错误"),
+	TABLE_FORMAT_NULL(130001,"表格数据不能为空"),
 	;
 
 	private Integer code;
