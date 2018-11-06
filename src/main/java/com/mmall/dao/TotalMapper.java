@@ -3,6 +3,7 @@ package com.mmall.dao;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
 import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.vo.TotalVo;
@@ -74,4 +75,6 @@ public interface TotalMapper extends BaseMapper<Total> {
                             @Param("id")Integer id);
 
     List<Total> getAllBillByIds(String billIds);
+
+    List<SysUserInfo> getCollection(@Param("sendId") Integer sendId);
 }

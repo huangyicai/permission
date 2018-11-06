@@ -224,4 +224,12 @@
     <update id="updateByTotalId">
       update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date},total_additional=#{totalAdditional} where total_id in (${totalId})
     </update>
+
+    <!--获取付款人信息-->
+    <select id="getCollection" resultType="com.mmall.model.SysUserInfo">
+      select s.* from total t
+      join sys_user_info s
+      on t.send_id=s.id
+      WHERE t.send_id=#{sendId} and t.total_state=3
+    </select>
 </mapper>

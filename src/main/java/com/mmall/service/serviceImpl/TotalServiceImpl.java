@@ -9,6 +9,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mmall.config.UserInfoConfig;
+import com.mmall.constants.LevelConstants;
 import com.mmall.dao.PricingGroupMapper;
 import com.mmall.dao.SpecialPricingGroupMapper;
 import com.mmall.dao.TotalMapper;
@@ -258,7 +259,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         String[] str=total.getTotalUrl().split("/");
-//        final String ompPath=path+str[str.length-1];
 
         //读取本地数据
         XlsxProcessAbstract xls=new XlsxProcessAbstract();
@@ -436,6 +436,58 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     }
 
     /**
+     * 获取收款提示
+     * @return
+     */
+    @Override
+    public List<SysUserInfo> getCollection() {
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return totalMapper.getCollection(user.getId());
+    }
+
+    /**
+     * 预算
+     * @param weight
+     * @return
+     */
+    @Override
+    public Result<List<Bill>> getBudget(Double weight,Integer userId) {
+
+        //獲取报价表
+        List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(userId);
+
+        //获取特殊报价表
+        List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(userId);
+
+        //定价表是否数据存在
+        List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(userId);
+
+        //判断定价组参数是否完善
+        /*if(allPricingGroups.size()!=34){
+            return Result.error(InfoEnums.PROCING_IS_NULL);
+        }*/
+
+        String[] str= LevelConstants.PROSTR;
+
+        //格式化数据
+        BigDecimal bd=new BigDecimal(weight.toString());
+
+        //制造数据
+        List<Bill> list=new ArrayList<>();
+        for(String s:str){
+            Bill b=new Bill();
+            b.setDestination(s);
+            b.setWeight(bd);
+            list.add(b);
+        }
+
+        //计算报价
+        list=getCalculate(pricingGroup,2,list,special);
+
+        return Result.ok(list);
+    }
+
+    /**
      * 计算价格
      * @param pricingGroupVo 计算表
      * @param type  计算类型
@@ -602,6 +654,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 }
             }
         }
+
+        //todo 计算额外收费
 
         return false;
     }

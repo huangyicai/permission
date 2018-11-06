@@ -199,10 +199,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public  Result register(UserInfoExpressParm user,SysUserInfo parent,Integer platformId,Integer roleId){
         SysUser userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",user.getUsername()));
         if(userByusername!=null){
-            SysUserInfo sysUserInfo = sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id", userByusername.getId()).in("status", 0, 1));
-            if(sysUserInfo!=null){
-                return Result.error(InfoEnums.USERNAME_EXISTENCE);
-            }
+            return Result.error(InfoEnums.USERNAME_EXISTENCE);
         }
         Md5Hash md = new Md5Hash(user.getPassword(),user.getUsername(),1024);
         SysUser sysUser = SysUser.builder().password(md.toString()).username(user.getUsername()).build();
@@ -210,7 +207,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Integer display = 0;
         if(roleId==2) {
             display=1;
-
         }else if(roleId==3){
             display=2;
         }

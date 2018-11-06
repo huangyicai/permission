@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.SumTatalMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
+import com.mmall.excel.Bill;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.SumTatal;
 import com.mmall.model.SysUserInfo;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +50,7 @@ import static java.math.BigDecimal.ROUND_DOWN;
 @Api(value = "TotalController", description = "账单管理")
 @RestController
 @RequestMapping("/express/total")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TotalController {
 
     @Autowired
@@ -80,6 +84,14 @@ public class TotalController {
         totalService.updateById(total);
         return Result.ok();
     }
+
+    @ApiOperation(value = "确认收款提示",  notes="需要Authorization")
+    @GetMapping(value = "/getCollection")
+    public Result<List<SysUserInfo>> getCollection(){
+        List<SysUserInfo> collection = totalService.getCollection();
+        return Result.ok(collection);
+    }
+
 
     @ApiOperation(value = "删除订单",  notes="需要Authorization")
     @DeleteMapping(value = "/deleteTotal/{totalId}")
@@ -203,6 +215,17 @@ public class TotalController {
         return totalService.getPricing(totalId,type);
     }
 
+    @ApiOperation(value = "试算",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "weight",value = "重量",dataType = "Double",paramType = "query"),
+            @ApiImplicitParam(name = "userId",value = "客户id",dataType = "Integer",paramType = "query")
+    })
+    @GetMapping(value = "/getBudget")
+    public Result<List<Bill>> getBudget(@RequestParam Double weight, @RequestParam Integer userId){
+        Result<List<Bill>> budget = totalService.getBudget(weight, userId);
+        return budget;
+    }
+
     @ApiOperation(value = "重新上传",  notes="需要Authorization")
     @PostMapping(value = "/againSet/{totalId}")
     public Result againSet(@PathVariable("totalId")Integer totalId,
@@ -217,7 +240,6 @@ public class TotalController {
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return totalService.polling(time,user.getId(),fileName);
     }
-
 
     @ApiOperation(value = "获取账单详情",  notes="需要Authorization")
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})

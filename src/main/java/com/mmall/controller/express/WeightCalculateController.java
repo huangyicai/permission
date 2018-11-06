@@ -4,6 +4,7 @@ package com.mmall.controller.express;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dto.BillDto;
+import com.mmall.dto.WeightCalculateDto;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
@@ -46,8 +47,8 @@ public class WeightCalculateController {
 
     @ApiOperation(value = "获取重量区间占比",  notes="需要Authorization")
     @PostMapping(value = "/getWeightCalculate")
-    public Result<Map<String,String>> getWeightCalculate(@RequestBody BillParam billParam){
-        Map<String,String> weightCalculate = weightCalculateService.getWeightCalculate(billParam);
+    public Result<List<WeightCalculateDto>> getWeightCalculate(@RequestBody BillParam billParam){
+        List<WeightCalculateDto> weightCalculate = weightCalculateService.getWeightCalculate(billParam);
         return Result.ok(weightCalculate);
     }
 }

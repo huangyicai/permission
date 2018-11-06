@@ -110,7 +110,10 @@ public class ThreadDto {
         return key;
     }
 
-    synchronized public void setKey(String key) {
+//    synchronized public void setKey(String key) {
+//        this.key = key;
+//    }
+    public void setKey(String key) {
         this.key = key;
     }
 
@@ -174,7 +177,7 @@ public class ThreadDto {
         return path;
     }
 
-    synchronized public void setPath(String path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -190,7 +193,7 @@ public class ThreadDto {
         return pathHead;
     }
 
-    synchronized public void setPathHead(String pathHead) {
+    public void setPathHead(String pathHead) {
         this.pathHead = pathHead;
     }
 
@@ -198,7 +201,7 @@ public class ThreadDto {
         return Idtime;
     }
 
-    synchronized public void setIdtime(String idtime) {
+    public void setIdtime(String idtime) {
         Idtime = idtime;
     }
 

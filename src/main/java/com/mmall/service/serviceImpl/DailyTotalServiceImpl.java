@@ -56,14 +56,14 @@ public class DailyTotalServiceImpl extends ServiceImpl<DailyTotalMapper, DailyTo
             dailyTotalDtos.add(dd);
         }
 
-        String totalIdStr="";
-        for(Total total:list){
-            totalIdStr+=total.getTotalId()+",";
-        }
-
         //空值处理
         if(list==null || list.size()<=0){
             return dailyTotalDtos;
+        }
+
+        String totalIdStr="";
+        for(Total total:list){
+            totalIdStr+=total.getTotalId()+",";
         }
         totalIdStr=totalIdStr.substring(0,totalIdStr.length()-1);
 

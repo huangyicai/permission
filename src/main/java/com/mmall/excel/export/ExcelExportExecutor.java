@@ -126,7 +126,7 @@ public class ExcelExportExecutor<T> {
          * 设置表头
          */
         Row row = this.sheet.createRow(this.dataRowStart - 1);
-        Integer[] width={60*70,60*70,60*80,60*120,60*50,60*50,60*50};
+        Integer[] width={60*70,60*90,60*90,60*120,60*50,60*50,60*50};
         for (int i = 0; i < rowHeader.length; i++) {
             Cell cell=row.createCell(i);
             cell.setCellStyle(headStyle);

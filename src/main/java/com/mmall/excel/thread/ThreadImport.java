@@ -52,22 +52,29 @@ public class ThreadImport extends Thread {
 
                 //重名名账单
                 String[] timeStr=threadDto.getTime().split("-");
+
+                //生成账单中间路径
                 String pubUrl = threadDto.getTime()+"/"
                         +threadDto.getCompanyName()+"/"
                         +threadDto.getName()+"/"
                         +threadDto.getKey()+"/"
-                        +threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                        +threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单("+keyId+")"+".xlsx";
+
                 //生成创建路径
                 String path=threadDto.getPathHead()+pubUrl;
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
-
                 File file=new File(path);
+
+                //获取父目录
                 File fileParent = file.getParentFile();
+
+                //判断父目录是否存在，不存在则创建
                 if (!fileParent.exists()) {
                     fileParent.mkdirs();
                 }
+
                 file.createNewFile();
 
                 //生成下载路径
