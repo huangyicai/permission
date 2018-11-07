@@ -92,13 +92,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     private DailyTotalService dailyTotalService;
 
     //成本
-    private static  BigDecimal totalCost=BigDecimal.ZERO;
+    private BigDecimal totalCost=BigDecimal.ZERO;
 
     //报价
-    private static  BigDecimal totalOffer=BigDecimal.ZERO;
-
-    //设置导出路径（生产环境无效）
-//    private static String path="E:/GDW/";
+    private BigDecimal totalOffer=BigDecimal.ZERO;
 
     /**
      * 获取客户月计统计
@@ -331,14 +328,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         Total total1=new Total();
         total1.setTotalId(totalId);
         total1.setTotalCost(totalCost);
+        totalCost=BigDecimal.ZERO;
         total1.setTotalOffer(totalOffer);
+        totalOffer=BigDecimal.ZERO;
         total1.setTotalState(1);
         total1.setTotalUrl(upload);
         total1.setUpdateTime(new Date());
-
         totalMapper.updateById(total1);
-        totalCost=BigDecimal.ZERO;
-        totalOffer=BigDecimal.ZERO;
         map.clear();
         return Result.ok(upload);
     }
@@ -606,11 +602,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(new BigDecimal(pg.getPrice().toString()));
-                        totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                        synchronized (totalCost){
+                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                        }
                         return true;
                     }else{
                         bill.setOffer(new BigDecimal(pg.getPrice().toString()));
-                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                        synchronized (totalOffer){
+                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                        }
                         return true;
                     }
                 }
@@ -636,11 +636,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(firstOne<=0){
                         if(type==1){
                             bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()));
-                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            synchronized (totalCost){
+                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            }
                             return true;
                         }else{
                             bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()));
-                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            synchronized (totalOffer){
+                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            }
                             return true;
                         }
                     }
@@ -667,11 +671,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(type==1){
                         bill.setCost(fist.add(two));
-                        totalCost=totalCost.add(fist.add(two));
+//                        synchronized (totalCost){
+                            totalCost=totalCost.add(fist.add(two));
+//                        }
                         return true;
                     }else{
                         bill.setOffer(fist.add(two));
-                        totalOffer=totalOffer.add(fist.add(two));
+//                        synchronized (totalOffer){
+                            totalOffer=totalOffer.add(fist.add(two));
+//                        }
                         return true;
                     }
                 }
@@ -704,10 +712,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())));
-                        totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                        synchronized (totalCost){
+                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                        }
                     }else{
                         bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())));
-                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                        synchronized (totalOffer){
+                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                        }
                     }
                 }
             }
@@ -732,10 +744,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(firstOne<=0){
                         if(type==1){
                             bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())));
-                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            synchronized (totalCost){
+                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            }
                         }else{
                             bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())));
-                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            synchronized (totalOffer){
+                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                            }
                         }
                     }
 
@@ -761,10 +777,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(type==1){
                         bill.setCost(bill.getCost().add(fist.add(two)));
-                        totalCost=totalCost.add(fist.add(two));
+//                        synchronized (totalCost){
+                            totalCost=totalCost.add(fist.add(two));
+//                        }
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)));
-                        totalOffer=totalOffer.add(fist.add(two));
+//                        synchronized (totalOffer){
+                            totalOffer=totalOffer.add(fist.add(two));
+//                        }
                     }
 
                 }
