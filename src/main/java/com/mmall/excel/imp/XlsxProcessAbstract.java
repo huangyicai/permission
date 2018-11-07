@@ -166,7 +166,6 @@ public class XlsxProcessAbstract {
                 weightCalculateMapper.deleteByTotalId(idStr);
                 provincialMeterMapper.deleteByTotalId(idStr);
                 dailyTotalMapper.deleteByTotalId(idStr);
-
             }
         }
 
@@ -351,6 +350,7 @@ public class XlsxProcessAbstract {
         destination.clear();
         weightMap.clear();
         dailyMap.clear();
+        pricing=-1;
         return result;
     }
 
@@ -471,6 +471,7 @@ public class XlsxProcessAbstract {
         destination.clear();
         weightMap.clear();
         dailyMap.clear();
+        pricing=-1;
     }
 
     /**

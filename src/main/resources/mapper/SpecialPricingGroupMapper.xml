@@ -14,7 +14,8 @@
         price,
         first_or_continued as firstOrContinued,
         user_id as userId,
-        key_name as city
+        key_name as city,
+        sk.status
         from special_pricing_group
         join special_pricing_group_key sk
         on sk.id=special_pricing_group.key_id AND user_id =#{userId}

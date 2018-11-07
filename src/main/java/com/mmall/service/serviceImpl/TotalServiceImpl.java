@@ -220,7 +220,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         billDto.setPrice(one.getTotalOffer().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
         billDto.setCostPrice(one.getTotalCost().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
 
-
         int days = DateUtils.getDays(one.getTotalTime());
         billDto.setAverageNumber(one.getTotalNumber()/days);
         return billDto;
@@ -278,7 +277,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         for (String key:map.keySet()) {
             list.addAll(map.get(key));
-            break;
         }
 
         if(type==2){
@@ -436,7 +434,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     }
 
     /**
-     * 获取收款提示
+     * 获取收款
      * @return
      */
     @Override
@@ -506,11 +504,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //特殊定价表首重集合
         List<PricingGroupVo> specialFirst=new ArrayList<PricingGroupVo>();
 
+        //追加首重集合
+        List<PricingGroupVo>  firstHeavy=new ArrayList<PricingGroupVo>();
+
         //续重集合
         List<PricingGroupVo> Continued=new ArrayList<PricingGroupVo>();
 
         //特殊定价表续重集合
         List<PricingGroupVo> specialContinued=new ArrayList<PricingGroupVo>();
+
+        //追加首重集合
+        List<PricingGroupVo>  additionalHeavy=new ArrayList<PricingGroupVo>();
 
         //分离首重和续重
         for(PricingGroupVo p:pricingGroupVo){
@@ -529,37 +533,56 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //分离特殊定价表首重和续重
         for(PricingGroupVo p:special){
 
-            //首重
-            if(p.getFirstOrContinued()==1){
+            //特殊首重
+            if(p.getFirstOrContinued()==1 && p.getStatus()==1){
                 specialFirst.add(p);
                 continue;
             }
 
-            if(p.getFirstOrContinued()==2){
+            //特殊续重
+            if(p.getFirstOrContinued()==2 && p.getStatus()==1){
                 specialContinued.add(p);
+                continue;
+            }
+
+            //追加首重
+            if(p.getFirstOrContinued()==1 && p.getStatus()==2){
+                firstHeavy.add(p);
+                continue;
+            }
+
+            //追加续重
+            if(p.getFirstOrContinued()==2 && p.getStatus()==2){
+                additionalHeavy.add(p);
             }
         }
 
         //获取每一条账单数据
         for (Bill bill:list) {
 
-            //遍历特殊定价组
-            Boolean traverse = traverse(bill,specialFirst, specialContinued, type);
+            Boolean traverse=false;
 
+            //遍历特殊定价组
+            if(specialFirst.size()>0){
+                traverse = traverse(bill,specialFirst, specialContinued, type);
+            }
+
+            //遍历定价组
             if(!traverse){
-                //遍历定价组
                 traverse(bill,first,Continued,type);
             }
 
-            //todo 遍历追加的城市
-
+            //遍历追加的城市
+            if(firstHeavy.size()>0 || additionalHeavy.size()>0){
+                additional(bill,firstHeavy,additionalHeavy,type);
+            }
         }
 
         return list;
     }
 
     /**
-     * 计算首重和续重
+     * 根据首重和续重计算价格
      * @param bill
      * @param first
      * @param Continued
@@ -582,11 +605,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
-                        bill.setCost(new BigDecimal(pg.getPrice()));
+                        bill.setCost(new BigDecimal(pg.getPrice().toString()));
                         totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
                         return true;
                     }else{
-                        bill.setOffer(new BigDecimal(pg.getPrice()));
+                        bill.setOffer(new BigDecimal(pg.getPrice().toString()));
                         totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
                         return true;
                     }
@@ -651,13 +674,101 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                         totalOffer=totalOffer.add(fist.add(two));
                         return true;
                     }
+                }
+            }
+        }
+        return false;
+    }
 
+    /**
+     * 计算追加
+     * @param bill
+     * @param first
+     * @param Continued
+     * @return
+     */
+    public void additional(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
+        //遍历首重
+        for(PricingGroupVo pg: first){
+
+            //根据城市锁定价格计算规则
+            if(bill.getDestination().startsWith(pg.getCity())){
+
+                //和区间开始比较
+                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
+
+                //和区间结束大小比较
+                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()));
+
+                //在区间，计算首重
+                if(greater>=0 && less<=0){
+                    if(type==1){
+                        bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())));
+                        totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+                    }else{
+                        bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())));
+                        totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+                    }
                 }
             }
         }
 
-        //todo 计算额外收费
+        //遍历续重区间
+        for(PricingGroupVo pp: Continued){
 
-        return false;
+            //根据城市锁定价格计算规则
+            if(bill.getDestination().startsWith(pp.getCity())){
+
+                //和区间开始比较
+                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
+
+                //和区间结束大小比较
+                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()));
+
+                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()));
+
+                if(greaterContinue>=0 && lessContinue<=0){
+
+                    if(firstOne<=0){
+                        if(type==1){
+                            bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())));
+                            totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                        }else{
+                            bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())));
+                            totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                        }
+                    }
+
+                    //获取计算的单位个数
+                    BigDecimal bd=bill.getWeight()
+                            .subtract(new BigDecimal(pp.getFirstWeight().toString()))
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()))
+                            .multiply(new BigDecimal(1000));
+
+                    Integer num=bd.intValue();
+
+                    if(num%1000!=0){
+                        num=num/1000+1;
+                    }else{
+                        num=num/1000;
+                    }
+
+                    //获取首重的钱
+                    BigDecimal fist=new BigDecimal(pp.getFirstWeightPrice().toString());
+
+                    //计算续重的钱
+                    BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
+
+                    if(type==1){
+                        bill.setCost(bill.getCost().add(fist.add(two)));
+                        totalCost=totalCost.add(fist.add(two));
+                    }else{
+                        bill.setOffer(bill.getOffer().add(fist.add(two)));
+                        totalOffer=totalOffer.add(fist.add(two));
+                    }
+
+                }
+            }
+        }
     }
 }

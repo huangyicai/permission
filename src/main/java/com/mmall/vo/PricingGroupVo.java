@@ -25,6 +25,11 @@ public class PricingGroupVo implements Serializable {
     private String city;
 
     /**
+     * 类型：1-特殊定价，2-追加
+     */
+    private Integer status;
+
+    /**
      * 开始区间
      */
 
