@@ -241,3 +241,18 @@ CREATE TABLE `purchase_record` (
   `status` int(11) NOT NULL DEFAULT '0' COMMENT '0=未付款，1=已付款',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '快递企业购买记录';
+
+CREATE TABLE `fn_contacts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(20) NOT NULL DEFAULT '' COMMENT '负责人',
+  `phone` varchar(20) NOT NULL DEFAULT '' COMMENT '电话/手机',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '弗恩快递负责人';
+
+
+CREATE TABLE `fn_and_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) NOT NULL DEFAULT '0' COMMENT 'userID',
+  `fn_id` varchar(20) NOT NULL DEFAULT '' COMMENT '负责人id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT '弗恩客服负责人与客户关联表';

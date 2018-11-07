@@ -42,6 +42,8 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     private PaymentMethodMapper paymentMethodMapper;
     @Autowired
     private SysUserMapper sysUserMapper;
+    @Autowired
+    private FnContactsMapper fnContactsMapper;
 
     public Result expressRegister(UserInfoExpressParm user, SysUserInfo parent,Integer id,Integer level) {
 
@@ -224,6 +226,12 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         map.put(userService,userServiceList);
         map.put(userOperate,userOperateList);
         return Result.ok(map);
+    }
+
+    @Override
+    public Result getFnContacts(SysUserInfo userInfo) {
+        FnContacts fnContacts = fnContactsMapper.getOneFnContacts(userInfo.getId());
+        return Result.ok(fnContacts);
     }
 
 

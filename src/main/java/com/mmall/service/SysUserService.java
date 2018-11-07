@@ -42,7 +42,7 @@ public interface SysUserService extends IService<SysUser> {
      * fn注册
      * @return
      */
-    Result fnRegister(UserInfoExpressParm user,SysUserInfo parent);
+    Result fnRegister(UserInfoExpressParm user,SysUserInfo parent,Integer fnId);
 
     /**
      * 获取快递公司列表

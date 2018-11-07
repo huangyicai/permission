@@ -432,6 +432,7 @@ public class XlsxProcessAbstract {
                 total.setCdUrl(path);
                 total.setCreateTime(new Date());
                 total.setTotalState(pricing);
+                total.setTotalOffer(threadDto.getCost());
                 totalMapper.insert(total);
 
                 //添加重量区间数据
@@ -518,7 +519,7 @@ public class XlsxProcessAbstract {
                 //计算每个月份的单量，总重量
                 total+=1;
                 weightOne=weightOne.add(bill.getWeight());
-                if(pricing==-1){
+                if(pricing==1){
                     pri=pri.add(bill.getCost());
                 }
             }
@@ -643,10 +644,10 @@ public class XlsxProcessAbstract {
 //                total.setName(threadDto.getKey());
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
-                total.setTotalOffer(BigDecimal.ZERO);
+                total.setTotalOffer(threadDto.getCost());
                 total.setTotalCost(BigDecimal.ZERO);
                 total.setTotalPaid(BigDecimal.ZERO);
-                total.setTotalState(-1);
+                total.setTotalState(pricing);
                 totalMapper.updateById(total);
 
                 //修改重量区间数据
@@ -741,8 +742,10 @@ public class XlsxProcessAbstract {
 
             if(!rowStrs.toString().equals("|@|")) {
                 String[] cellStrs = endRowStrs.split("\\|@\\|");
-                if(currentRowNumber==0){
-                    pricing=1;
+                if(currentRowNumber==0 ){
+                    if(cellStrs.length==6){
+                        pricing=1;
+                    }
                 }else{
                     String nameStr=cellStrs[0];
 
@@ -753,6 +756,10 @@ public class XlsxProcessAbstract {
                     bill.setSerialNumber(cellStrs[2]);
                     bill.setDestination(cellStrs[3]);
                     bill.setWeight(new BigDecimal(cellStrs[4]));
+
+                    if(pricing==1){
+                        bill.setCost(new BigDecimal(cellStrs[5]));
+                    }
 
                     //todo 后续分表按照名字+时间，可实现按用户和时间的分表
                     map.put(nameStr,bill);

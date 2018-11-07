@@ -9,7 +9,7 @@
         <constructor-arg value="118.25.103.48" type="java.lang.String"/>
         <constructor-arg value="6379" type="int"/>
     </bean>
-   <!-- <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
+    <!--<bean class="redis.clients.jedis.JedisPool" id="jedisPool">
         <constructor-arg ref="jedisPoolConfig"/>
         <constructor-arg value="r-bp1fe43975477074.redis.rds.aliyuncs.com" type="java.lang.String"/>
         <constructor-arg value="6379" type="int"/>

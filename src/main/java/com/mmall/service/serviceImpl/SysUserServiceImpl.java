@@ -66,6 +66,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private CourierCompanyMapper courierCompanyMapper;
     @Autowired
     private UseTermMapper useTermMapper;
+    @Autowired
+    private FnAndUserMapper fnAndUserMapper;
+    @Autowired
+    private FnContactsMapper fnContactsMapper;
 
     public Comparator<SysMenuDto> menusSeqComparator = new Comparator<SysMenuDto>() {
         public int compare(SysMenuDto o1, SysMenuDto o2) {
@@ -185,13 +189,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return Result.error(InfoEnums.AUTHORIZATION);
     }
     @Transactional
-    public Result fnRegister(UserInfoExpressParm user,SysUserInfo parent) {
+    public Result fnRegister(UserInfoExpressParm user,SysUserInfo parent,Integer fnId) {
         SysUserInfo sysUserInfo = (SysUserInfo)register(user, parent, LevelConstants.EXPRESS, 2).getData();
         UseTerm useTerm = new UseTerm();
         useTerm.setUserId(sysUserInfo.getId());
         long sysTime = System.currentTimeMillis();
         useTerm.setClosingDate(DateTimeUtil.addDateNum(sysTime,2)+"");
         useTermMapper.insert(useTerm);
+        FnAndUser fnAndUser = new FnAndUser();
+        fnAndUser.setFnId(fnId);
+        fnAndUser.setUserId(sysUserInfo.getId());
+        fnAndUserMapper.insert(fnAndUser);
         return Result.ok();
     }
 

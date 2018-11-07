@@ -115,8 +115,9 @@ public class PricingGroupController {
     }
 
     @ApiOperation(value = "添加特殊定价关键字",  notes="需要Authorization")
-    @PostMapping(value = "/special/key/{userId}",produces = {"application/json;charest=Utf-8"})
+    @PostMapping(value = "/special/key/{userId}/{rpId}",produces = {"application/json;charest=Utf-8"})
     public Result saveSpecialPricingGroupKey(@PathVariable("userId")Integer userId,
+                                             @PathVariable("rpId")Integer rpId,
                                              @RequestBody keyNameParam keyName){
         if(userId==0||userId.equals(0)){
             SysUserInfo userInfo = UserInfoConfig.getUserInfo();
@@ -131,6 +132,7 @@ public class PricingGroupController {
         SpecialPricingGroupKey specialPricingGroupKey = new SpecialPricingGroupKey();
         specialPricingGroupKey.setKeyName(keyName.getKeyName());
         specialPricingGroupKey.setUserId(userId);
+        specialPricingGroupKey.setStatus(rpId);
         specialPricingGroupKeyMapper.insert(specialPricingGroupKey);
         return Result.ok(specialPricingGroupKey);
     }

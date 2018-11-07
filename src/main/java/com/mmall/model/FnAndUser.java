@@ -13,16 +13,16 @@ import java.math.BigDecimal;
 
 /**
  * <p>
- * 
+ * 弗恩客服负责人与客户关联表
  * </p>
  *
  * @author hyc
- * @since 2018-10-14
+ * @since 2018-11-07
  */
-@ApiModel(value = "SpecialPricingGroupKey", description = "")
-@TableName("special_pricing_group_key")
+@ApiModel(value = "FnAndUser", description = "弗恩客服负责人与客户关联表")
+@TableName("fn_and_user")
 @Builder
-public class SpecialPricingGroupKey implements Serializable {
+public class FnAndUser implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,28 +34,18 @@ public class SpecialPricingGroupKey implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     /**
-     * 用户id
+     * userID
      */
-    @ApiModelProperty(value = "用户id")
+    @ApiModelProperty(value = "userID")
     @TableField("user_id")
     private Integer userId;
     /**
-     * 特殊定价关键字
+     * 负责人
      */
-    @ApiModelProperty(value = "特殊定价关键字")
-    @TableField("key_name")
-    private String keyName;
+    @ApiModelProperty(value = "负责人")
+    @TableField("fn_id")
+    private Integer fnId;
 
-    @ApiModelProperty(value = "1=取代定价，2=追加定价")
-    private Integer status;
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
 
     public Integer getId() {
         return id;
@@ -73,30 +63,29 @@ public class SpecialPricingGroupKey implements Serializable {
         this.userId = userId;
     }
 
-    public String getKeyName() {
-        return keyName;
+    public Integer getFnId() {
+        return fnId;
     }
 
-    public void setKeyName(String keyName) {
-        this.keyName = keyName;
+    public void setFnId(Integer fnId) {
+        this.fnId = fnId;
     }
 
-    public SpecialPricingGroupKey() {
-    }
-
-    public SpecialPricingGroupKey(Integer id, Integer userId, String keyName, Integer status) {
+    public FnAndUser(Integer id, Integer userId, Integer fnId) {
         this.id = id;
         this.userId = userId;
-        this.keyName = keyName;
-        this.status = status;
+        this.fnId = fnId;
+    }
+
+    public FnAndUser() {
     }
 
     @Override
     public String toString() {
-        return "SpecialPricingGroupKey{" +
+        return "FnAndUser{" +
         ", id=" + id +
         ", userId=" + userId +
-        ", keyName=" + keyName +
+        ", fnId=" + fnId +
         "}";
     }
 }

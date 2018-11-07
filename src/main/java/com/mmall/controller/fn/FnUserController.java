@@ -2,7 +2,9 @@ package com.mmall.controller.fn;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.dao.CourierCompanyMapper;
+import com.mmall.dao.FnContactsMapper;
 import com.mmall.model.CourierCompany;
+import com.mmall.model.FnContacts;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
@@ -31,14 +33,17 @@ public class FnUserController {
     private SysUserService sysUserService;
     @Autowired
     private CourierCompanyMapper courierCompanyMapper;
+    @Autowired
+    private FnContactsMapper fnContactsMapper;
 
     @ApiOperation(value = "弗恩注册快递公司",  notes="需要Authorization")
-    @PostMapping(value = "/register",produces = {"application/json;charest=Utf-8"})
-    public Result fnRegister(@RequestBody UserInfoExpressParm user){
+    @PostMapping(value = "/register/{fnId}",produces = {"application/json;charest=Utf-8"})
+    public Result fnRegister(@PathVariable("fnId") Integer fnId,
+                             @RequestBody UserInfoExpressParm user){
 
         BeanValidator.check(user);
         SysUserInfo parent = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
-        return sysUserService.fnRegister(user,parent);
+        return sysUserService.fnRegister(user,parent,fnId);
     }
 
 
@@ -79,5 +84,11 @@ public class FnUserController {
     public Result<List<SysUserInfo>> getCompanys(){
         SysUserInfo user = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
         return sysUserService.getCompanys(user);
+    }
+
+    @ApiOperation(value = "获取弗恩客服",  notes="需要Authorization")
+    @GetMapping(value = "/contacts",produces = {"application/json;charest=Utf-8"})
+    public Result getContacts(){
+        return Result.ok(fnContactsMapper.selectList(new QueryWrapper<>()));
     }
 }

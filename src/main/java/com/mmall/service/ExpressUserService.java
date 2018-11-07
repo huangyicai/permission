@@ -91,4 +91,11 @@ public interface ExpressUserService {
      * @return
      */
     Result getAllOperate(SysUserInfo userInfo);
+
+    /**
+     * 获取弗恩客服负责人
+     * @param userInfo
+     * @return
+     */
+    Result getFnContacts(SysUserInfo userInfo);
 }

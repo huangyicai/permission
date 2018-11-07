@@ -60,4 +60,12 @@ public class UserCenterController {
         return pricingGroupService.savePricingGroup(pricingGroups,userInfo.getId(),cityId);
     }
 
+
+    @ApiOperation(value = "获取弗恩客服负责人)",  notes="需要Authorization")
+    @GetMapping(value = "/contacts",produces = {"application/json;charest=Utf-8"})
+    public Result getFnContacts(){
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        return expressUserService.getFnContacts(userInfo);
+    }
+
 }

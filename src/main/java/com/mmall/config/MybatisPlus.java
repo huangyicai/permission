@@ -29,10 +29,10 @@ public class MybatisPlus {
     private static String packageName="";
 
     //作者
-    private static String authorName="qty";
+    private static String authorName="hyc";
 
     //table名字
-    private static String table="system_price";
+    private static String table="fn_contacts";
 
     //table前缀
     private static String prefix="";
@@ -109,19 +109,19 @@ public class MybatisPlus {
                 //.setXml("mapper")
         );
 
-        //FileOutConfig mapperConfig = getMapperConfig();
-        FileOutConfig entityConfig = getEntityConfig();
+        FileOutConfig mapperConfig = getMapperConfig();
+       // FileOutConfig entityConfig = getEntityConfig();
 //        FileOutConfig serviceConfig = getServiceConfig();
 //        FileOutConfig serviceImplConfig = getServiceImplConfig();
 //        FileOutConfig contolConfig = getContolConfig();
-        FileOutConfig daoConfig = getDaoConfig();
+        //FileOutConfig daoConfig = getDaoConfig();
         List<FileOutConfig> fileOutConfigs = new ArrayList<FileOutConfig>();
-        //fileOutConfigs.add(mapperConfig);
-        fileOutConfigs.add(entityConfig);
+        fileOutConfigs.add(mapperConfig);
+        //fileOutConfigs.add(entityConfig);
 //        fileOutConfigs.add(serviceConfig);
 //        fileOutConfigs.add(serviceImplConfig);
 //        fileOutConfigs.add(contolConfig);
-        fileOutConfigs.add(daoConfig);
+        //fileOutConfigs.add(daoConfig);
         mpg.setCfg(
                 // 注入自定义配置，可以在 VM 中使用 cfg.abc 设置的值
                 new InjectionConfig() {
