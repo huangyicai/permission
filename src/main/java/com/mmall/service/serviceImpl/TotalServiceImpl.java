@@ -25,6 +25,7 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
+import com.mmall.model.params.TotalParam;
 import com.mmall.service.*;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
@@ -32,25 +33,16 @@ import com.mmall.util.RandomHelper;
 import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
-import org.apache.poi.xssf.streaming.SXSSFCell;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -113,7 +105,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             userInfo.setId(0);
         }
 
-        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId());
+        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4");
 
         if(one==null){
             return new BillDto();
@@ -200,26 +192,106 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
-        Total one = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId());
 
-        if(one==null){
-            return null;
+        //应收数据
+        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3");
+
+        //实收数据
+        Total Paid = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"4");
+        if(Offer==null){
+            Offer = check(new Total());
+        }if(Paid==null){
+            Paid=check(new Total());
         }
 
         ProfitsDto billDto=new ProfitsDto();
-        billDto.setTotalNumber(one.getTotalNumber());
-        billDto.setTotalWeight(one.getTotalWeight());
-        billDto.setAverageWeight(one.getTotalWeight().divide(new BigDecimal(one.getTotalNumber()),2, RoundingMode.DOWN));
-        billDto.setTotalOffer(one.getTotalOffer().add(one.getTotalAdditional()));
-        billDto.setTotalPaid(one.getTotalPaid());
-        billDto.setTotalCost(one.getTotalCost());
-        billDto.setProfits(billDto.getTotalPaid().subtract(one.getTotalCost()));
-        billDto.setPrice(one.getTotalOffer().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
-        billDto.setCostPrice(one.getTotalCost().divide(new BigDecimal(one.getTotalNumber()),2,RoundingMode.DOWN));
 
-        int days = DateUtils.getDays(one.getTotalTime());
-        billDto.setAverageNumber(one.getTotalNumber()/days);
+        //计算总单量
+        billDto.setTotalNumber(Offer.getTotalNumber()+Paid.getTotalNumber());
+
+        //计算每日单量
+        int days = DateUtils.getDays(billParam.getDate());
+        billDto.setAverageNumber(billDto.getTotalNumber()/days);
+
+        //计算总总量
+        billDto.setTotalWeight(Offer.getTotalWeight().add(Paid.getTotalWeight()));
+
+        //计算平均重量
+        if (new BigDecimal(billDto.getTotalNumber()).compareTo(new BigDecimal(0)) == 0) {
+            billDto.setAverageWeight(new BigDecimal(0));
+        } else {
+            billDto.setAverageWeight(billDto.getTotalWeight().divide(new BigDecimal(billDto.getTotalNumber()), 2, RoundingMode.DOWN));
+        }
+
+
+        //获取应收
+        billDto.setTotalOffer(Offer.getTotalOffer().add(Offer.getTotalAdditional()));
+
+        //计算应收成本
+        billDto.setOfferCost(Offer.getTotalCost());
+
+        //计算应收利润
+        billDto.setOfferProfits(billDto.getTotalOffer().subtract(billDto.getOfferCost()));
+
+        //计算应收单价,和应收的成本单价
+        if(Offer.getTotalNumber()==0){
+            billDto.setOfferOnePrice(new BigDecimal(0));
+            billDto.setOfferCostOne(new BigDecimal(0));
+        }else{
+            billDto.setOfferOnePrice(Offer.getTotalOffer().divide(new BigDecimal(Offer.getTotalNumber()), 2, RoundingMode.DOWN));
+            billDto.setOfferCostOne(Offer.getTotalCost().divide(new BigDecimal(Offer.getTotalNumber()), 2, RoundingMode.DOWN));
+        }
+
+        //计算应收单间利润
+        billDto.setOfferOneProfits(billDto.getOfferOnePrice().subtract(billDto.getOfferOnePrice()));
+
+        //应收利润百分比
+        if(billDto.getTotalOffer().compareTo(new BigDecimal(0))==0){
+            billDto.setOfferProfitsPercentage(new BigDecimal(0));
+        }else{
+            billDto.setOfferProfitsPercentage(billDto.getOfferProfits().divide(billDto.getTotalOffer(), 4, RoundingMode.DOWN));
+
+        }
+
+        //获取实收
+        billDto.setTotalPaid(Paid.getTotalPaid());
+
+        //计算实收成本
+        billDto.setPaidCost(Paid.getTotalCost());
+
+        //计算实收利润
+        billDto.setPaidProfits(billDto.getTotalPaid().subtract(billDto.getPaidCost()));
+
+        //计算实收单价,和实收成本单价
+        if(Paid.getTotalNumber()==0){
+            billDto.setPaidOnePrice(new BigDecimal(0));
+            billDto.setPaidCostOne(new BigDecimal(0));
+        }else{
+            billDto.setPaidOnePrice(Paid.getTotalPaid().divide(new BigDecimal(Paid.getTotalNumber()), 2, RoundingMode.DOWN));
+            billDto.setPaidCostOne(Paid.getTotalCost().divide(new BigDecimal(Paid.getTotalNumber()), 2, RoundingMode.DOWN));
+        }
+
+        //计算实收单间利润
+        billDto.setPaidOneProfits(billDto.getPaidOnePrice().subtract(billDto.getPaidCostOne()));
+
+        //实收利润百分比
+        if((billDto.getTotalPaid().compareTo(new BigDecimal(0))==0)){
+            billDto.setPaidProfitsPercentage(new BigDecimal(0));
+        }else{
+            billDto.setPaidProfitsPercentage(billDto.getPaidProfits().divide(billDto.getTotalPaid(),4, RoundingMode.DOWN));
+        }
         return billDto;
+    }
+
+    //利用反射赋值
+    public Total check(Total total){
+        total.setTotalNumber(0);
+        total.setTotalWeight(new BigDecimal(0));
+        total.setTotalCost(new BigDecimal(0));
+        total.setTotalOffer(new BigDecimal(0));
+        total.setTotalPaid(new BigDecimal(0));
+        total.setTotalAdditional(new BigDecimal(0));
+        return total;
     }
 
     /**
@@ -328,13 +400,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         Total total1=new Total();
         total1.setTotalId(totalId);
         total1.setTotalCost(totalCost);
-        totalCost=BigDecimal.ZERO;
         total1.setTotalOffer(totalOffer);
-        totalOffer=BigDecimal.ZERO;
         total1.setTotalState(1);
         total1.setTotalUrl(upload);
         total1.setUpdateTime(new Date());
+
         totalMapper.updateById(total1);
+        totalCost=BigDecimal.ZERO;
+        totalOffer=BigDecimal.ZERO;
         map.clear();
         return Result.ok(upload);
     }
@@ -482,6 +555,24 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     }
 
     /**
+     * 批量发送订单
+     * @param totalParam
+     * @return
+     */
+    @Override
+    public Result sendAll(TotalParam totalParam) {
+        String totalId = totalParam.getTotalId();
+        List<Total> allBillByIds = totalMapper.getAllBillByIds(totalId);
+        for(Total tt:allBillByIds){
+            if(tt.getTotalState()!=1){
+                return Result.error(InfoEnums.SEND_FAILURE,"单号："+tt.getOrderNo()+"，请查是否定价，或者已经发送");
+            }
+        }
+        totalMapper.updateByTotalId(totalId,totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
+        return Result.ok();
+    }
+
+    /**
      * 计算价格
      * @param pricingGroupVo 计算表
      * @param type  计算类型
@@ -557,7 +648,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for (Bill bill:list) {
 
             Boolean traverse=false;
-
+            Thread.yield();
             //遍历特殊定价组
             if(specialFirst.size()>0){
                 traverse = traverse(bill,specialFirst, specialContinued, type);

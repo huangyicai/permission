@@ -5,23 +5,40 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.mmall.component.ApplicationContextHelper;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
+import com.mmall.excel.thread.ImportPrice;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.params.PricingGroupParam;
+import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.service.PricingGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mmall.util.LevelUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * <p>
@@ -32,6 +49,7 @@ import java.util.Map;
  * @since 2018-09-28
  */
 @Service
+@Slf4j
 public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, PricingGroup> implements PricingGroupService {
     @Resource
     private PricingGroupMapper pricingGroupMapper;
@@ -246,6 +264,117 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         return Result.ok();
     }
 
+    @Override
+    public Result importPrice(MultipartFile file, Integer userId) throws IOException, InterruptedException, ExecutionException {
+        List<PricingGroup> list = getList(file, userId);
+        ExecutorService threadPool = Executors.newFixedThreadPool(3);
+
+        for(PricingGroup pg:list){
+            ImportPrice ip=new ImportPrice(pg);
+            threadPool.submit(ip);
+        }
+
+        //判断线程是否执行完毕
+        threadPool.shutdown();
+        while (true){
+            if (threadPool.isTerminated()) {
+                log.info("线程已执行完毕");
+                break;
+            }
+            Thread.sleep(500);
+        }
+        return Result.ok();
+    }
+
+    /**
+     * 获取定价表数据
+     * @param file
+     * @param userId
+     * @return
+     * @throws IOException
+     */
+    public List<PricingGroup> getList(MultipartFile file, Integer userId) throws IOException {
+        InputStream inputStream = file.getInputStream();
+        XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
+
+        //初始化数据
+        List<PricingGroup> list = new ArrayList<PricingGroup>();
+        Integer CityId=0;
+
+        //获取省份数据
+        List<City> cities = cityMapper.selectList(new QueryWrapper<City>());
+        for (int numSheet = 0; numSheet < xssfWorkbook.getNumberOfSheets(); numSheet++) {
+            XSSFSheet xssfSheet = xssfWorkbook.getSheetAt(numSheet);
+            if (xssfSheet == null) {
+                continue;
+            }
+
+            for (int rowNum = 4; rowNum < xssfSheet.getLastRowNum(); rowNum++) {
+
+                XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+
+                //获取省份
+                String check = check(xssfRow.getCell(0));
+                String check3 = check(xssfRow.getCell(1));
+                if("".equals(check) || check==null){
+                    if("".equals(check3) || check3==null){
+                        break;
+                    }
+                }
+
+                if(!"".equals(check) && check!=null){
+                    for(City c:cities){
+                        if(check.startsWith(c.getProvinceName())){
+                            CityId=c.getId();
+                        }
+                    }
+                }
+
+                //添加首重
+                PricingGroup pg=new PricingGroup();
+                pg.setCityId(CityId);
+                pg.setUserId(userId);
+                pg.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(1))));
+                pg.setAreaEnd(Double.parseDouble(check(xssfRow.getCell(2))));
+                pg.setPrice(Double.parseDouble(check(xssfRow.getCell(3))));
+                pg.setFirstOrContinued(1);
+                list.add(pg);
+
+                //添加续重
+                String check1 = check(xssfRow.getCell(4));
+                if(!"".equals(check1) && check!=null){
+                    PricingGroup pg1=new PricingGroup();
+                    pg1.setCityId(CityId);
+                    pg1.setUserId(userId);
+                    pg1.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(4))));
+
+                    //判断是否是“~”
+                    String check2 = check(xssfRow.getCell(5));
+                    if("~".equals(check2)){
+                        pg1.setAreaEnd(Double.parseDouble("1000000"));
+                    }else{
+                        pg1.setAreaEnd(Double.parseDouble(check2));
+                    }
+
+                    pg1.setFirstWeight(Double.parseDouble(check(xssfRow.getCell(6))));
+                    pg1.setFirstWeightPrice(Double.parseDouble(check(xssfRow.getCell(7))));
+                    pg1.setWeightStandard(Double.parseDouble(check(xssfRow.getCell(8))));
+                    pg1.setPrice(Double.parseDouble(check(xssfRow.getCell(9))));
+                    pg1.setFirstOrContinued(2);
+                    list.add(pg1);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 校验数据，去除空格
+     * @return
+     */
+    public String check(XSSFCell xssfCell){
+        return xssfCell.toString().replaceAll("\u00A0", "");
+    }
     public static void main(String[] args) {
         String s = ",1,2,3";
         String[] a = s.split(",");

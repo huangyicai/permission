@@ -118,7 +118,15 @@ public class TotalController {
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);
         }
+    }
 
+    @ApiOperation(value = "批量发送账单",notes = "需要Authorization")
+    @PutMapping(value = "/sendAll",produces = {"application/json;charest=Utf-8"})
+    public Result sendAll(@RequestBody TotalParam totalParam){
+        if("".equals(totalParam.getTotalId()) || totalParam.getTotalId()==null){
+            return Result.error(InfoEnums.BILL_IS_NULL);
+        }
+        return totalService.sendAll(totalParam);
     }
 
     @ApiOperation(value = "上传账单---追加",  notes="需要Authorization")
@@ -212,7 +220,7 @@ public class TotalController {
     @GetMapping(value = "/getPricing/{totalId}/{type}")
     public Result<String> getPricing(@PathVariable("totalId")Integer totalId,
                                      @PathVariable("type")Integer type){
-        return totalService.getPricing(totalId,type);
+        return  totalService.getPricing(totalId,type);
     }
 
     @ApiOperation(value = "试算",  notes="需要Authorization")

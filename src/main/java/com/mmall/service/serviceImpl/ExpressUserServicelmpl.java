@@ -75,7 +75,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     }
 
     @Override
-    public Result importUser(MultipartFile file,SysUserInfo parent, Integer id) throws IOException, InterruptedException {
+    public Result importUser(MultipartFile file,SysUserInfo parent, Integer id) throws IOException{
 
         if(id!=0) parent= sysUserInfoMapper.selectById(id);
 

@@ -25,7 +25,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 读取excel
+ * 读取excel(用户模板)
  * @author qty
  * @created 2018-11-5
  */
@@ -67,7 +67,7 @@ public class ReadExcel{
                 continue;
             }
 
-            for (int rowNum = 0; rowNum < xssfSheet.getLastRowNum(); rowNum++) {
+            for (int rowNum = 0; rowNum <= xssfSheet.getLastRowNum(); rowNum++) {
                 XSSFRow xssfRow = xssfSheet.getRow(rowNum);
 
                 if(rowNum==0){
@@ -117,10 +117,12 @@ public class ReadExcel{
      * @return
      */
     public String check(XSSFCell xssfCell,Integer rowNum,List<String> listError){
-        String s = xssfCell.toString().replaceAll("\u00A0", "");
-        if("".equals(s) || s==null){
+        String s="";
+        if(xssfCell==null){
             listError.add("第"+(rowNum+1)+"行有数据为空");
+        }else{
+            s = xssfCell.toString();
         }
-        return s;
+        return s.replaceAll("\u00A0", "");
     }
 }

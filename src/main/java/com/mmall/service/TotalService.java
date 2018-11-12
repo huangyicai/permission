@@ -12,6 +12,7 @@ import com.mmall.model.Total;
 import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
+import com.mmall.model.params.TotalParam;
 import com.mmall.vo.TotalVo;
 
 import java.util.List;
@@ -71,4 +72,6 @@ public interface TotalService extends IService<Total> {
     List<SysUserInfo> getCollection();
 
     Result<List<Bill>> getBudget(Double weight, Integer userId);
+
+    Result sendAll(TotalParam totalParam);
 }
