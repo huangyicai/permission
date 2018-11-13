@@ -6,9 +6,12 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.SpecialPricingGroup;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>
@@ -92,4 +95,12 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @return
      */
     Result saveAllExistingPricingGroups(String pgsId, Integer cityId,Integer userId);
+
+    /**
+     * 导入定价
+     * @param file
+     * @param userId
+     * @return
+     */
+    Result importPrice(MultipartFile file,Integer userId) throws IOException, InterruptedException, ExecutionException;
 }

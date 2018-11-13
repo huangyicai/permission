@@ -45,7 +45,10 @@
       SUM(total_cost) as totalCost
       from total
       <where>
-          total_state &gt;=2
+          <if test="totalState!=null and totalState!=''">
+              and FIND_IN_SET(total_state,#{totalState})
+          </if>
+
           <if test="totalTime!=null and totalTime!=''">
               and total_time=#{totalTime}
           </if>
@@ -213,7 +216,9 @@
     </select>
     <select id="getAllBillByIds" resultType="com.mmall.model.Total">
         select
-            t.total_id as totalId
+            t.total_id as totalId,
+            t.total_state as totalState,
+            t.order_no as orderNo
         from
           total t
         where
@@ -222,12 +227,12 @@
 
     <!--发送订单-->
     <update id="updateByTotalId">
-      update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date},total_additional=#{totalAdditional} where total_id in (${totalId})
+      update total set total_remark=#{totalRemark},total_state=2,as_of_time=#{date},total_additional=#{totalAdditional} where FIND_IN_SET(total_id,#{totalId})
     </update>
 
     <!--获取付款人信息-->
     <select id="getCollection" resultType="com.mmall.model.SysUserInfo">
-      select s.* from total t
+      select distinct s.* from total t
       join sys_user_info s
       on t.send_id=s.id
       WHERE t.send_id=#{sendId} and t.total_state=3

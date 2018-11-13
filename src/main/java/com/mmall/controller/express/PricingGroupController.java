@@ -2,6 +2,7 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.Lists;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.CityMapper;
@@ -14,14 +15,19 @@ import com.mmall.model.params.keyNameParam;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.BeanValidator;
 import com.mmall.vo.CityVo;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>
@@ -201,6 +207,19 @@ public class PricingGroupController {
         return pricingGroupService.saveExistingPricingGroups(userId,selfId);
     }
 
-
+    @ApiOperation(value = "导入省份定价",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
+            @ApiImplicitParam(name = "type",value = "类型：1-直接添加，2-替换",dataType = "long",paramType = "path")
+    })
+    @PostMapping(value = "/importPrice/{userId}/{type}",produces = {"application/json;charest=Utf-8"})
+    public Result importPrice(@RequestParam(value = "file") MultipartFile file,
+                              @PathVariable("userId")Integer userId,
+                              @PathVariable("type")Integer type) throws IOException, ExecutionException, InterruptedException {
+        if(type==2){
+            pricingGroupService.remove(new UpdateWrapper<PricingGroup>().eq("user_id",userId));
+        }
+        return pricingGroupService.importPrice(file,userId);
+    }
 }
 
