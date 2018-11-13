@@ -8,10 +8,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.mmall.Socket.ExpressWebSocket;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.PricingGroupMapper;
 import com.mmall.dao.SpecialPricingGroupMapper;
+import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
@@ -82,6 +84,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
     @Autowired
     private DailyTotalService dailyTotalService;
+
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
 
     //成本
     private BigDecimal totalCost=BigDecimal.ZERO;
@@ -569,6 +574,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             }
         }
         totalMapper.updateByTotalId(totalId,totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
+        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(allBillByIds.get(0).getUserId());
+        ExpressWebSocket.sendMsgTotals(sysUserInfo,allBillByIds);
         return Result.ok();
     }
 

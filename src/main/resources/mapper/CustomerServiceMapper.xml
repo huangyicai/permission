@@ -26,6 +26,31 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMapDto" type="com.mmall.dto.ReplynumServiceDto">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="express_id" property="expressId" />
+        <result column="handle_id" property="handleId" />
+        <result column="handle_name" property="handleName" />
+        <result column="waybill_number" property="waybillNumber" />
+        <result column="content" property="content" />
+        <result column="contacts" property="contacts" />
+        <result column="phone" property="phone" />
+        <result column="enclosure" property="enclosure" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="end_time" property="endTime" />
+        <result column="receive_time_solt" property="receiveTimeSolt" />
+        <result column="end_time_solt" property="endTimeSolt" />
+        <result column="type_id" property="typeId" />
+        <result column="type_name" property="typeName" />
+        <result column="status" property="status" />
+        <result column="remarks" property="remarks" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, user_id, express_id, handle_id, handle_name, waybill_number, content, contacts, phone, enclosure, time_slot, type_id, type_name, status, remarks, create_time, update_time
@@ -90,7 +115,7 @@
     </select>
 
 
-    <select id="getAllCustomerServiceByUser" resultMap="BaseResultMap">
+    <select id="getAllCustomerServiceByUser" resultMap="BaseResultMapDto">
         select
         id,
         user_id,
@@ -120,7 +145,7 @@
     </select>
 
 
-    <select id="getCustomerServiceBySelf" resultMap="BaseResultMap">
+    <select id="getCustomerServiceBySelf" resultMap="BaseResultMapDto">
         select
         id,
         user_id,

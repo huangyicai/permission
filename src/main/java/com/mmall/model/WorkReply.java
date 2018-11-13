@@ -54,9 +54,16 @@ public class WorkReply implements Serializable {
     /**
      * 是否已读
      */
-    @ApiModelProperty(value = "是否已读")
+    @ApiModelProperty(value = "客户是否已读")
     @TableField("status")
     private Integer status;
+
+    /**
+     * 客服是否已读
+     */
+    @ApiModelProperty(value = "客服是否已读")
+    @TableField("service_type")
+    private Integer serviceType;
     /**
      * 创建时间
      */
@@ -64,6 +71,13 @@ public class WorkReply implements Serializable {
     @TableField("create_time")
     private String  createTime;
 
+    public Integer getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(Integer serviceType) {
+        this.serviceType = serviceType;
+    }
 
     public Integer getId() {
         return id;
@@ -116,12 +130,13 @@ public class WorkReply implements Serializable {
     public WorkReply() {
     }
 
-    public WorkReply(Integer id, Integer userId, Integer serviceId, String content, Integer status, String createTime) {
+    public WorkReply(Integer id, Integer userId, Integer serviceId, String content, Integer status, Integer serviceType, String createTime) {
         this.id = id;
         this.userId = userId;
         this.serviceId = serviceId;
         this.content = content;
         this.status = status;
+        this.serviceType = serviceType;
         this.createTime = createTime;
     }
 

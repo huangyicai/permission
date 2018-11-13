@@ -1,6 +1,7 @@
 package com.mmall.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mmall.dto.ReplynumServiceDto;
 import com.mmall.model.CustomerService;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -44,7 +45,7 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      * @param waybillNumber
      * @return
      */
-    Page<CustomerService> getAllCustomerServiceByUser(Page ipage,
+    Page<ReplynumServiceDto> getAllCustomerServiceByUser(Page ipage,
                                      @Param("status") Integer status,
                                      @Param("userId")Integer userId,
                                      @Param("waybillNumber")String waybillNumber);
@@ -55,9 +56,9 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      * @param status
      * @param waybillNumber
      */
-    Page<CustomerService> getCustomerServiceBySelf(Page ipage,
-                                                   @Param("status") Integer status,
-                                                   @Param("type") Integer type,
-                                                   @Param("userId")Integer userId,
-                                                   @Param("waybillNumber")String waybillNumber);
+    Page<ReplynumServiceDto> getCustomerServiceBySelf(Page ipage,
+                                                      @Param("status") Integer status,
+                                                      @Param("type") Integer type,
+                                                      @Param("userId")Integer userId,
+                                                      @Param("waybillNumber")String waybillNumber);
 }

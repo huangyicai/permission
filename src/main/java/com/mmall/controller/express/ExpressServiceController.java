@@ -3,6 +3,7 @@ package com.mmall.controller.express;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.mmall.Socket.ExpressWebSocket;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dto.SysUserInfoDto;
@@ -108,6 +109,9 @@ public class ExpressServiceController {
         long createT = DateTimeUtil.DateToNum(byId.getCreateTime());
         byId.setEndTimeSolt((currentTime-createT)/(1000*60));
         customerServiceService.saveOrUpdate(byId);
+
+        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(byId.getUserId());
+        ExpressWebSocket.sendMsgAddServices(sysUserInfo,"已处理完毕，请查看","运单号:"+ byId.getWaybillNumber(),5);
         return Result.ok();
     }
 
@@ -140,6 +144,13 @@ public class ExpressServiceController {
     public Result getAllReplysByService(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return customerServiceService.getAllReplysByService(user);
+    }
+
+    @ApiOperation(value = "获取未处理的工单数",  notes="需要Authorization")
+    @GetMapping(value = "/noHandle",produces = {"application/json;charest=Utf-8"})
+    public Result getAllByNoHandle(){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return customerServiceService.getAllByNoHandle(user);
     }
 
 }

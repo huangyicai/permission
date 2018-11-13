@@ -216,6 +216,7 @@
     </select>
     <select id="getAllBillByIds" resultType="com.mmall.model.Total">
         select
+            t.user_id as userId,
             t.total_id as totalId,
             t.total_state as totalState,
             t.order_no as orderNo

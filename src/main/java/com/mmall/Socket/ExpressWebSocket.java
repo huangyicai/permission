@@ -120,6 +120,45 @@ public class ExpressWebSocket {
         }
     }
 
+    /**
+     * 发送未付款账单消息
+     */
+    public static void sendMsgTotals(SysUserInfo sysUserInfo, List<Total> totals){
+        Session session = map.get(sysUserInfo);
+        if(session==null)return;
+        boolean open = session.isOpen();
+        if(!open) return;
+        Gson gson = new Gson();
+        Map<Object, Object> map = Maps.newHashMap();
+        map.put("type",3);//未付款账单(1=未付款，2=待确认,3=批量发送)
+        map.put("bill",totals);
+        try {
+            session.getBasicRemote().sendText(gson.toJson(map));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 工单消息
+     */
+    public static void sendMsgAddServices(SysUserInfo sysUserInfo,String content,String wayNum,Integer type){
+        Session session = map.get(sysUserInfo);
+        if(session==null)return;
+        boolean open = session.isOpen();
+        if(!open) return;
+        Gson gson = new Gson();
+        Map<Object, Object> map = Maps.newHashMap();
+        map.put("type",type);//工单提示
+        map.put("content",content);//提示内容
+        map.put("wayNum",wayNum);//运单号
+        try {
+            session.getBasicRemote().sendText(gson.toJson(map));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**

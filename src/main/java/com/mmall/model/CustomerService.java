@@ -130,6 +130,9 @@ public class CustomerService implements Serializable {
     @ApiModelProperty(value = "备注")
     @TableField("remarks")
     private String remarks;
+
+
+
     /**
      * 创建时间
      */
@@ -142,6 +145,7 @@ public class CustomerService implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField("update_time")
     private String updateTime;
+
 
     public long getReceiveTimeSolt() {
         return receiveTimeSolt;
@@ -328,6 +332,7 @@ public class CustomerService implements Serializable {
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
+
 
     @Override
     public boolean equals(Object o) {

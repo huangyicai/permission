@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.HandleTypeMapper;
+import com.mmall.dto.ReplynumServiceDto;
 import com.mmall.model.CustomerService;
 import com.mmall.model.HandleType;
 import com.mmall.model.Response.Result;
@@ -41,10 +42,10 @@ public class CustomerServiceController {
 
     @ApiOperation(value = "获取工单（0=全部，1=未处理，2=处理中，3=处理完毕）",  notes="需要Authorization")
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
-    public Result<Page<CustomerService>> getAllCustomerService(@PathVariable("status") Integer status,
-                                                                     @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
-                                                                     @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
-                                                                     @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
+    public Result<Page<ReplynumServiceDto>> getAllCustomerService(@PathVariable("status") Integer status,
+                                                                  @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
+                                                                  @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
+                                                                  @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
         return customerServiceService.getAllCustomerServiceByUser(status,userInfo.getId(),ipage,waybillNumber);

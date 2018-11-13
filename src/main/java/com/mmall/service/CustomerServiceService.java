@@ -86,4 +86,11 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result getAllReplysByService(SysUserInfo user);
+
+    /**
+     *
+     * @param user
+     * @return
+     */
+    Result getAllByNoHandle(SysUserInfo user);
 }
