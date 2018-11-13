@@ -89,12 +89,23 @@ public class CustomerService implements Serializable {
     @ApiModelProperty(value = "附件地址")
     @TableField("enclosure")
     private String enclosure;
-    /**
-     * 时间段
-     */
-    @ApiModelProperty(value = "时间段")
-    @TableField("time_slot")
-    private String timeSlot;
+
+    @ApiModelProperty(value = "接单时间")
+    @TableField("receive_time")
+    private String receiveTime;
+
+    @ApiModelProperty(value = "完结时间")
+    @TableField("end_time")
+    private String endTime;
+
+    @ApiModelProperty(value = "接单耗时")
+    @TableField("receive_time_solt")
+    private long receiveTimeSolt;
+
+    @ApiModelProperty(value = "完结耗时")
+    @TableField("end_time_solt")
+    private long endTimeSolt;
+
     /**
      * 类型（1=破损，2=丢失，3=其他）
      */
@@ -132,6 +143,21 @@ public class CustomerService implements Serializable {
     @TableField("update_time")
     private String updateTime;
 
+    public long getReceiveTimeSolt() {
+        return receiveTimeSolt;
+    }
+
+    public void setReceiveTimeSolt(long receiveTimeSolt) {
+        this.receiveTimeSolt = receiveTimeSolt;
+    }
+
+    public long getEndTimeSolt() {
+        return endTimeSolt;
+    }
+
+    public void setEndTimeSolt(long endTimeSolt) {
+        this.endTimeSolt = endTimeSolt;
+    }
 
     public Integer getId() {
         return id;
@@ -213,12 +239,20 @@ public class CustomerService implements Serializable {
         this.enclosure = enclosure;
     }
 
-    public String getTimeSlot() {
-        return timeSlot;
+    public String getReceiveTime() {
+        return receiveTime;
     }
 
-    public void setTimeSlot(String timeSlot) {
-        this.timeSlot = timeSlot;
+    public void setReceiveTime(String receiveTime) {
+        this.receiveTime = receiveTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public Integer getTypeId() {
@@ -272,7 +306,7 @@ public class CustomerService implements Serializable {
     public CustomerService() {
     }
 
-    public CustomerService(Integer id, Integer userId, Integer expressId, Integer handleId, String handleName, String waybillNumber, String content, String contacts, String phone, String enclosure, String timeSlot, Integer typeId, String typeName, Integer status, String remarks, String createTime, String updateTime) {
+    public CustomerService(Integer id, Integer userId, Integer expressId, Integer handleId, String handleName, String waybillNumber, String content, String contacts, String phone, String enclosure, String receiveTime, String endTime, long receiveTimeSolt, long endTimeSolt, Integer typeId, String typeName, Integer status, String remarks, String createTime, String updateTime) {
         this.id = id;
         this.userId = userId;
         this.expressId = expressId;
@@ -283,13 +317,71 @@ public class CustomerService implements Serializable {
         this.contacts = contacts;
         this.phone = phone;
         this.enclosure = enclosure;
-        this.timeSlot = timeSlot;
+        this.receiveTime = receiveTime;
+        this.endTime = endTime;
+        this.receiveTimeSolt = receiveTimeSolt;
+        this.endTimeSolt = endTimeSolt;
         this.typeId = typeId;
         this.typeName = typeName;
         this.status = status;
         this.remarks = remarks;
         this.createTime = createTime;
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CustomerService that = (CustomerService) o;
+
+        if (receiveTimeSolt != that.receiveTimeSolt) return false;
+        if (endTimeSolt != that.endTimeSolt) return false;
+        if (!id.equals(that.id)) return false;
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+        if (expressId != null ? !expressId.equals(that.expressId) : that.expressId != null) return false;
+        if (handleId != null ? !handleId.equals(that.handleId) : that.handleId != null) return false;
+        if (handleName != null ? !handleName.equals(that.handleName) : that.handleName != null) return false;
+        if (waybillNumber != null ? !waybillNumber.equals(that.waybillNumber) : that.waybillNumber != null)
+            return false;
+        if (content != null ? !content.equals(that.content) : that.content != null) return false;
+        if (contacts != null ? !contacts.equals(that.contacts) : that.contacts != null) return false;
+        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
+        if (enclosure != null ? !enclosure.equals(that.enclosure) : that.enclosure != null) return false;
+        if (receiveTime != null ? !receiveTime.equals(that.receiveTime) : that.receiveTime != null) return false;
+        if (endTime != null ? !endTime.equals(that.endTime) : that.endTime != null) return false;
+        if (typeId != null ? !typeId.equals(that.typeId) : that.typeId != null) return false;
+        if (typeName != null ? !typeName.equals(that.typeName) : that.typeName != null) return false;
+        if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (remarks != null ? !remarks.equals(that.remarks) : that.remarks != null) return false;
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
+        return updateTime != null ? updateTime.equals(that.updateTime) : that.updateTime == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
+        result = 31 * result + (expressId != null ? expressId.hashCode() : 0);
+        result = 31 * result + (handleId != null ? handleId.hashCode() : 0);
+        result = 31 * result + (handleName != null ? handleName.hashCode() : 0);
+        result = 31 * result + (waybillNumber != null ? waybillNumber.hashCode() : 0);
+        result = 31 * result + (content != null ? content.hashCode() : 0);
+        result = 31 * result + (contacts != null ? contacts.hashCode() : 0);
+        result = 31 * result + (phone != null ? phone.hashCode() : 0);
+        result = 31 * result + (enclosure != null ? enclosure.hashCode() : 0);
+        result = 31 * result + (receiveTime != null ? receiveTime.hashCode() : 0);
+        result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
+        result = 31 * result + (int) (receiveTimeSolt ^ (receiveTimeSolt >>> 32));
+        result = 31 * result + (int) (endTimeSolt ^ (endTimeSolt >>> 32));
+        result = 31 * result + (typeId != null ? typeId.hashCode() : 0);
+        result = 31 * result + (typeName != null ? typeName.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (remarks != null ? remarks.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        return result;
     }
 
     @Override
@@ -305,7 +397,6 @@ public class CustomerService implements Serializable {
         ", contacts=" + contacts +
         ", phone=" + phone +
         ", enclosure=" + enclosure +
-        ", timeSlot=" + timeSlot +
         ", typeId=" + typeId +
         ", typeName=" + typeName +
         ", status=" + status +

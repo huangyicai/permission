@@ -3,8 +3,11 @@ package com.mmall.service.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 import com.mmall.dao.HandleTypeMapper;
+import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dao.WorkReplyMapper;
+import com.mmall.dto.ReplyDto;
 import com.mmall.model.CustomerService;
 import com.mmall.dao.CustomerServiceMapper;
 import com.mmall.model.Response.Result;
@@ -13,10 +16,14 @@ import com.mmall.model.WorkReply;
 import com.mmall.model.params.CustomerServiceParam;
 import com.mmall.service.CustomerServiceService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mmall.util.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -34,6 +41,8 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     private CustomerServiceMapper customerServiceMapper;
     @Autowired
     private WorkReplyMapper workReplyMapper;
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
     @Override
     public Result saveCustomerService(SysUserInfo userInfo, CustomerServiceParam customerServiceParam) {
         String level = userInfo.getLevel().split("\\.")[2];
@@ -43,7 +52,7 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                 .content(customerServiceParam.getContent())
                 .phone(customerServiceParam.getPhone())
                 .enclosure(customerServiceParam.getEnclosure())
-                .timeSlot(customerServiceParam.getTimeSlot())
+                .receiveTime(customerServiceParam.getTimeSlot())
                 .typeId(customerServiceParam.getTypeId())
                 .userId(userInfo.getId())
                 .expressId(Integer.parseInt(level))
@@ -54,8 +63,9 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getAllCustomerService(Integer status,Integer type, Integer expressId, Page ipage,String waybillNumber,String createTime,String endTime) {
-        customerServiceMapper.getAllCustomerServices(ipage,status,type,expressId,waybillNumber, createTime,endTime);
+    public Result getAllCustomerService(Integer status,Integer type, Integer expressId, Page ipage,String waybillNumber,
+                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
+        Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, createTime, endTime,receiveSolt,endSolt);
         return Result.ok(ipage);
     }
 
@@ -67,10 +77,17 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
 
     @Override
     public Result handleService(Integer handleId, SysUserInfo userInfo) {
+        //当前时间
+        long currentTime = System.currentTimeMillis();
         CustomerService customerService = customerServiceMapper.selectById(handleId);
         customerService.setHandleId(userInfo.getId());
+        customerService.setReceiveTime(DateTimeUtil.numToDate(currentTime,"yyyy-MM-dd HH:mm:ss"));
         customerService.setHandleName(userInfo.getName());
         customerService.setStatus(2);
+        //工单创建时间
+        long createT = DateTimeUtil.DateToNum(customerService.getCreateTime());
+
+        customerService.setReceiveTimeSolt((currentTime-createT)/(1000*60));
         customerServiceMapper.updateById(customerService);
         return Result.ok();
     }
@@ -106,5 +123,49 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                 .eq("service_id",handleId)
                 .orderByDesc("create_time"));
         return Result.ok(iPage);
+    }
+
+    @Override
+    public Result getAllReplys(SysUserInfo user) {
+        return Result.ok(puGetAllReplys(user,"express_id"));
+    }
+
+    public ReplyDto puGetAllReplys(SysUserInfo user,String column){
+        ReplyDto rd = new ReplyDto();
+
+        //处理完毕工单数
+        Integer handledNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
+                .eq(column, user.getId()).eq("status",3));
+        //处理中的工单数
+        Integer handleingNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
+                .eq(column, user.getId()).eq("status",2));
+        //未处理工单数
+        Integer noHandleNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
+                .eq(column, user.getId()).eq("status",1));
+        //总工单
+        Integer totalallNum = noHandleNum + handleingNum +  handledNum;
+        rd.setTotalallNum(totalallNum);
+        rd.setHandledNum(handledNum);
+        rd.setHandleingNum(handleingNum);
+        rd.setNoHandleNum(noHandleNum);
+        rd.setName(user.getName());
+        rd.setUser_id(user.getId());
+        rd.setDisplay(user.getDisplay());
+        rd.setPersonInCharge(user.getPersonInCharge());
+        return rd;
+    }
+
+    @Override
+    public Result getAllReplysByService(SysUserInfo user) {
+        List<ReplyDto> lr = Lists.newArrayList();
+        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .notIn("status", -1)
+                .eq("platform_id", 2)
+                .eq("parent_id", user.getId()));
+        sysUserInfos.add(user);
+        for(SysUserInfo Info : sysUserInfos){
+            lr.add(puGetAllReplys(Info,"handle_id"));
+        }
+        return Result.ok(lr);
     }
 }

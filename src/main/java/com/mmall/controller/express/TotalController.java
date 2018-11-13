@@ -2,13 +2,12 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonView;
+import com.mmall.Socket.ExpressWebSocket;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.SumTatalMapper;
+import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dao.TotalMapper;
 import com.mmall.dto.BillDto;
 import com.mmall.dto.ProfitsDto;
@@ -21,24 +20,18 @@ import com.mmall.excel.imp.XlsxProcessAbstract;
 import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.service.TotalService;
-import com.mmall.util.BeanValidator;
 import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.junit.runners.Parameterized;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static java.math.BigDecimal.ROUND_DOWN;
 
 /**
  * <p>
@@ -64,6 +57,9 @@ public class TotalController {
 
     @Autowired
     private XlsxProcessAbstract xlsxProcessAbstract;
+
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
     @GetMapping(value = "/update/{totalId}")
@@ -112,8 +108,11 @@ public class TotalController {
     @PostMapping(value = "/send",produces = {"application/json;charest=Utf-8"})
     public Result send(@RequestBody TotalParam totalParam){
         Total byId = totalService.getById(totalParam.getTotalId());
+
         if(byId.getTotalState()==1){
             totalMapper.updateByTotalId(totalParam.getTotalId(),totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
+            SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(byId.getUserId());
+            ExpressWebSocket.sendMsg(sysUserInfo,byId,1);
             return Result.ok();
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);

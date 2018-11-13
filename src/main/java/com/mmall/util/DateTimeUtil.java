@@ -17,7 +17,7 @@ public class DateTimeUtil {
      * @return
      */
     public static String numToDate(long time,String format){
-        SimpleDateFormat formatter = new SimpleDateFormat(format);//格式化为2017-10
+        SimpleDateFormat formatter = new SimpleDateFormat(format);//格式化为2018-10-01
         String stardtr = formatter.format(time);//使用格式化Data
         return stardtr;
     }

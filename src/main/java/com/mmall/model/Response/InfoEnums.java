@@ -2,7 +2,7 @@ package com.mmall.model.Response;
 
 public enum InfoEnums {
 	SUCCESS(0,"success"),
-	ERROR(10001,"系统异常"),
+	ERROR(10001,"请稍后重试！"),
 	AUTHORIZATION(10002,"已授权"),
 	PARAM_NOT(10003,"参数不正确！"),
 	USERNAME_EXISTENCE(10004,"用户名已存在！"),

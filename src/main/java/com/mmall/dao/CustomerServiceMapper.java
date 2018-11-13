@@ -32,7 +32,9 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                  @Param("userId")Integer userId,
                                                  @Param("waybillNumber")String waybillNumber,
                                                  @Param("createTime")String createTime,
-                                                 @Param("endTime")String endTime);
+                                                 @Param("endTime")String endTime,
+                                                 @Param("receiveSolt")Integer receiveSolt,
+                                                 @Param("endSolt")Integer endSolt);
 
     /**
      * 客户获取自己的工单

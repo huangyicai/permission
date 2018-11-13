@@ -295,4 +295,57 @@ public class SysUserInfo extends Model<SysUserInfo> {
                 ", updateTime=" + updateTime +
                 "}";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SysUserInfo that = (SysUserInfo) o;
+
+        if (!id.equals(that.id)) return false;
+        if (userId != null ? !userId.equals(that.userId) : that.userId != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (email != null ? !email.equals(that.email) : that.email != null) return false;
+        if (companyName != null ? !companyName.equals(that.companyName) : that.companyName != null) return false;
+        if (province != null ? !province.equals(that.province) : that.province != null) return false;
+        if (city != null ? !city.equals(that.city) : that.city != null) return false;
+        if (area != null ? !area.equals(that.area) : that.area != null) return false;
+        if (address != null ? !address.equals(that.address) : that.address != null) return false;
+        if (telephone != null ? !telephone.equals(that.telephone) : that.telephone != null) return false;
+        if (personInCharge != null ? !personInCharge.equals(that.personInCharge) : that.personInCharge != null)
+            return false;
+        if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (display != null ? !display.equals(that.display) : that.display != null) return false;
+        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
+        if (updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null) return false;
+        if (level != null ? !level.equals(that.level) : that.level != null) return false;
+        if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
+        if (courierId != null ? !courierId.equals(that.courierId) : that.courierId != null) return false;
+        return platformId != null ? platformId.equals(that.platformId) : that.platformId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + (userId != null ? userId.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + (companyName != null ? companyName.hashCode() : 0);
+        result = 31 * result + (province != null ? province.hashCode() : 0);
+        result = 31 * result + (city != null ? city.hashCode() : 0);
+        result = 31 * result + (area != null ? area.hashCode() : 0);
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
+        result = 31 * result + (personInCharge != null ? personInCharge.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (display != null ? display.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + (level != null ? level.hashCode() : 0);
+        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
+        result = 31 * result + (courierId != null ? courierId.hashCode() : 0);
+        result = 31 * result + (platformId != null ? platformId.hashCode() : 0);
+        return result;
+    }
 }

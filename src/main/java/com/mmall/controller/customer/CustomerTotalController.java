@@ -3,6 +3,8 @@ package com.mmall.controller.customer;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mmall.Socket.ExpressWebSocket;
+import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
@@ -45,14 +47,21 @@ public class CustomerTotalController {
         return Result.ok(bill);
     }
 
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
+
     @ApiOperation(value = "上传凭证",  notes="需要Authorization")
     @PostMapping(value = "/setCredentials")
     public Result<IPage<TotalVo>> setCredentials(@RequestBody CredentialsParam credentialsParam){
-        Total total=new Total();
-        total.setTotalId(credentialsParam.getTotalId());
+        Total total= totalService.getById(credentialsParam.getTotalId());
+        //total.setTotalId(credentialsParam.getTotalId());
         total.setTotalState(3);
         total.setTotalCredentialsUrl(credentialsParam.getTotalCredentialsUrl());
         totalService.updateById(total);
+
+        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(total.getSendId());
+        ExpressWebSocket.sendMsg(sysUserInfo,total,2);
+
         return Result.ok();
     }
 }

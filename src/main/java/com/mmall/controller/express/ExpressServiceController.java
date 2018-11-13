@@ -12,6 +12,7 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.WorkReplyParam;
 import com.mmall.service.CustomerServiceService;
 import com.mmall.util.BeanValidator;
+import com.mmall.util.DateTimeUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,9 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "ExpressServiceController", description = "客服/工单")
 @RestController
@@ -38,11 +41,13 @@ public class ExpressServiceController {
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                                         @RequestParam(name = "createTime",required = false) String createTime,
                                         @RequestParam(name = "endTime",required = false) String endTime,
+                                        @RequestParam(name = "receiveSolt",required = false,defaultValue = "-1") Integer receiveSolt,
+                                        @RequestParam(name = "endSolt",required = false,defaultValue = "-1") Integer endSolt,
                                         @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                         @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
-        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime);
+        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime,receiveSolt,endSolt);
     }
 
     @ApiOperation(value = "我处理的工单（0=全部，2=处理中，3=处理完毕）",  notes="需要Authorization")
@@ -84,7 +89,8 @@ public class ExpressServiceController {
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
                 .eq("parent_id", userInfo.getId())
                 .eq("platform_id", userInfo.getPlatformId())
-                .eq("display", 0));
+                .eq("display", 0)
+                .in("status",0,1));
         return Result.ok(sysUserInfos);
     }
 
@@ -92,9 +98,15 @@ public class ExpressServiceController {
     @GetMapping(value = "/finish/{handleId}",produces = {"application/json;charest=Utf-8"})
     public Result handleFinishService(@PathVariable("handleId") Integer handleId,
                                       @RequestParam(name = "remarks",required = true) String remarks){
+        //当前时间
+        long currentTime = System.currentTimeMillis();
         CustomerService byId = customerServiceService.getById(handleId);
         byId.setRemarks(remarks);
+        byId.setEndTime(DateTimeUtil.numToDate(currentTime,"yyyy-MM-dd HH:mm:ss"));
         byId.setStatus(3);
+        //工单创建时间
+        long createT = DateTimeUtil.DateToNum(byId.getCreateTime());
+        byId.setEndTimeSolt((currentTime-createT)/(1000*60));
         customerServiceService.saveOrUpdate(byId);
         return Result.ok();
     }
@@ -114,6 +126,20 @@ public class ExpressServiceController {
                             @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                             @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         return customerServiceService.getReplys(page,size,handleId);
+    }
+
+    @ApiOperation(value = "总的工单统计",  notes="需要Authorization")
+    @GetMapping(value = "/reply/all",produces = {"application/json;charest=Utf-8"})
+    public Result getAllReplys(){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return customerServiceService.getAllReplys(user);
+    }
+
+    @ApiOperation(value = "每个客服工单统计",  notes="需要Authorization")
+    @GetMapping(value = "/reply/byService",produces = {"application/json;charest=Utf-8"})
+    public Result getAllReplysByService(){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return customerServiceService.getAllReplysByService(user);
     }
 
 }

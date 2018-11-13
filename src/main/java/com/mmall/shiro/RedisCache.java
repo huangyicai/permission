@@ -21,7 +21,7 @@ import java.util.Set;
 public class RedisCache<K,V>  implements Cache<K,V> {
     private final String CACHE_PREFIX = "fn_cache";
     //过期时间
-    private final Integer BE_OVERDUE_TIME = 10*60*10;
+    private final Integer BE_OVERDUE_TIME = 1000*60*120;
     @Resource
     private JedisUtil jedisUtil;
 

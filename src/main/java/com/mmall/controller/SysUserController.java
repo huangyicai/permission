@@ -11,6 +11,7 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.*;
 import com.mmall.model.params.SysUserParam;
 import com.mmall.model.params.UserPasswordParam;
+import com.mmall.service.ExpressUserService;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
 import com.mmall.util.UploadApi;
@@ -118,6 +119,15 @@ public class SysUserController {
     }
 
 
+    @Autowired
+    private ExpressUserService expressUserService;
+
+    @ApiOperation(value = "获取弗恩客服负责人)",  notes="需要Authorization")
+    @GetMapping(value = "/contacts",produces = {"application/json;charest=Utf-8"})
+    public Result getFnContacts(){
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        return expressUserService.getFnContacts(userInfo);
+    }
 
 }
 

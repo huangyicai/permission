@@ -14,7 +14,10 @@
         <result column="contacts" property="contacts" />
         <result column="phone" property="phone" />
         <result column="enclosure" property="enclosure" />
-        <result column="time_slot" property="timeSlot" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="end_time" property="endTime" />
+        <result column="receive_time_solt" property="receiveTimeSolt" />
+        <result column="end_time_solt" property="endTimeSolt" />
         <result column="type_id" property="typeId" />
         <result column="type_name" property="typeName" />
         <result column="status" property="status" />
@@ -42,7 +45,10 @@
         contacts,
         phone,
         enclosure,
-        time_slot ,
+        receive_time ,
+        end_time,
+        receive_time_solt ,
+        end_time_solt,
         type_name ,
         status,
         remarks,
@@ -64,6 +70,20 @@
             <if test="endTime!=null and endTime!=''">
                 and create_time &lt; #{endTime}
             </if>
+            <if test="receiveSolt!=-1 and receiveSolt!=0">
+                and  receive_time_solt &lt;= #{receiveSolt} and  receive_time_solt !=0
+            </if>
+            <if test="receiveSolt==0">
+                and  receive_time_solt &gt; 4320
+            </if>
+
+            <if test="endSolt!=-1 and endSolt!=0">
+                and  end_time_solt &lt;= #{endSolt} and  end_time_solt !=0
+            </if>
+            <if test="endSolt==0">
+                and  end_time_solt &gt; 4320
+            </if>
+
                 and express_id =#{userId}
         </where>
         ORDER BY status ASC,create_time DESC
@@ -80,7 +100,6 @@
         contacts,
         phone,
         enclosure,
-        time_slot ,
         type_name ,
         status,
         remarks,
@@ -111,7 +130,10 @@
         contacts,
         phone,
         enclosure,
-        time_slot ,
+        receive_time ,
+        end_time,
+        receive_time_solt ,
+        end_time_solt,
         type_name ,
         status,
         remarks,

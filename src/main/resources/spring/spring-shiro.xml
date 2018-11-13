@@ -21,6 +21,7 @@
          <property name="filterChainDefinitions">
              <value>
                 <!--/total/** = anon-->
+                 /websocket = anon
                  /druid/** = anon
                  /swagger-ui.html = anon
                  /v2/api-docs = anon

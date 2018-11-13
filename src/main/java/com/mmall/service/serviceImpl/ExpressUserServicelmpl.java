@@ -231,6 +231,9 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     @Override
     public Result getFnContacts(SysUserInfo userInfo) {
         FnContacts fnContacts = fnContactsMapper.getOneFnContacts(userInfo.getId());
+        if(fnContacts==null){
+            fnContacts = fnContactsMapper.selectOne(new QueryWrapper<FnContacts>().eq("id",1));
+        }
         return Result.ok(fnContacts);
     }
 
