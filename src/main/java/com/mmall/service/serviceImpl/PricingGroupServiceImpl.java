@@ -1,6 +1,7 @@
 package com.mmall.service.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,6 +19,7 @@ import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.service.PricingGroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mmall.util.LevelUtil;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -61,6 +63,9 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     private SpecialPricingGroupMapper specialPricingGroupMapper;
     @Autowired
     private SpecialPricingGroupKeyMapper specialPricingGroupKeyMapper;
+
+    @Autowired
+    private PricingGroupMapper totalMapper;
 
     public Result<Map<String, List<PricingGroup>>> getPricingGroup(Integer userId, Integer cityId) {
         List<PricingGroup> pricingGroups = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>()
@@ -268,6 +273,13 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     public Result importPrice(MultipartFile file, Integer userId) throws IOException, InterruptedException, ExecutionException {
         List<PricingGroup> list = getList(file, userId);
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
+
+        for(PricingGroup pg:list){
+            List<PricingGroup> pricingGroups = totalMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id", pg.getUserId()).eq("city_id", pg.getCityId()));
+            if(pricingGroups.size()!=0){
+                totalMapper.delete(new UpdateWrapper<PricingGroup>().eq("user_id", pg.getUserId()).eq("city_id", pg.getCityId()));
+            }
+        }
 
         for(PricingGroup pg:list){
             ImportPrice ip=new ImportPrice(pg);
