@@ -199,7 +199,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
 
         //应收数据
-        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3");
+        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4");
 
         //实收数据
         Total Paid = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"4");
@@ -212,14 +212,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         ProfitsDto billDto=new ProfitsDto();
 
         //计算总单量
-        billDto.setTotalNumber(Offer.getTotalNumber()+Paid.getTotalNumber());
+        billDto.setTotalNumber(Offer.getTotalNumber());
 
         //计算每日单量
         int days = DateUtils.getDays(billParam.getDate());
         billDto.setAverageNumber(billDto.getTotalNumber()/days);
 
         //计算总总量
-        billDto.setTotalWeight(Offer.getTotalWeight().add(Paid.getTotalWeight()));
+        billDto.setTotalWeight(Offer.getTotalWeight());
 
         //计算平均重量
         if (new BigDecimal(billDto.getTotalNumber()).compareTo(new BigDecimal(0)) == 0) {
@@ -311,7 +311,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         //报价
         BigDecimal totalOffer=BigDecimal.ZERO;
-
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
 
@@ -373,12 +372,18 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
 
             //计算成本
-            list= getCalculate(pricingOffer,1,list,special1,totalCost,totalOffer);
+            list= getCalculate(pricingOffer,1,list,special1);
 
         }
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special,totalCost,totalOffer);
+        list=getCalculate(pricingGroup,2,list,special);
+
+        //计算价格
+        for(Bill b:list){
+            totalCost=totalCost.add(b.getCost());
+            totalOffer=totalOffer.add(b.getOffer());
+        }
 
         //写入Excel
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","报价"};
@@ -416,8 +421,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         total1.setUpdateTime(new Date());
 
         totalMapper.updateById(total1);
-        totalCost=BigDecimal.ZERO;
-        totalOffer=BigDecimal.ZERO;
         map.clear();
         return Result.ok(upload);
     }
@@ -530,12 +533,6 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     @Override
     public Result<List<Bill>> getBudget(Double weight,Integer userId) {
 
-        //成本
-        BigDecimal totalCost=BigDecimal.ZERO;
-
-        //报价
-        BigDecimal totalOffer=BigDecimal.ZERO;
-
         //獲取报价表
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(userId);
 
@@ -565,7 +562,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special,totalCost,totalOffer);
+        list=getCalculate(pricingGroup,2,list,special);
 
         return Result.ok(list);
     }
@@ -601,9 +598,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
                                    Integer type,
                                    List<Bill> list,
-                                   List<PricingGroupVo> special,
-                                   BigDecimal totalCost,
-                                   BigDecimal totalOffer){
+                                   List<PricingGroupVo> special){
 
         //首重集合
         List<PricingGroupVo> first=new ArrayList<PricingGroupVo>();
@@ -671,17 +666,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             Thread.yield();
             //遍历特殊定价组
             if(specialFirst.size()>0){
-                traverse = traverse(bill,specialFirst, specialContinued, type,totalCost,totalOffer);
+                traverse = traverse(bill,specialFirst, specialContinued, type);
             }
 
             //遍历定价组
             if(!traverse){
-                traverse(bill,first,Continued,type,totalCost,totalOffer);
+                traverse(bill,first,Continued,type);
             }
 
             //遍历追加的城市
             if(firstHeavy.size()>0 || additionalHeavy.size()>0){
-                additional(bill,firstHeavy,additionalHeavy,type,totalCost,totalOffer);
+                additional(bill,firstHeavy,additionalHeavy,type);
             }
         }
 
@@ -695,7 +690,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param Continued
      */
     @Transactional
-    public Boolean traverse(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type,BigDecimal totalCost,BigDecimal totalOffer){
+    public Boolean traverse(Bill bill,List<PricingGroupVo> first,
+                            List<PricingGroupVo> Continued,
+                            Integer type){
 
         //遍历首重
         for(PricingGroupVo pg: first){
@@ -714,13 +711,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(type==1){
                         bill.setCost(new BigDecimal(pg.getPrice().toString()));
 //                        synchronized (totalCost){
-                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
 //                        }
                         return true;
                     }else{
                         bill.setOffer(new BigDecimal(pg.getPrice().toString()));
 //                        synchronized (totalOffer){
-                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
 //                        }
                         return true;
                     }
@@ -748,13 +745,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                         if(type==1){
                             bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            synchronized (totalCost){
-                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            }
                             return true;
                         }else{
                             bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            synchronized (totalOffer){
-                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            }
                             return true;
                         }
@@ -783,13 +780,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(type==1){
                         bill.setCost(fist.add(two));
 //                        synchronized (totalCost){
-                            totalCost=totalCost.add(fist.add(two));
+//                            totalCost=totalCost.add(fist.add(two));
 //                        }
                         return true;
                     }else{
                         bill.setOffer(fist.add(two));
 //                        synchronized (totalOffer){
-                            totalOffer=totalOffer.add(fist.add(two));
+//                            totalOffer=totalOffer.add(fist.add(two));
 //                        }
                         return true;
                     }
@@ -808,9 +805,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     public void additional(Bill bill,List<PricingGroupVo> first,
                            List<PricingGroupVo> Continued,
-                           Integer type,
-                           BigDecimal totalCost,
-                           BigDecimal totalOffer){
+                           Integer type){
         //遍历首重
         for(PricingGroupVo pg: first){
 
@@ -828,12 +823,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(type==1){
                         bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())));
 //                        synchronized (totalCost){
-                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
+//                            totalCost=totalCost.add(new BigDecimal(pg.getPrice().toString()));
 //                        }
                     }else{
                         bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())));
 //                        synchronized (totalOffer){
-                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
+//                            totalOffer=totalOffer.add(new BigDecimal(pg.getPrice().toString()));
 //                        }
                     }
                 }
@@ -860,12 +855,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                         if(type==1){
                             bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())));
 //                            synchronized (totalCost){
-                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                                totalCost=totalCost.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            }
                         }else{
                             bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())));
 //                            synchronized (totalOffer){
-                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
+//                                totalOffer=totalOffer.add(new BigDecimal(pp.getFirstWeightPrice().toString()));
 //                            }
                         }
                     }
@@ -893,12 +888,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(type==1){
                         bill.setCost(bill.getCost().add(fist.add(two)));
 //                        synchronized (totalCost){
-                            totalCost=totalCost.add(fist.add(two));
+//                            totalCost=totalCost.add(fist.add(two));
 //                        }
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)));
 //                        synchronized (totalOffer){
-                            totalOffer=totalOffer.add(fist.add(two));
+//                            totalOffer=totalOffer.add(fist.add(two));
 //                        }
                     }
 
