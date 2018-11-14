@@ -209,16 +209,11 @@ public class PricingGroupController {
 
     @ApiOperation(value = "导入省份定价",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
-            @ApiImplicitParam(name = "type",value = "类型：1-直接添加，2-替换",dataType = "long",paramType = "path")
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path")
     })
     @PostMapping(value = "/importPrice/{userId}/{type}",produces = {"application/json;charest=Utf-8"})
     public Result importPrice(@RequestParam(value = "file") MultipartFile file,
-                              @PathVariable("userId")Integer userId,
-                              @PathVariable("type")Integer type) throws IOException, ExecutionException, InterruptedException {
-        if(type==2){
-            pricingGroupService.remove(new UpdateWrapper<PricingGroup>().eq("user_id",userId));
-        }
+                              @PathVariable("userId")Integer userId) throws IOException, ExecutionException, InterruptedException {
         return pricingGroupService.importPrice(file,userId);
     }
 }

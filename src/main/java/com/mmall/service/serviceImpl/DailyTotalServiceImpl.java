@@ -76,6 +76,7 @@ public class DailyTotalServiceImpl extends ServiceImpl<DailyTotalMapper, DailyTo
                 for (DailyTotalDto dd:dailyTotalDtos){
                     if((i+1+"日").equals(dd.getDay())){
                         dd.setNum(dd.getNum()+Integer.parseInt(split[i]));
+                        break;
                     }
                 }
             }

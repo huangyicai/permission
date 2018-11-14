@@ -570,7 +570,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         List<Total> allBillByIds = totalMapper.getAllBillByIds(totalId);
         for(Total tt:allBillByIds){
             if(tt.getTotalState()!=1){
-                return Result.error(InfoEnums.SEND_FAILURE,"单号："+tt.getOrderNo()+"，请查是否定价，或者已经发送");
+                return Result.error(InfoEnums.SEND_FAILURE,"单号："+tt.getOrderNo()+"，请检查是否定价，或者已经发送");
             }
         }
         totalMapper.updateByTotalId(totalId,totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
