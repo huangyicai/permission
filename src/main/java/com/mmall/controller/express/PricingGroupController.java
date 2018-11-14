@@ -211,7 +211,7 @@ public class PricingGroupController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path")
     })
-    @PostMapping(value = "/importPrice/{userId}/{type}",produces = {"application/json;charest=Utf-8"})
+    @PostMapping(value = "/importPrice/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result importPrice(@RequestParam(value = "file") MultipartFile file,
                               @PathVariable("userId")Integer userId) throws IOException, ExecutionException, InterruptedException {
         return pricingGroupService.importPrice(file,userId);
