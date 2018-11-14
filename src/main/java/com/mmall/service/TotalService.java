@@ -15,6 +15,7 @@ import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.model.params.TotalParam;
 import com.mmall.vo.TotalVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**

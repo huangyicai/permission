@@ -88,11 +88,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     @Autowired
     private SysUserInfoMapper sysUserInfoMapper;
 
-    //成本
-    private BigDecimal totalCost=BigDecimal.ZERO;
-
-    //报价
-    private BigDecimal totalOffer=BigDecimal.ZERO;
+//    //成本
+//    private BigDecimal totalCost=BigDecimal.ZERO;
+//
+//    //报价
+//    private BigDecimal totalOffer=BigDecimal.ZERO;
 
     /**
      * 获取客户月计统计
@@ -306,6 +306,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     @Transactional
     public Result<String> getPricing(Integer totalId,Integer type) {
+        //成本
+        BigDecimal totalCost=BigDecimal.ZERO;
+
+        //报价
+        BigDecimal totalOffer=BigDecimal.ZERO;
 
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
@@ -368,12 +373,12 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
 
             //计算成本
-            list= getCalculate(pricingOffer,1,list,special1);
+            list= getCalculate(pricingOffer,1,list,special1,totalCost,totalOffer);
 
         }
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special);
+        list=getCalculate(pricingGroup,2,list,special,totalCost,totalOffer);
 
         //写入Excel
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量","报价"};
@@ -525,14 +530,20 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     @Override
     public Result<List<Bill>> getBudget(Double weight,Integer userId) {
 
+        //成本
+        BigDecimal totalCost=BigDecimal.ZERO;
+
+        //报价
+        BigDecimal totalOffer=BigDecimal.ZERO;
+
         //獲取报价表
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(userId);
 
         //获取特殊报价表
         List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(userId);
 
-        //定价表是否数据存在
-        List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(userId);
+//        //定价表是否数据存在
+//        List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(userId);
 
         //判断定价组参数是否完善
         /*if(allPricingGroups.size()!=34){
@@ -554,7 +565,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special);
+        list=getCalculate(pricingGroup,2,list,special,totalCost,totalOffer);
 
         return Result.ok(list);
     }
@@ -590,7 +601,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
                                    Integer type,
                                    List<Bill> list,
-                                   List<PricingGroupVo> special){
+                                   List<PricingGroupVo> special,
+                                   BigDecimal totalCost,
+                                   BigDecimal totalOffer){
 
         //首重集合
         List<PricingGroupVo> first=new ArrayList<PricingGroupVo>();
@@ -658,17 +671,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             Thread.yield();
             //遍历特殊定价组
             if(specialFirst.size()>0){
-                traverse = traverse(bill,specialFirst, specialContinued, type);
+                traverse = traverse(bill,specialFirst, specialContinued, type,totalCost,totalOffer);
             }
 
             //遍历定价组
             if(!traverse){
-                traverse(bill,first,Continued,type);
+                traverse(bill,first,Continued,type,totalCost,totalOffer);
             }
 
             //遍历追加的城市
             if(firstHeavy.size()>0 || additionalHeavy.size()>0){
-                additional(bill,firstHeavy,additionalHeavy,type);
+                additional(bill,firstHeavy,additionalHeavy,type,totalCost,totalOffer);
             }
         }
 
@@ -682,7 +695,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param Continued
      */
     @Transactional
-    public Boolean traverse(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
+    public Boolean traverse(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type,BigDecimal totalCost,BigDecimal totalOffer){
 
         //遍历首重
         for(PricingGroupVo pg: first){
@@ -793,7 +806,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param Continued
      * @return
      */
-    public void additional(Bill bill,List<PricingGroupVo> first,List<PricingGroupVo> Continued,Integer type){
+    public void additional(Bill bill,List<PricingGroupVo> first,
+                           List<PricingGroupVo> Continued,
+                           Integer type,
+                           BigDecimal totalCost,
+                           BigDecimal totalOffer){
         //遍历首重
         for(PricingGroupVo pg: first){
 
