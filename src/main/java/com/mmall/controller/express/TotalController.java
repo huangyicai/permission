@@ -56,9 +56,6 @@ public class TotalController {
     private SumTatalMapper sumTatalMapper;
 
     @Autowired
-    private XlsxProcessAbstract xlsxProcessAbstract;
-
-    @Autowired
     private SysUserInfoMapper sysUserInfoMapper;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
@@ -134,6 +131,7 @@ public class TotalController {
     )
     @PostMapping(value = "/additional/{time}",produces = {"application/json;charest=Utf-8"})
     public Result additional(MultipartFile file,@PathVariable("time")String time) throws Exception {
+        XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
         xlsxProcessAbstract.processAllSheet(file,time,1,null);
         return Result.ok();
     }
@@ -147,6 +145,7 @@ public class TotalController {
     public Result replace(MultipartFile file,
                           @PathVariable("time")String time,
                           @PathVariable("sumId") String sumId) throws Exception {
+        XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
         xlsxProcessAbstract.processAllSheet(file,time,2,sumId);
         return Result.ok();
     }
@@ -169,6 +168,7 @@ public class TotalController {
     public Result additionalSet(MultipartFile file,
                                 @PathVariable("time") String time,
                                 @PathVariable("userId") Integer userId) throws Exception {
+        XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
         xlsxProcessAbstract.additionalSet(file,userId,time);
         return Result.ok();
     }
@@ -237,6 +237,7 @@ public class TotalController {
     @PostMapping(value = "/againSet/{totalId}")
     public Result againSet(@PathVariable("totalId")Integer totalId,
                                    MultipartFile file) throws Exception {
+        XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
         return xlsxProcessAbstract.againSet(file,totalId);
     }
 

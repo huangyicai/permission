@@ -3,6 +3,7 @@ package com.mmall.excel.imp;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.ArrayListMultimap;
+import com.mmall.component.ApplicationContextHelper;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
@@ -59,46 +60,34 @@ import java.util.regex.Pattern;
  * @author qty
  * @since 2018-09-19
  */
-@Component
 public class XlsxProcessAbstract {
 
-    @Autowired
     private SysUserInfoService sysUserInfoService;
 
-    @Autowired
     private TotalMapper totalService;
 
-    @Autowired
     private WeightCalculateMapper weightCalculateMapper;
 
-    @Autowired
     private ProvincialMeterMapper provincialMeterMapper;
 
-    @Autowired
     private BillKeywordMapper billKeywordMapper;
 
-    @Autowired
     private TotalMapper totalMapper;
 
-    @Autowired
     private SumTatalMapper sumTatalMapper;
 
-    @Autowired
     private DailyTotalMapper dailyTotalMapper;
 
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
 
     //开始读取行数从第0行开始计算
-    private final int minColumns = 0;
+    private int minColumns = 0;
 
     //储存每一行数据
-    private final StringBuffer rowStrs = new StringBuffer();
+    private StringBuffer rowStrs = new StringBuffer();
 
     //根据店铺分离数据
     private ArrayListMultimap<String, Bill> map = ArrayListMultimap.create();
-
-    //获取Excel每一行的执行类
-//    private ProcessTransDetailDataDto processTransDetailData = new ProcessTransDetailDataDto();
 
     //根据重量分离
     private ArrayListMultimap<Integer, BigDecimal> weightMap = ArrayListMultimap.create();
@@ -109,7 +98,20 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     private ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
 
+    //初始化用户状态
     private Integer pricing=-1;
+
+    public XlsxProcessAbstract() {
+        this.sysUserInfoService = ApplicationContextHelper.getBeanClass(SysUserInfoService.class);
+        this.totalService = ApplicationContextHelper.getBeanClass(TotalMapper.class);
+        this.weightCalculateMapper = ApplicationContextHelper.getBeanClass(WeightCalculateMapper.class);
+        this.provincialMeterMapper = ApplicationContextHelper.getBeanClass(ProvincialMeterMapper.class);
+        this.billKeywordMapper = ApplicationContextHelper.getBeanClass(BillKeywordMapper.class);
+        this.totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
+        this.sumTatalMapper = ApplicationContextHelper.getBeanClass(SumTatalMapper.class);
+        this.dailyTotalMapper = ApplicationContextHelper.getBeanClass(DailyTotalMapper.class);
+    }
+
 
     /**
      * 根据路径读取数据
@@ -117,7 +119,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    synchronized public ArrayListMultimap<String, Bill> processAllSheet(String filename) throws Exception {
+     public ArrayListMultimap<String, Bill> processAllSheet(String filename) throws Exception {
         OPCPackage pkg = OPCPackage.open(filename, PackageAccess.READ);
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -133,8 +135,6 @@ public class XlsxProcessAbstract {
                 stream.close();
             }
         }
-
-//        return processTransDetailData.map;
         return map;
     }
 
@@ -146,7 +146,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    synchronized public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
+    public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
 
         //替换
         if(type==2){
@@ -361,7 +361,7 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     @Transactional
-    synchronized public void additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
+    public void additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
         Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
@@ -392,7 +392,7 @@ public class XlsxProcessAbstract {
                 String[] timeStr=threadDto.getTime().split("-");
 
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
@@ -404,7 +404,7 @@ public class XlsxProcessAbstract {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"账单"+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
 
@@ -480,7 +480,7 @@ public class XlsxProcessAbstract {
      * @return
      */
     @Transactional
-    synchronized public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
+    public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
@@ -580,6 +580,7 @@ public class XlsxProcessAbstract {
             threadDto.setMw(mw);
             threadDto.setPath(LevelConstants.OMPPATH);
             threadDto.setPathHead(LevelConstants.REALPATH);
+            threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             threadDto.setName(str1[0]);
@@ -599,11 +600,17 @@ public class XlsxProcessAbstract {
      * @param threadDto
      */
     @Transactional
-    synchronized public Result updateTatal(final ThreadDto threadDto,Total total){
+    public Result updateTatal(final ThreadDto threadDto,Total total){
 
         if(total!=null && total.getTotalState()>1){
             return Result.error(InfoEnums.NOT_UPDATE);
         }
+
+        //重名名账单
+        String[] timeStr=threadDto.getTime().split("-");
+
+        //生成下载路径
+        String path=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
@@ -648,6 +655,7 @@ public class XlsxProcessAbstract {
                 total.setTotalOffer(threadDto.getCost());
                 total.setTotalCost(BigDecimal.ZERO);
                 total.setTotalPaid(BigDecimal.ZERO);
+                total.setTotalUrl(path);
                 total.setTotalState(pricing);
                 totalMapper.updateById(total);
 

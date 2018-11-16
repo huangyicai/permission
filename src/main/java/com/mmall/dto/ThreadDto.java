@@ -110,9 +110,6 @@ public class ThreadDto {
         return key;
     }
 
-//    synchronized public void setKey(String key) {
-//        this.key = key;
-//    }
     public void setKey(String key) {
         this.key = key;
     }
