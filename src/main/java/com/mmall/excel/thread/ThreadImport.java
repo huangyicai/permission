@@ -58,7 +58,7 @@ public class ThreadImport extends Thread {
                         +threadDto.getCompanyName()+"/"
                         +threadDto.getName()+"/"
                         +threadDto.getKey()+"/"
-                        +threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单("+keyId+")"+".xlsx";
+                        +threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+keyId+".xlsx";
 
                 //生成创建路径
                 String path=threadDto.getPathHead()+pubUrl;

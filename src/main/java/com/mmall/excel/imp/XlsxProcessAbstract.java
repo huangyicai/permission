@@ -392,7 +392,7 @@ public class XlsxProcessAbstract {
                 String[] timeStr=threadDto.getTime().split("-");
 
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
@@ -404,7 +404,7 @@ public class XlsxProcessAbstract {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"账单"+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
 
@@ -580,6 +580,7 @@ public class XlsxProcessAbstract {
             threadDto.setMw(mw);
             threadDto.setPath(LevelConstants.OMPPATH);
             threadDto.setPathHead(LevelConstants.REALPATH);
+            threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
             threadDto.setName(str1[0]);
@@ -604,6 +605,12 @@ public class XlsxProcessAbstract {
         if(total!=null && total.getTotalState()>1){
             return Result.error(InfoEnums.NOT_UPDATE);
         }
+
+        //重名名账单
+        String[] timeStr=threadDto.getTime().split("-");
+
+        //生成下载路径
+        String path=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
@@ -648,6 +655,7 @@ public class XlsxProcessAbstract {
                 total.setTotalOffer(threadDto.getCost());
                 total.setTotalCost(BigDecimal.ZERO);
                 total.setTotalPaid(BigDecimal.ZERO);
+                total.setTotalUrl(path);
                 total.setTotalState(pricing);
                 totalMapper.updateById(total);
 
