@@ -239,7 +239,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         //计算应收单间利润
-        billDto.setOfferOneProfits(billDto.getOfferOnePrice().subtract(billDto.getOfferOnePrice()));
+        billDto.setOfferOneProfits(billDto.getOfferOnePrice().subtract(billDto.getOfferCostOne()));
 
         //应收利润百分比
         if(billDto.getTotalOffer().compareTo(new BigDecimal(0))==0){
