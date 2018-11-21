@@ -20,11 +20,10 @@ import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
 import com.mmall.util.StringToDateUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.eventusermodel.ReadOnlySharedStringsTable;
@@ -36,8 +35,6 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFComment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.ContentHandler;
@@ -392,7 +389,7 @@ public class XlsxProcessAbstract {
                 String[] timeStr=threadDto.getTime().split("-");
 
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+keyId+".xlsx";
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
@@ -404,7 +401,7 @@ public class XlsxProcessAbstract {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"账单"+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"账单-"+keyId+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
 
