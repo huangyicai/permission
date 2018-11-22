@@ -359,6 +359,7 @@ public class XlsxProcessAbstract {
      */
     @Transactional
     public void additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
+        SysUserInfo user = sysUserInfoService.getById( userId);
         Map threadDto1 = getThreadDto(xlsxFile,date);
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
@@ -389,7 +390,7 @@ public class XlsxProcessAbstract {
                 String[] timeStr=threadDto.getTime().split("-");
 
                 //生成创建路径
-                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+keyId+".xlsx";
+                String path=threadDto.getPathHead()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+user.getName()+"/"+"客户追加账单"+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+keyId+".xlsx";
 
                 threadDto.setKey(threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月");
 
@@ -580,7 +581,7 @@ public class XlsxProcessAbstract {
             threadDto.setTime(time);
             threadDto.setTotalNum(total);
             threadDto.setWeight(weightOne);
-            threadDto.setName(str1[0]);
+            threadDto.setName(userInfo.getName());
             threadDto.setCompanyName(userInfo.getCompanyName());
         }
         Map m=new HashMap<>();
@@ -607,7 +608,7 @@ public class XlsxProcessAbstract {
         String[] timeStr=threadDto.getTime().split("-");
 
         //生成下载路径
-        String path=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单"+".xlsx";
+        String path=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+total.getOrderNo()+".xlsx";
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 

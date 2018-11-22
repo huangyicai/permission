@@ -160,7 +160,6 @@ public class TotalController {
 
     @ApiOperation(value = "客户追加上传",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type",value = "类型：1-已经定价，2-未定价",dataType = "long",paramType = "path"),
             @ApiImplicitParam(name = "userId",value = "用户id",dataType = "Integer",paramType = "path"),
             @ApiImplicitParam(name = "time",value = "时间",dataType = "String",paramType = "path"),
     })
