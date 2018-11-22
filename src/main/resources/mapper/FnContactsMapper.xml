@@ -15,7 +15,7 @@
     </sql>
     <select id="getOneFnContacts" resultType="com.mmall.model.FnContacts">
         SELECT
-        *
+        s.*
         FROM
             fn_contacts s
         INNER JOIN fn_and_user u ON u.fn_id = s.id

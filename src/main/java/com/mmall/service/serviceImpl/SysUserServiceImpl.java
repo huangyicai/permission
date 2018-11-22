@@ -190,7 +190,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
     @Transactional
     public Result fnRegister(UserInfoExpressParm user,SysUserInfo parent,Integer fnId) {
-        SysUserInfo sysUserInfo = (SysUserInfo)register(user, parent, LevelConstants.EXPRESS, 2).getData();
+
+        Result register = register(user, parent, LevelConstants.EXPRESS, 2);
+        if(register.getCode()!=0){
+            return register;
+        }
+        SysUserInfo sysUserInfo = (SysUserInfo)register.getData();
         UseTerm useTerm = new UseTerm();
         useTerm.setUserId(sysUserInfo.getId());
         long sysTime = System.currentTimeMillis();
