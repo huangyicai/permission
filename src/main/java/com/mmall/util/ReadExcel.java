@@ -1,20 +1,9 @@
 package com.mmall.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.component.ApplicationContextHelper;
 import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.dao.SysUserMapper;
-import com.mmall.dao.TotalMapper;
-import com.mmall.model.Response.InfoEnums;
-import com.mmall.model.Response.Result;
 import com.mmall.model.SysUser;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.UserInfoExpressParm;
@@ -23,6 +12,16 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
+import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 /**
  * 读取excel(用户模板)
@@ -95,7 +94,11 @@ public class ReadExcel{
                     uiep.setPassword("123456");
                     uiep.setCompanyName(check(xssfRow.getCell(1),rowNum,listError));
                     uiep.setName( check(xssfRow.getCell(2),rowNum,listError));
-                    uiep.setTelephone( check(xssfRow.getCell(3),rowNum,listError));
+                    XSSFCell cell = xssfRow.getCell(3);
+                    if( cell.getCellType()== NUMERIC){
+                        cell.setCellType(STRING);
+                    }
+                    uiep.setTelephone(cell.toString());
                     uiep.setPersonInCharge(check(xssfRow.getCell(4),rowNum,listError));
                     uiep.setEmail( check(xssfRow.getCell(5),rowNum,listError));
                     uiep.setProvince(check(xssfRow.getCell(6),rowNum,listError));
