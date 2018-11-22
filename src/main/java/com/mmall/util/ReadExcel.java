@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 import static org.apache.poi.ss.usermodel.CellType.STRING;
 
 /**
@@ -95,9 +94,7 @@ public class ReadExcel{
                     uiep.setCompanyName(check(xssfRow.getCell(1),rowNum,listError));
                     uiep.setName( check(xssfRow.getCell(2),rowNum,listError));
                     XSSFCell cell = xssfRow.getCell(3);
-                    if( cell.getCellType()== NUMERIC){
-                        cell.setCellType(STRING);
-                    }
+                    cell.setCellType(STRING);
                     uiep.setTelephone(cell.toString());
                     uiep.setPersonInCharge(check(xssfRow.getCell(4),rowNum,listError));
                     uiep.setEmail( check(xssfRow.getCell(5),rowNum,listError));
