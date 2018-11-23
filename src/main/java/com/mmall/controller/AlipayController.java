@@ -46,13 +46,13 @@ public class AlipayController {
 
     @ApiOperation(value = "支付",  notes="需要Authorization")
     @PostMapping(value = "/{sysId}",produces = {"application/json;charest=Utf-8"})
-    public Result saveNotice(@PathVariable("sysId") Integer sysId) throws AlipayApiException {
-        SystemPrice systemPrice = systemPriceMapper.selectById(sysId);
+    public Result saveNotice(@PathVariable("sysId") String sysId) throws AlipayApiException {
+        /*SystemPrice systemPrice = systemPriceMapper.selectById(sysId);
         SysUserInfo user = UserInfoConfig.getUserInfo();
-        UseTerm useTerm = useTermMapper.selectOne(new QueryWrapper<UseTerm>().eq("user_id", user.getId()));
+        UseTerm useTerm = useTermMapper.selectOne(new QueryWrapper<UseTerm>().eq("user_id", user.getId()));*/
         long sysTime = System.currentTimeMillis();
         //当前时间是否大于使用截止时间
-        long add = sysTime-Long.parseLong(useTerm.getClosingDate());
+        /*long add = sysTime-Long.parseLong(useTerm.getClosingDate());
         String dateTime = null;
         if(add>=0){
             dateTime = DateTimeUtil.addDateNum(sysTime,systemPrice.getMonthNum())+"";
@@ -60,8 +60,8 @@ public class AlipayController {
             dateTime = DateTimeUtil.addDateNum(sysTime,systemPrice.getMonthNum())-add+"";
         }
         useTerm.setClosingDate(dateTime);
-        useTermMapper.updateById(useTerm);
-        return Result.ok(AlipayTrade.pay(systemPrice.getActualPrice()+"","blbl"+sysTime));
+        useTermMapper.updateById(useTerm);*/
+        return Result.ok(AlipayTrade.pay(sysId+"","blbl"+sysTime));
     }
 
     @ApiOperation(value = "notify",  notes="不需要Authorization")

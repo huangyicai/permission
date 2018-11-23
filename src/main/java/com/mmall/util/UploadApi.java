@@ -50,7 +50,7 @@ public class UploadApi {
             e.printStackTrace();
         }
         String name = file.getContentType();
-        String firstKey = RandomHelper.generateRandomStr(5) + file.getOriginalFilename();
+        String firstKey = RandomHelper.generateRandomStr(10) ;
         OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
         ObjectMetadata objectMetadata = new ObjectMetadata();
         // 设置content type
