@@ -402,7 +402,7 @@ public class XlsxProcessAbstract {
                 file.createNewFile();
 
                 //生成下载路径
-                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"账单-"+keyId+".xlsx";
+                String pathIpUrl=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+user.getName()+"/"+"客户追加账单"+"/"+threadDto.getKey()+"账单-"+keyId+".xlsx";
                 threadDto.setPath(pathIpUrl);
                 threadDto.setPathHead(path);
 
@@ -604,12 +604,12 @@ public class XlsxProcessAbstract {
             return Result.error(InfoEnums.NOT_UPDATE);
         }
 
-        //重名名账单
-        String[] timeStr=threadDto.getTime().split("-");
+//        //重名名账单
+//        String[] timeStr=threadDto.getTime().split("-");
 
         //生成下载路径
-        String path=threadDto.getPath()+threadDto.getTime()+"/"+threadDto.getCompanyName()+"/"+threadDto.getName()+"/"+threadDto.getKey()+"-"+timeStr[0]+"年"+timeStr[1]+"月账单-"+total.getOrderNo()+".xlsx";
-
+        String path=total.getCdUrl();
+        String replace = path.replace(LevelConstants.REALPATH, LevelConstants.OMPPATH);
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
@@ -653,7 +653,7 @@ public class XlsxProcessAbstract {
                 total.setTotalOffer(threadDto.getCost());
                 total.setTotalCost(BigDecimal.ZERO);
                 total.setTotalPaid(BigDecimal.ZERO);
-                total.setTotalUrl(path);
+                total.setTotalUrl(replace);
                 total.setTotalState(pricing);
                 totalMapper.updateById(total);
 
