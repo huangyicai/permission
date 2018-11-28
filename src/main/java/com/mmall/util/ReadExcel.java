@@ -83,7 +83,7 @@ public class ReadExcel{
 
                     SysUser userByusername =sysUserMapper.selectOne(new QueryWrapper<SysUser>().eq("username",uiep.getUsername()));
                     if(userByusername!=null){
-                        SysUserInfo sysUserInfo = sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id", userByusername.getId()).in("status", 0, 1));
+                        SysUserInfo sysUserInfo = sysUserInfoMapper.selectOne(new QueryWrapper<SysUserInfo>().eq("user_id", userByusername.getId()).in("status", -1,0, 1));
                         if(sysUserInfo!=null){
                             listError.add("第"+(rowNum+1)+"行用户已经存在");
                             continue;
@@ -118,11 +118,13 @@ public class ReadExcel{
      */
     public String check(XSSFCell xssfCell,Integer rowNum,List<String> listError){
         String s="";
-        if(xssfCell==null){
-            listError.add("第"+(rowNum+1)+"行有数据为空");
-        }else{
-            s = xssfCell.toString();
+        if(xssfCell!=null){
+            s = xssfCell.toString().replaceAll("\u00A0", "");
         }
-        return s.replaceAll("\u00A0", "");
+
+        if("".equals(s)){
+            listError.add("第"+(rowNum+1)+"行有数据为空");
+        }
+        return s;
     }
 }
