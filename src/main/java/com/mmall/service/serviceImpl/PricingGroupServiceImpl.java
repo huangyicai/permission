@@ -273,20 +273,15 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         List<PGVo> list = getList(file, userId);
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
-        //处理读取的数据
+        //处理读取的数据并判断空值
         for(PGVo pg:list){
 
-            //删除数据库原有的数据
-            List<PricingGroup> pricingGroups = totalMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id", pg.getUserId()).eq("city_id", pg.getCityId()));
-            if(pricingGroups.size()!=0){
-                totalMapper.delete(new UpdateWrapper<PricingGroup>().eq("user_id", pg.getUserId()).eq("city_id", pg.getCityId()));
-            }
+            Thread.yield();
 
             //根据省份分离数据
             map.put(pg.getCityId(),pg);
 
             //判断并处理空值
-
             if(pg.getFirstOrContinued()==1){
                 if(pg.getAreaBegin()==Double.parseDouble("0")||pg.getAreaEnd()==Double.parseDouble("0")){
                     if(pg.isNull()){
@@ -320,6 +315,13 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
                     listError.add(pg.getRow() + "行：金额不能为空");
                 }
             }
+
+            //判断区间末尾是否大于开始
+            if(pg.getAreaEnd()<=pg.getAreaBegin()){
+                City city = cityMapper.selectOne(new QueryWrapper<City>().eq("id", pg.getCityId()));
+                listError.add(city.getProvinceName()+":定价组区间["+pg.getAreaBegin()+","+pg.getAreaEnd()+"]区间的末尾必须大于开始");
+
+            }
         }
 
         //返回表格空值
@@ -328,7 +330,83 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         }
 
 
-        //todo 循环处理省份数据---------可以单独写成方法，此方法能直接校验数据定价组库集合数据
+        //判断表格无法识别的地址和首重续重重复
+        for (Integer key:map.keySet()) {
+
+            //删除数据库原有的数据
+            List<PricingGroup> pricingGroupss = totalMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id",userId).eq("city_id", key));
+            if(pricingGroupss.size()!=0){
+                totalMapper.delete(new UpdateWrapper<PricingGroup>().eq("user_id", userId).eq("city_id", key));
+            }
+
+            //获取当前省份数据
+            List<PGVo> pricingGroups = map.get(key);
+
+            List<PGVo> pricingGroupsOne=new ArrayList<>();
+
+            List<PGVo> pricingGroupsTwo=new ArrayList<>();
+
+            for(PGVo pv:pricingGroups){
+                if(pv.getFirstOrContinued()==1){
+                    pricingGroupsOne.add(pv);
+                    continue;
+                }
+
+                if(pv.getFirstOrContinued()==2){
+                    pricingGroupsTwo.add(pv);
+                }
+            }
+
+            //获取读取不到的省份数据
+            if(key==0){
+                for(PGVo pg:pricingGroups){
+                    if(pg.getRow()!=null && pg.isRowNo()){
+                        listError.add("表格第"+pg.getRow()+"行地址无法识别（检查是否有错字，或者本账单已存在该省份定价）");
+                    }
+                }
+                continue;
+            }
+
+            Collections.sort(pricingGroupsTwo, new Comparator<PricingGroup>(){
+
+                public int compare(PricingGroup o1, PricingGroup o2) {
+                    if(o1.getAreaBegin() < o2.getAreaBegin()){
+                        return -1;
+                    }
+                    if(o1.getAreaBegin() == o2.getAreaBegin()){
+                        return 0;
+                    }
+                    return 1;
+                }});
+
+            Collections.sort(pricingGroupsOne, new Comparator<PricingGroup>(){
+
+                public int compare(PricingGroup o3, PricingGroup o4) {
+                    if(o3.getAreaBegin() > o4.getAreaBegin()){
+                        return -1;
+                    }
+                    if(o3.getAreaBegin() == o4.getAreaBegin()){
+                        return 0;
+                    }
+                    return 1;
+                }});
+
+            //判断最大首重值和最小续重值是否相差0.01
+            BigDecimal begin=new BigDecimal(pricingGroupsTwo.get(0).getAreaBegin().toString());
+            BigDecimal end =new BigDecimal(pricingGroupsOne.get(0).getAreaEnd().toString());
+            boolean b = begin.subtract(end).compareTo(new BigDecimal("0.01"))==0;
+            if(!b){
+                City city = cityMapper.selectOne(new QueryWrapper<City>().eq("id", key));
+                listError.add(city.getProvinceName()+"：最大首重的值和最小续重的值大小差距只能为0.01");
+            }
+        }
+
+        //返回表格首重和续重重复的数据
+        if(listError.size()!=0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
+
+        //判断连续的区间是否合法
         for (Integer key:map.keySet()) {
 
             Thread.yield();
@@ -336,21 +414,9 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             //获取当前省份数据
             List<PGVo> pricingGroups = map.get(key);
 
-            //获取读取不到的省份数据
-            if(key==0){
-                for(PGVo pg:pricingGroups){
-                    if(pg.getRow()!=null && pg.isRowNo()){
-                        listError.add("表格第"+pg.getRow()+"行地址无法识别");
-                    }
-                }
-                continue;
-            }
-
             Collections.sort(pricingGroups, new Comparator<PricingGroup>(){
 
                 public int compare(PricingGroup o1, PricingGroup o2) {
-
-                    //按照金额大小进行降序排列
                     if(o1.getAreaBegin() < o2.getAreaBegin()){
                         return -1;
                     }
@@ -479,25 +545,28 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
                 //获取省份
                 String check = check1(xssfRow.getCell(0));
-                String check3 = check1(xssfRow.getCell(7));
-                if("".equals(check) || check==null){
-                    if("".equals(check3) || check3==null){
-                        break;
-                    }
+                String check3 = check1(xssfRow.getCell(4));
+                String check44 = check1(xssfRow.getCell(1));
+                if("".equals(check) &&"".equals(check3) && "".equals(check44)){
+                    break;
                 }
 
                 if(!"".equals(check) && check!=null){
+                    Integer CityIdTwo=CityId;
                     for(City c:cities){
                         if(check.startsWith(c.getProvinceName())){
                             CityId=c.getId();
+                            break;
                         }
+                    }
+                    if(CityIdTwo==CityId){
+                        CityId=0;
                     }
                     CityNum=0;
                 }
 
                 //添加首重
-                String check44 = check1(xssfRow.getCell(0));
-                if(!"".equals(check) && !"".equals(check44)){
+                if(!"".equals(check44)){
                     PGVo pg=new PGVo();
                     if(CityId==0 && CityNum==0){
                         CityNum++;
