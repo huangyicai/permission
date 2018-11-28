@@ -39,7 +39,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param waybillNumber
      * @return
      */
-    Result getAllCustomerServiceByUser(Integer status, Integer id, Page ipage, String waybillNumber);
+    Result getAllCustomerServiceByUser(Integer errorId,Integer status, Integer id, Page ipage, String waybillNumber);
 
     /**
      * 客服接取工单
@@ -93,4 +93,11 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result getAllByNoHandle(SysUserInfo user);
+
+    /**
+     * 获取商户名
+     * @param userInfo
+     * @return
+     */
+    Result getUserKeys(SysUserInfo userInfo);
 }

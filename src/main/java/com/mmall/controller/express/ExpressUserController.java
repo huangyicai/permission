@@ -47,6 +47,18 @@ public class ExpressUserController {
         return expressUserService.expressRegister(user,parent,id,level);
     }
 
+
+    @ApiOperation(value = "修改商户信息",  notes="需要Authorization")
+    @PutMapping(value = "/put",produces = {"application/json;charest=Utf-8"})
+    public Result expressUpdateInfo(@RequestBody UserInfoExpressParm user){
+        return expressUserService.expressUpdateInfo(user);
+    }
+
+    @ApiOperation(value = "商户密码重置",  notes="需要Authorization")
+    @PostMapping(value = "/password/reset/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result passwordReset(@PathVariable("id") Integer id){
+        return expressUserService.passwordReset(id);
+    }
     @ApiOperation(value = "快递公司注册(导入)",  notes="需要Authorization")
     @PostMapping(value = "/importUser/{id}",produces = {"application/json;charest=Utf-8"})
     public Result importUser(@RequestParam("file") MultipartFile file,@PathVariable("id") Integer id) throws IOException, InterruptedException {

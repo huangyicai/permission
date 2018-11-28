@@ -132,6 +132,7 @@ public class PricingGroupController {
         SpecialPricingGroupKey key_name = specialPricingGroupKeyMapper.selectOne(new QueryWrapper<SpecialPricingGroupKey>()
                 .eq("key_name", keyName.getKeyName())
                 .eq("user_id",userId));
+
         if(key_name!=null){
             return Result.error(InfoEnums.KEY_EXISTENCE);
         }

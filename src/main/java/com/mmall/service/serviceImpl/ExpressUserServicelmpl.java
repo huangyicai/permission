@@ -1,10 +1,9 @@
 package com.mmall.service.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
+import com.mmall.component.ApplicationContextHelper;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysUserInfoDto;
@@ -19,6 +18,7 @@ import com.mmall.util.LevelUtil;
 import com.mmall.util.ReadExcel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -143,19 +144,39 @@ public class ExpressUserServicelmpl implements ExpressUserService {
     }
     @Transactional
     public Result deleteUser(Integer id) {
+        SysUserInfo user = UserInfoConfig.getUserInfo();
         SysUserInfo userInfo = sysUserInfoMapper.selectById(id);
-
+        Integer expressId = userInfo.getParentId();
+        if(user.getId()==expressId||user.getId().equals(expressId)){
+            return Result.error(InfoEnums.BRANCH_NOTDELETE);
+        }
         if(userInfo.getStatus()==-1){
             return Result.error(InfoEnums.USER_NOT_EXISTENCE);
         }else {
             userInfo.setStatus(-1);
         }
+
         sysUserInfoMapper.updateById(userInfo);
+        sysUserInfoMapper.updateUserList("%."+id+"%");
         sysUserMapper.deleteById(userInfo.getUserId());
         return Result.ok();
     }
-
     public Result saveKeyword(BillKeyword billKeywords) {
+
+        /*List<BillKeyword> key_names = billKeywordMapper.selectList(new QueryWrapper<BillKeyword>()
+                .eq("keyword", billKeywords.getKeyword()).eq("status",1));
+        Set<Integer> set = Sets.newHashSet();
+        SysUserInfo sysUserInfo1 = sysUserInfoMapper.selectById(billKeywords.getUserId());
+        Integer a = Integer.parseInt(sysUserInfo1.getLevel().split("\\.")[2]);
+        set.add(a);
+        for (BillKeyword sk:key_names) {
+            SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(sk.getUserId());
+            Integer s = Integer.parseInt(sysUserInfo.getLevel().split("\\.")[2]);
+            boolean add = set.add(s);
+            if(!add){
+                return Result.error(InfoEnums.ERROR,sysUserInfo.getName()+"账户中存在此商户名");
+            }
+        }*/
         Integer id = billKeywordMapper.insertBillKeyword(billKeywords);
         return Result.ok(billKeywords);
     }
@@ -210,6 +231,10 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .eq("parent_id", userInfo.getId())
                 .eq("platform_id",LevelConstants.EXPRESS)
                 .in("status",1,0));
+        for (SysUserInfo su:sysUserInfos){
+            SysUser sysUser = sysUserMapper.selectById(su.getUserId());
+            su.setCompanyName(sysUser.getUsername());
+        }
         Multimap<String, SysUserInfo> userMap = ArrayListMultimap.create();
         String userService = "userService";//客服
         String userOperate = "userOperate";//运营
@@ -220,6 +245,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         Map<String,List<SysUserInfo>> map = Maps.newHashMap();
         //客服集合
         List<SysUserInfo> userServiceList = (List<SysUserInfo>) userMap.get(userService);
+
         //运营集合
         List<SysUserInfo> userOperateList = (List<SysUserInfo>) userMap.get(userOperate);
 
@@ -235,6 +261,34 @@ public class ExpressUserServicelmpl implements ExpressUserService {
             fnContacts = fnContactsMapper.selectOne(new QueryWrapper<FnContacts>().eq("id",1));
         }
         return Result.ok(fnContacts);
+    }
+
+    @Override
+    public Result expressUpdateInfo(UserInfoExpressParm user) {
+        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(user.getId());
+        sysUserInfo.setCompanyName(user.getCompanyName());
+
+        sysUserInfo.setProvince(user.getProvince());
+        sysUserInfo.setCity(user.getCity());
+        sysUserInfo.setArea(user.getArea());
+
+        sysUserInfo.setAddress(user.getAddress());
+        sysUserInfo.setName(user.getName());
+        sysUserInfo.setEmail(user.getEmail());
+        sysUserInfo.setPersonInCharge(user.getPersonInCharge());
+        sysUserInfo.setTelephone(user.getTelephone());
+        sysUserInfoMapper.updateById(sysUserInfo);
+        return Result.ok();
+    }
+
+    @Override
+    public Result passwordReset(Integer id) {
+        Integer userId = sysUserInfoMapper.selectById(id).getUserId();
+        SysUser sysUser = sysUserMapper.selectById(userId);
+        Md5Hash md = new Md5Hash("123456",sysUser.getUsername(),1024);
+        sysUser.setPassword(md.toString());
+        sysUserMapper.updateById(sysUser);
+        return Result.ok();
     }
 
 

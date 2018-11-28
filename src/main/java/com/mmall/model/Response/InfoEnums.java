@@ -5,7 +5,7 @@ public enum InfoEnums {
 	ERROR(10001,"请稍后重试！"),
 	AUTHORIZATION(10002,"已授权"),
 	PARAM_NOT(10003,"参数不正确！"),
-	USERNAME_EXISTENCE(10004,"用户名已存在！"),
+	USERNAME_EXISTENCE(10004,"该账号已存在！"),
 	USER_NOT_EXISTENCE(10005,"账号不存在"),
 	USER_NOT_FROZEN(10006,"账号被冻结"),
 	SignIn(10008,"请先登录！"),
@@ -20,6 +20,9 @@ public enum InfoEnums {
 	KEY_EXISTENCE(10017,"已有相同关键字定价组！"),
 	PLEASE_ADD_PRICING(10018,"请添加定价！"),
 	ADD_PAYMENT_INSTITUTION(10015,"请先为该分支添加付款机构！"),
+	SERVICE_HANDLED(10020,"此工单已被处理"),
+	BRANCH_NOTDELETE(10021,"该分支为主分支，不能删除！"),
+
 
 	//oss相关
 	FILE_ERRO(100000,"文件不合法"),

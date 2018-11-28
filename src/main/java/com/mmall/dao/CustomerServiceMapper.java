@@ -46,9 +46,10 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      * @return
      */
     Page<ReplynumServiceDto> getAllCustomerServiceByUser(Page ipage,
-                                     @Param("status") Integer status,
-                                     @Param("userId")Integer userId,
-                                     @Param("waybillNumber")String waybillNumber);
+                                                         @Param("errorId") Integer errorId,
+                                                         @Param("status") Integer status,
+                                                        @Param("userId")Integer userId,
+                                                        @Param("waybillNumber")String waybillNumber);
 
     /**
      * 客服获取自己处理的工单

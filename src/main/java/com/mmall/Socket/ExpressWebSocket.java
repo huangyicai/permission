@@ -159,6 +159,30 @@ public class ExpressWebSocket {
         }
     }
 
+    /**
+     * 工单消息
+     */
+    public static void sendMsgAddServicesLists(List<SysUserInfo> sysUserInfos,String content,String wayNum,Integer type){
+
+        for(SysUserInfo sysUserInfo :sysUserInfos){
+            Session session = map.get(sysUserInfo);
+            if(session==null)continue;
+            boolean open = session.isOpen();
+            if(!open) continue;
+            Gson gson = new Gson();
+            Map<Object, Object> map = Maps.newHashMap();
+            map.put("type",type);//工单（4=客户添加工单，5='我来处理'）提示
+            map.put("content",content);//提示内容
+            map.put("wayNum",wayNum);//运单号
+            try {
+                session.getBasicRemote().sendText(gson.toJson(map));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
 
 
     /**

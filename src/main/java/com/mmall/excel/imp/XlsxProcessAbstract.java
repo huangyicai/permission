@@ -185,7 +185,7 @@ public class XlsxProcessAbstract {
             nameStr+=sysUserInfo.getId()+",";
         }
 
-        nameStr=nameStr.substring(0,nameStr.length()-1);
+        //nameStr=nameStr.substring(0,nameStr.length()-1);
 
         //獲取姓名集合
         List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);

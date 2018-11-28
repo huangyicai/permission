@@ -42,6 +42,12 @@ public class CustomerService implements Serializable {
     @TableField("user_id")
     private Integer userId;
     /**
+     * 商户名
+     */
+    @ApiModelProperty(value = "用户id")
+    @TableField("user_key")
+    private String userKey;
+    /**
      * 所属快递公司id
      */
     @ApiModelProperty(value = "所属快递公司id")
@@ -146,6 +152,13 @@ public class CustomerService implements Serializable {
     @TableField("update_time")
     private String updateTime;
 
+    public String getUserKey() {
+        return userKey;
+    }
+
+    public void setUserKey(String userKey) {
+        this.userKey = userKey;
+    }
 
     public long getReceiveTimeSolt() {
         return receiveTimeSolt;
@@ -310,9 +323,10 @@ public class CustomerService implements Serializable {
     public CustomerService() {
     }
 
-    public CustomerService(Integer id, Integer userId, Integer expressId, Integer handleId, String handleName, String waybillNumber, String content, String contacts, String phone, String enclosure, String receiveTime, String endTime, long receiveTimeSolt, long endTimeSolt, Integer typeId, String typeName, Integer status, String remarks, String createTime, String updateTime) {
+    public CustomerService(Integer id, Integer userId, String userKey, Integer expressId, Integer handleId, String handleName, String waybillNumber, String content, String contacts, String phone, String enclosure, String receiveTime, String endTime, long receiveTimeSolt, long endTimeSolt, Integer typeId, String typeName, Integer status, String remarks, String createTime, String updateTime) {
         this.id = id;
         this.userId = userId;
+        this.userKey = userKey;
         this.expressId = expressId;
         this.handleId = handleId;
         this.handleName = handleName;
@@ -332,7 +346,6 @@ public class CustomerService implements Serializable {
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
-
 
     @Override
     public boolean equals(Object o) {

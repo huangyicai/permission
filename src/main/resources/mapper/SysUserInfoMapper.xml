@@ -18,6 +18,9 @@
     <sql id="Base_Column_List">
         id, name, email, company_name as companyName,province,city,area,address,telephone,person_in_charge,create_time
     </sql>
+    <update id="updateUserList">
+        UPDATE sys_user_info set  status=-1 where `level` LIKE #{s} and status!=-1
+    </update>
 
     <select id="findUserByusername" parameterType="String" resultType="com.mmall.model.SysUserInfo">
         SELECT

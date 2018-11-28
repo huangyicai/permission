@@ -98,4 +98,18 @@ public interface ExpressUserService {
      * @return
      */
     Result getFnContacts(SysUserInfo userInfo);
+
+    /**
+     * 修改商户信息
+     * @param user
+     * @return
+     */
+    Result expressUpdateInfo(UserInfoExpressParm user);
+
+    /**
+     * 商户密码重置
+     * @param id
+     * @return
+     */
+    Result passwordReset(Integer id);
 }
