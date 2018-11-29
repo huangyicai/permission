@@ -5,11 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
-import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.vo.TotalVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -60,6 +58,7 @@ public interface TotalMapper extends BaseMapper<Total> {
                                                       @Param("status")Integer status,
                                                       @Param("userId")String userId,
                                                       @Param("date")String date,
+                                                      @Param("endDate")String endDate,
                                                       @Param("id")Integer id);
 
     /**

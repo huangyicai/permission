@@ -1,16 +1,16 @@
 package com.mmall.model;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 
 /**
@@ -76,7 +76,7 @@ public class PricingGroup implements Serializable {
     private Double firstWeight;
 
     /**
-     * 续重关联的首重
+     * 续重关联的首重价格
      */
     @ApiModelProperty(value = "续重关联的首重价格")
     @TableField("first_weight_price")

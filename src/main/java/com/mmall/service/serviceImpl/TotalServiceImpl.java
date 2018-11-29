@@ -35,6 +35,7 @@ import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -190,7 +191,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
 
         //应收数据
-        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4");
+        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
 
         //实收数据
         Total Paid = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"4");
@@ -296,7 +297,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @return
      */
     @Transactional
-    public Result<String> getPricing(Integer totalId,Integer type) {
+    public Result<String> getPricing(Integer totalId) {
 
         //成本
         BigDecimal totalCost=BigDecimal.ZERO;
@@ -307,13 +308,13 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
 
+        if(total==null){
+            return  Result.error(InfoEnums.BILL_IS_NULL);
+        }
+
         //判断是否能够定价
         if(total.getTotalState()>1){
             return Result.error(InfoEnums.TOATL_IS_PRICING);
-        }
-
-        if(total==null){
-            return  Result.error(InfoEnums.BILL_IS_NULL);
         }
 
         //獲取报价表
@@ -350,13 +351,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             list.addAll(map.get(key));
         }
 
-        if(type==2){
-
-            //校验成本表是否存在数据
-            List<Integer> ag = pricingGroupMapper.getAllPricingGroups(total.getSendId());
-            if(ag.size()!=34){
-                return Result.error(InfoEnums.COST_IS_NULL);
-            }
+        //判断是否成本定价
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        SysUserInfo byId = sysUserInfoService.getById(userInfo.getId());
+        if(byId.getPricingStatus()==1){
 
             //获取成本表
             List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(total.getSendId());
@@ -466,9 +464,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     }
 
     @Override
-    public Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date, Page ipage) {
+    public Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date,String endDate, Page ipage) {
         Total sumBiLLDetails = totalMapper.getSumBiLLDetails( status,userId, date, userInfo.getId());
-        totalMapper.getAllBySendIdAndCreateTimeAndUserIds(ipage,status,userId,date,userInfo.getId());
+        totalMapper.getAllBySendIdAndCreateTimeAndUserIds(ipage,status,userId,date,endDate,userInfo.getId());
         Map<String,Object> map = Maps.newHashMap();
         if(sumBiLLDetails==null){
             sumBiLLDetails = new Total();
@@ -580,6 +578,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         return Result.ok();
     }
 
+
+
     /**
      * 计算价格
      * @param pricingGroupVo 计算表
@@ -656,7 +656,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for (Bill bill:list) {
 
             Boolean traverse=false;
-            Thread.yield();
+
             //遍历特殊定价组
             if(specialFirst.size()>0){
                 traverse = traverse(bill,specialFirst, specialContinued, type);
@@ -853,9 +853,34 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)));
                     }
-
                 }
             }
         }
+    }
+
+    /**
+     * 获取未付款账单提示
+     * @return
+     */
+    @Override
+    public Result getNotPaying() {
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        List<Total> list = totalService.list(new QueryWrapper<Total>()
+                .eq(user.getId() != null, "user_id", user.getId()).in("total_state",2,5));
+        List<Map<String,String>> li=new ArrayList<>();
+
+        if(list.size()==0){
+            return Result.ok(li);
+        }
+
+        for(Total t:list){
+            Map<String,String> map=new HashMap<>();
+            map.put("totalId",t.getTotalId().toString());
+            map.put("totalName",t.getName());
+            map.put("totalTime",t.getTotalTime());
+            map.put("money",t.getTotalOffer().subtract(t.getTotalPaid()).toString());
+            li.add(map);
+        }
+        return Result.ok(li);
     }
 }

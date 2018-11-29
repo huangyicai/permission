@@ -13,9 +13,9 @@ import com.mmall.model.params.BillDetailsParam;
 import com.mmall.model.params.BillParam;
 import com.mmall.model.params.TotalIncomeParam;
 import com.mmall.model.params.TotalParam;
+import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -48,7 +48,7 @@ public interface TotalService extends IService<Total> {
     Result polling(String time, Integer id,String fileName);
 
 
-    Result<String> getPricing(Integer totalId,Integer type);
+    Result<String> getPricing(Integer totalId);
 
     String getUserIdStr();
 
@@ -58,7 +58,7 @@ public interface TotalService extends IService<Total> {
      * @param ipage
      * @return
      */
-    Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date, Page ipage);
+    Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date,String endDate,Page ipage);
 
     /**
      * 其他账单转发
@@ -75,4 +75,19 @@ public interface TotalService extends IService<Total> {
     Result<List<Bill>> getBudget(Double weight, Integer userId);
 
     Result sendAll(TotalParam totalParam);
+
+    Result getNotPaying();
+
+    List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
+                                   Integer type,
+                                   List<Bill> list,
+                                   List<PricingGroupVo> special);
+
+    Boolean traverse(Bill bill,List<PricingGroupVo> first,
+                            List<PricingGroupVo> Continued,
+                            Integer type);
+
+    void additional(Bill bill,List<PricingGroupVo> first,
+                           List<PricingGroupVo> Continued,
+                           Integer type);
 }

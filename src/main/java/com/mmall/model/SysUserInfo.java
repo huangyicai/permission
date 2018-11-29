@@ -1,21 +1,18 @@
 package com.mmall.model;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.dto.SysUserInfoDto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
-import com.baomidou.mybatisplus.annotation.TableId;
 
 
 /**
@@ -63,8 +60,13 @@ public class SysUserInfo extends Model<SysUserInfo> {
     @JsonView(SysUserInfoDto.UserInfoView.class)
     @TableField("person_in_charge")
     private String personInCharge;
+
     @ApiModelProperty(value = "该条记录是否有效1:有效、0：无效 ,-1冻结")
     private Integer status;
+
+    @ApiModelProperty(value = "是否自动定价成本：0-否，1-是")
+    @TableField("pricing_status")
+    private Integer pricingStatus;
 
     @ApiModelProperty(value = "2：运营好 ，1:老板号，0：其他")
     private Integer display;
@@ -91,6 +93,15 @@ public class SysUserInfo extends Model<SysUserInfo> {
     @JsonView(SysUserInfoDto.UserInfoView.class)
     private Integer platformId;
     //private String  platformName;
+
+
+    public Integer getPricingStatus() {
+        return pricingStatus;
+    }
+
+    public void setPricingStatus(Integer pricingStatus) {
+        this.pricingStatus = pricingStatus;
+    }
 
     public Integer getCourierId() {
         return courierId;
@@ -347,5 +358,28 @@ public class SysUserInfo extends Model<SysUserInfo> {
         result = 31 * result + (courierId != null ? courierId.hashCode() : 0);
         result = 31 * result + (platformId != null ? platformId.hashCode() : 0);
         return result;
+    }
+
+    public SysUserInfo(Integer id, Integer userId, String name, String email, String companyName, String province, String city, String area, String address, String telephone, String personInCharge, Integer status, Integer pricingStatus, Integer display, String createTime, String updateTime, String level, Integer parentId, Integer courierId, Integer platformId) {
+        this.id = id;
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.companyName = companyName;
+        this.province = province;
+        this.city = city;
+        this.area = area;
+        this.address = address;
+        this.telephone = telephone;
+        this.personInCharge = personInCharge;
+        this.status = status;
+        this.pricingStatus = pricingStatus;
+        this.display = display;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.level = level;
+        this.parentId = parentId;
+        this.courierId = courierId;
+        this.platformId = platformId;
     }
 }

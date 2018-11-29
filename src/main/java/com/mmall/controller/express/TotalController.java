@@ -59,22 +59,58 @@ public class TotalController {
     private SysUserInfoMapper sysUserInfoMapper;
 
     @ApiOperation(value = "确认收款",  notes="需要Authorization")
-    @GetMapping(value = "/update/{totalId}")
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "type",value = "类型：1-全部付款，2-部分付款",dataType = "Integer",paramType = "path")
+    )
+    @GetMapping(value = "/update/{totalId}/{type}")
     public Result updateSatte(@PathVariable(value = "totalId") Integer totalId,
+                              @PathVariable(value = "type") Integer type,
                               @RequestParam(value = "money") String money){
 
         Total byId = totalService.getById(totalId);
 
-        if(byId==null || byId.getTotalState()!=3){
+        if(byId.getTotalState()==2||byId.getTotalState()==5||byId.getTotalState()==3){
+            Integer state=(type==1?4:5);
+            Total total=new Total();
+            total.setTotalId(totalId);
+            total.setTotalPaid(byId.getTotalPaid().add(new BigDecimal(money)));
+            total.setTotalState(state);
+            total.setUpdateTime(new Date());
+            totalService.updateById(total);
+        }else{
             return Result.error(InfoEnums.NO_PAYMENT);
         }
 
-        Total total=new Total();
-        total.setTotalId(totalId);
-        total.setTotalPaid(new BigDecimal(money));
-        total.setTotalState(4);
-        total.setUpdateTime(new Date());
-        totalService.updateById(total);
+        return Result.ok();
+    }
+
+    @ApiOperation(value = "自我结账",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "totalId",value = "账单id",dataType = "long",paramType = "path"),
+            @ApiImplicitParam(name = "type",value = "类型：1-全部付款，2-部分付款",dataType = "long",paramType = "path"),
+            @ApiImplicitParam(name = "money",value = "收款金额",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "totalCredentialsUrl",value = "凭证路径",dataType = "String",paramType = "query")
+    } )
+    @PostMapping(value = "/selfCollection/{totalId}/{type}")
+    public Result selfCollection(@PathVariable(value = "totalId") Integer totalId,
+                              @PathVariable(value = "type") Integer type,
+                              @RequestParam(value = "money") String money,
+                              @RequestParam(value = "totalCredentialsUrl") String totalCredentialsUrl){
+
+        Total byId = totalService.getById(totalId);
+        if(byId.getTotalState()==2||byId.getTotalState()==5||byId.getTotalState()==3){
+            String url="".equals(byId.getTotalCredentialsUrl())?totalCredentialsUrl:byId.getTotalCredentialsUrl()+"$$$"+totalCredentialsUrl;
+            Integer state=(type==1?4:5);
+            Total total=new Total();
+            total.setTotalId(totalId);
+            total.setTotalPaid(byId.getTotalPaid().add(new BigDecimal(money)));
+            total.setTotalState(state);
+            total.setUpdateTime(new Date());
+            total.setTotalCredentialsUrl(url);
+            totalService.updateById(total);
+        }else{
+            return Result.error(InfoEnums.NO_PAYMENT);
+        }
         return Result.ok();
     }
 
@@ -212,13 +248,10 @@ public class TotalController {
     }
 
     @ApiOperation(value = "定价",  notes="需要Authorization")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "type",value = "类型：1-计算应付费用，2-都计算",dataType = "Integer",paramType = "path")
-    })
+
     @GetMapping(value = "/getPricing/{totalId}/{type}")
-    public Result<String> getPricing(@PathVariable("totalId")Integer totalId,
-                                     @PathVariable("type")Integer type){
-        return  totalService.getPricing(totalId,type);
+    public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
+        return  totalService.getPricing(totalId);
     }
 
     @ApiOperation(value = "试算",  notes="需要Authorization")
@@ -252,12 +285,13 @@ public class TotalController {
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
     public Result getBillDetails(@RequestParam(name = "userId") String userId,
                                  @RequestParam(name = "date") String date,
+                                 @RequestParam(name = "endDate") String endDate,
                                  @PathVariable("status")Integer status,
                                  @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                  @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
-        return totalService.getBillDetails( status,userInfo,userId,date,ipage);
+        return totalService.getBillDetails( status,userInfo,userId,date,endDate,ipage);
     }
 
     @ApiOperation(value = "其他账单转发",  notes="需要Authorization")

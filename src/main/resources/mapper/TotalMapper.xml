@@ -185,10 +185,19 @@
           total t
           LEFT JOIN sys_user_info u on u.id=t.user_id
         <where>
-            t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId})
+            t.send_id=#{id} and FIND_IN_SET(t.user_id,#{userId})
+            <if test="endDate!=null and endDate!='' and date!=null and date!=''">
+                and t.total_time BETWEEN #{date} and #{endDate}
+            </if>
+
+            <if test="endDate==null and endDate=='' and date!=null and date!=''">
+                and t.total_time=#{date}
+            </if>
+
             <if test="status>1">
                 and t.total_state=#{status}
             </if>
+
             <if test="status &lt;= 1">
                 and t.total_state>1
             </if>

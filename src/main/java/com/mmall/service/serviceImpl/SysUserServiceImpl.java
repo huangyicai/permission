@@ -4,7 +4,6 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -12,14 +11,14 @@ import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.SysMenuDto;
-import com.mmall.dto.SysUserInfoDto;
 import com.mmall.dto.SysUserInfoTypeDto;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.*;
 import com.mmall.model.params.UserInfoExpressParm;
 import com.mmall.model.params.UserInfoServiceParm;
 import com.mmall.model.params.UserPasswordParam;
+import com.mmall.service.SysUserInfoService;
 import com.mmall.service.SysUserService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.LevelUtil;
@@ -70,6 +69,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private FnAndUserMapper fnAndUserMapper;
     @Autowired
     private FnContactsMapper fnContactsMapper;
+
+    @Autowired
+    private SysUserInfoService sysUserInfoService;
 
     public Comparator<SysMenuDto> menusSeqComparator = new Comparator<SysMenuDto>() {
         public int compare(SysMenuDto o1, SysMenuDto o2) {
@@ -340,12 +342,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     public Result<Map<String,Object>> getUserInfo(SysUserInfo user) {
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        SysUserInfo byId = sysUserInfoService.getById(userInfo.getId());
         SysUser sysUser = sysUserMapper.selectById(user.getUserId());
         sysUser.setPassword("***********");
         user = sysUserInfoMapper.selectById(user.getId());
         Map<String,Object> map = Maps.newHashMap();
         map.put("user",sysUser);
         map.put("userInfo",user);
+        map.put("pricingStatus",byId.getPricingStatus()==null?0:byId.getPricingStatus());
         return Result.ok(map);
     }
 

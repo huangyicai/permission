@@ -117,6 +117,7 @@ public class ReadExcel{
      * @return
      */
     public String check(XSSFCell xssfCell,Integer rowNum,List<String> listError){
+        xssfCell.setCellType(STRING);
         String s="";
         if(xssfCell!=null){
             s = xssfCell.toString().replaceAll("\u00A0", "");
