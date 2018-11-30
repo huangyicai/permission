@@ -91,7 +91,7 @@ public class TotalController {
             @ApiImplicitParam(name = "money",value = "收款金额",dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "totalCredentialsUrl",value = "凭证路径",dataType = "String",paramType = "query")
     } )
-    @PostMapping(value = "/selfCollection/{totalId}/{type}")
+    @GetMapping(value = "/selfCollection/{totalId}/{type}")
     public Result selfCollection(@PathVariable(value = "totalId") Integer totalId,
                               @PathVariable(value = "type") Integer type,
                               @RequestParam(value = "money") String money,

@@ -49,7 +49,11 @@ public class CustomerTotalController {
         Total total= totalService.getById(credentialsParam.getTotalId());
         //total.setTotalId(credentialsParam.getTotalId());
         total.setTotalState(3);
-        total.setTotalCredentialsUrl(credentialsParam.getTotalCredentialsUrl());
+        if(total.getTotalCredentialsUrl()==null||total.getTotalCredentialsUrl()==""||"".equals(total.getTotalCredentialsUrl())){
+            total.setTotalCredentialsUrl(credentialsParam.getTotalCredentialsUrl());
+        }else{
+            total.setTotalCredentialsUrl(total.getTotalCredentialsUrl()+"$$$"+credentialsParam.getTotalCredentialsUrl());
+        }
         totalService.updateById(total);
 
         SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(total.getSendId());
