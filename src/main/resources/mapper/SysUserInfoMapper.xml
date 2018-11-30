@@ -21,6 +21,9 @@
     <update id="updateUserList">
         UPDATE sys_user_info set  status=-1 where `level` LIKE #{s} and status!=-1
     </update>
+    <update id="updataUserLevelAndParentId">
+        UPDATE sys_user_info set level=#{level} , parent_id=#{toBranchId} where FIND_IN_SET(id,#{userIds})
+    </update>
 
     <select id="findUserByusername" parameterType="String" resultType="com.mmall.model.SysUserInfo">
         SELECT

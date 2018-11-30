@@ -79,4 +79,13 @@ public class FnContacts implements Serializable {
         ", phone=" + phone +
         "}";
     }
+
+    public FnContacts() {
+    }
+
+    public FnContacts(Integer id, String name, String phone) {
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+    }
 }

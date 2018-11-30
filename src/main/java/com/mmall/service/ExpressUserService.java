@@ -112,4 +112,26 @@ public interface ExpressUserService {
      * @return
      */
     Result passwordReset(Integer id);
+
+    /**
+     * 获取分支列表
+     * @param user
+     * @return
+     */
+    Result<List<SysUserInfoDto>> getCusmotersBranch(SysUserInfo user);
+
+    /**
+     * 获取分支下的所有客户
+     * @param id
+     * @return
+     */
+    Result<List<SysUserInfo>> getBranchCusmotersUser(Integer id);
+
+    /**
+     * 转移分支下的客户
+     * @param toBranchId
+     * @param userIds
+     * @return
+     */
+    Result<List<SysUserInfo>> transferBranchCusmotersUser(Integer toBranchId, String userIds);
 }

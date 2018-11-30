@@ -178,6 +178,7 @@
             t.total_offer as totalOffer,
             t.total_paid as totalPaid,
             t.total_state as totalState,
+            t.total_credentials_url as totalCredentialsUrl,
             u.name as nameNick,
             u.person_in_charge as personInCharge,
             u.telephone

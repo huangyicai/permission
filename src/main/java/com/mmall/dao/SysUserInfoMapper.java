@@ -22,4 +22,8 @@ public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
     List<SysUserInfo> findAllLikeLevel(String level);
 
     int updateUserList(@Param("s") String s);
+
+    int updataUserLevelAndParentId(@Param("userIds") String userIds,
+                                   @Param("level")String level,
+                                   @Param("toBranchId")Integer toBranchId);
 }

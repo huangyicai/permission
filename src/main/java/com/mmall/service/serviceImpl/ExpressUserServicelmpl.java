@@ -259,6 +259,13 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         FnContacts fnContacts = fnContactsMapper.getOneFnContacts(userInfo.getId());
         if(fnContacts==null){
             fnContacts = fnContactsMapper.selectOne(new QueryWrapper<FnContacts>().eq("id",1));
+            if(fnContacts==null){
+                List<FnContacts> fnContactsList = fnContactsMapper.selectList(new QueryWrapper<FnContacts>());
+                if(fnContactsList.isEmpty()){
+                    fnContacts = new FnContacts(1,"黄益财","18069000780");
+                    fnContactsMapper.insert(fnContacts);
+                }
+            }
         }
         return Result.ok(fnContacts);
     }
@@ -291,6 +298,60 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         return Result.ok();
     }
 
+    @Override
+    public Result<List<SysUserInfoDto>> getCusmotersBranch(SysUserInfo user) {
+
+        Integer id = user.getId();
+        //List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
+        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .like("level","%"+id+"%")
+                .in("status",1,0)
+                .eq("platform_id",LevelConstants.BRANCH));
+        String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
+        List<SysUserInfoDto> dtoList = Lists.newArrayList();
+        for (SysUserInfo sysUserInfo : sysUserInfos) {
+            dtoList.add(SysUserInfoDto.adapt(sysUserInfo));
+        }
+        if (CollectionUtils.isEmpty(dtoList)) {
+            return Result.ok(dtoList);
+        }
+        // level -> [aclmodule1, aclmodule2, ...] Map<String, List<Object>>
+        Multimap<String, SysUserInfoDto> levelMap = ArrayListMultimap.create();
+        List<SysUserInfoDto> rootList = Lists.newArrayList();
+        for (SysUserInfoDto dto : dtoList) {
+            levelMap.put(dto.getLevel(), dto);
+            if (nextLevel.equals(dto.getLevel())) {
+                rootList.add(dto);
+            }
+        }
+        transformUserInfoTree(rootList, nextLevel, levelMap);
+        return Result.ok(rootList);
+    }
+
+    @Override
+    public Result<List<SysUserInfo>> getBranchCusmotersUser(Integer id) {
+        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .eq("parent_id",id)
+                .in("status",1,0)
+                .eq("platform_id",LevelConstants.SERVICE));
+        return Result.ok(sysUserInfos);
+    }
+
+    @Override
+    public Result<List<SysUserInfo>> transferBranchCusmotersUser(Integer toBranchId, String userIds) {
+        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(toBranchId);
+        String level = sysUserInfo.getLevel()+"."+toBranchId;
+        int i = sysUserInfoMapper.updataUserLevelAndParentId(userIds, level, toBranchId);
+        if(i==userIds.split(",").length-1){
+            return Result.ok();
+        }
+        return Result.error(InfoEnums.ERROR);
+    }
+
+    public static void main(String[] args) {
+        String s = ",1,2";
+        System.out.println(s.split(",").length);
+    }
 
     public  void transformUserInfoTree(List<SysUserInfoDto> dtoList, String level, Multimap<String, SysUserInfoDto> levelMap) {
         for (int i = 0; i < dtoList.size(); i++) {

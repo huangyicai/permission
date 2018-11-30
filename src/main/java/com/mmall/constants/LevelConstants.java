@@ -29,7 +29,7 @@ public class LevelConstants {
 
     //创建文件写入路径
     //public static String REALPATH = "C:\\Program Files\\apache-tomcat-9.0.12\\webapps\\total\\";
-    public static String REALPATH = "/usr/local/tomcat/apache-tomcat-9.0.12/webapps/ total/";
+    public static String REALPATH = "/usr/local/tomcat/apache-tomcat-9.0.12/webapps/total/";
 
     //省计数据循环规则
     public static String[] PROSTR={"北京","天津","河北","山西","内蒙古","辽宁","吉林","黑龙江","上海","江苏","浙江","安徽","福建",

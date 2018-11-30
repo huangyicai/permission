@@ -97,11 +97,30 @@ public class ExpressUserController {
     public Result getCusmotersInfo(@PathVariable Integer id){
         return expressUserService.getCusmotersInfo(id);
     }
+
     @ApiOperation(value = "获取用户列表", notes="需要Authorization")
     @GetMapping(value = "/cusmoters",produces = {"application/json;charest=Utf-8"})
     public Result<List<SysUserInfoDto>> getCusmoters(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return expressUserService.getCusmoters(user);
+    }
+    @ApiOperation(value = "获取分支列表", notes="需要Authorization")
+    @GetMapping(value = "/branch",produces = {"application/json;charest=Utf-8"})
+    public Result<List<SysUserInfoDto>> getCusmotersBranch(){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return expressUserService.getCusmotersBranch(user);
+    }
+
+    @ApiOperation(value = "获取分支下的所有客户", notes="需要Authorization")
+    @GetMapping(value = "/branchUsers/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result<List<SysUserInfo>> getBranchCusmotersUser(@PathVariable("id")Integer id){
+        return expressUserService.getBranchCusmotersUser(id);
+    }
+    @ApiOperation(value = "转移分支下的客户", notes="需要Authorization")
+    @PostMapping(value = "/users/updataBranch/{userIds}/{toBranchId}",produces = {"application/json;charest=Utf-8"})
+    public Result<List<SysUserInfo>> transferBranchCusmotersUser(@PathVariable("toBranchId")Integer toBranchId,
+                                                                 @PathVariable("userIds")String userIds){
+        return expressUserService.transferBranchCusmotersUser(toBranchId,userIds);
     }
 
 

@@ -91,4 +91,15 @@ public class FnUserController {
     public Result getContacts(){
         return Result.ok(fnContactsMapper.selectList(new QueryWrapper<>()));
     }
+
+    @ApiOperation(value = "删除弗恩客服",  notes="需要Authorization")
+    @DeleteMapping(value = "/contacts/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result deleteContacts(@PathVariable("id") Integer id){
+        return Result.ok(fnContactsMapper.deleteById(id));
+    }
+    @ApiOperation(value = "获取弗恩客服",  notes="需要Authorization")
+    @PostMapping(value = "/contacts/service",produces = {"application/json;charest=Utf-8"})
+    public Result saveContacts(@RequestBody FnContacts fnContacts){
+        return Result.ok(fnContactsMapper.insert(fnContacts));
+    }
 }

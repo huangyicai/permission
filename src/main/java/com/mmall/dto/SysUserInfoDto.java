@@ -1,5 +1,6 @@
 package com.mmall.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
 import com.mmall.model.Response.Result;
@@ -13,11 +14,12 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SysUserInfoDto extends SysUserInfo {
     public interface UserInfoView extends Result.ResultMenus {}
 
     @JsonView(UserInfoView.class)
-    private List<SysUserInfoDto> sysUserInfos = Lists.newArrayList();
+    private List<SysUserInfoDto> sysUserInfos = null;
 
     private List<SysUserInfo> sysMenu = null;
 
