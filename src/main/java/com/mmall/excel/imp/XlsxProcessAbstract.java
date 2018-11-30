@@ -16,10 +16,12 @@ import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.service.SysUserInfoService;
+import com.mmall.service.TotalService;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
 import com.mmall.util.RandomHelper;
 import com.mmall.util.StringToDateUtil;
+import com.mmall.vo.PricingGroupVo;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -63,6 +65,8 @@ public class XlsxProcessAbstract {
 
     private TotalMapper totalService;
 
+    private TotalService totalService1;
+
     private WeightCalculateMapper weightCalculateMapper;
 
     private ProvincialMeterMapper provincialMeterMapper;
@@ -74,6 +78,10 @@ public class XlsxProcessAbstract {
     private SumTatalMapper sumTatalMapper;
 
     private DailyTotalMapper dailyTotalMapper;
+
+    private PricingGroupMapper pricingGroupMapper;
+
+    private SpecialPricingGroupMapper specialPricingGroupMapper;
 
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
 
@@ -95,6 +103,9 @@ public class XlsxProcessAbstract {
     //根据省份分离数据
     private ArrayListMultimap<String, String> dailyMap = ArrayListMultimap.create();
 
+    //获取异常信息
+    private List<String> listError = new ArrayList<String>();
+
     //初始化用户状态
     private Integer pricing=-1;
 
@@ -107,6 +118,9 @@ public class XlsxProcessAbstract {
         this.totalMapper = ApplicationContextHelper.getBeanClass(TotalMapper.class);
         this.sumTatalMapper = ApplicationContextHelper.getBeanClass(SumTatalMapper.class);
         this.dailyTotalMapper = ApplicationContextHelper.getBeanClass(DailyTotalMapper.class);
+        this.pricingGroupMapper = ApplicationContextHelper.getBeanClass(PricingGroupMapper.class);
+        this.specialPricingGroupMapper = ApplicationContextHelper.getBeanClass(SpecialPricingGroupMapper.class);
+        this.totalService1 = ApplicationContextHelper.getBeanClass(TotalService.class);
     }
 
 
@@ -178,6 +192,7 @@ public class XlsxProcessAbstract {
         List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
                 .like("level", s)
                 .eq("platform_id", 3)
+                .eq("status",1)
                 .select("id"));
 
         String nameStr="";
@@ -431,6 +446,7 @@ public class XlsxProcessAbstract {
                 total.setCreateTime(new Date());
                 total.setTotalState(pricing);
                 total.setTotalOffer(threadDto.getCost());
+                total.setTotalCost(threadDto.getOff());
                 totalMapper.insert(total);
 
                 //添加重量区间数据
@@ -501,89 +517,108 @@ public class XlsxProcessAbstract {
         String fName = xlsxFile.getOriginalFilename();
         String[] str1= fName.split("\\.");
 
-        //根据用户分表
-//        ArrayListMultimap<String, Bill> map = processTransDetailData.map;
+        //创建数据集合
         ThreadDto threadDto=new ThreadDto();
 
         Integer total=0;//总单量
         BigDecimal weightOne=BigDecimal.ZERO;//总重
         BigDecimal pri=BigDecimal.ZERO;
+        BigDecimal cos=BigDecimal.ZERO;
+
+        List<Bill> list=new ArrayList<>();
+
         for (String key:map.keySet()) {
-
-            //分离数据
-            for (Bill bill:map.get(key)) {
-                weightInterval(bill.getWeight());
-                province(bill.getDestination());
-                daily(bill.getSweepTime(),bill.getSerialNumber());
-                //计算每个月份的单量，总重量
-                total+=1;
-                weightOne=weightOne.add(bill.getWeight());
-                if(pricing==1){
-                    pri=pri.add(bill.getCost());
-                }
-            }
-
-            //根据重量分离数据
-            Map<Integer,BigDecimal> mw=new HashMap<Integer, BigDecimal>();
-            for (Integer integer:weightMap.keySet()) {
-                BigDecimal weight=BigDecimal.ZERO;
-                for (BigDecimal bigDecimal:weightMap.get(integer)){
-                    weight=weight.add(bigDecimal);
-                }
-                mw.put(integer,weight);
-            }
-
-            //根据省份分离数据
-            String[] proStr=LevelConstants.PROSTR;
-
-            String mdStr="";
-            for(String str:proStr){
-                mdStr+=destination.get(str).size()+",";
-            }
-            //得到省计字符串
-            mdStr=mdStr.substring(0,mdStr.length()-1);
-
-            //根据时间分离数据
-            String[] dailyOriginal=LevelConstants.DAILY_ORIGINAL;
-            String dyStr="";
-            Integer day=DateUtils.getDays(time);
-            String[] arr=dailyOriginal;
-            switch (day){
-                case 30:arr=daily(dailyOriginal,1);
-                    break;
-                case 29:arr=daily(dailyOriginal,2);
-                    break;
-                case 28:arr=daily(dailyOriginal,3);
-                    break;
-            }
-
-            for(String str:arr){
-                String sss= time+"-"+str;
-                dyStr+=dailyMap.get(sss).size()+",";
-            }
-
-            dyStr=dyStr.substring(0,dyStr.length()-1);
-            threadDto.setCost(pri);
-            threadDto.setDaily(dyStr);
-            threadDto.setDailyTime(time);
-            threadDto.setSendId(userInfo.getId());
-            threadDto.setKey(str1[0]);
-            List<Bill> list = threadDto.getList();
-            if(list==null || list.size()<=0){
-                list=new ArrayList<>();
-            }
-            list.addAll((map.get(key)));
-            threadDto.setList(list);
-            threadDto.setMd(mdStr);
-            threadDto.setMw(mw);
-            threadDto.setPath(LevelConstants.OMPPATH);
-            threadDto.setPathHead(LevelConstants.REALPATH);
-            threadDto.setTime(time);
-            threadDto.setTotalNum(total);
-            threadDto.setWeight(weightOne);
-            threadDto.setName(userInfo.getName());
-            threadDto.setCompanyName(userInfo.getCompanyName());
+            list.addAll(map.get(key));
         }
+
+
+        //判断并计算成本
+        SysUserInfo byId = sysUserInfoService.getById(userInfo.getId());
+        if(byId.getPricingStatus()==1){
+            //获取成本表
+            List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(userInfo.getId());
+
+            //获取特殊成本表
+            List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(userInfo.getId());
+
+            //计算成本
+            list= totalService1.getCalculate(pricingOffer,1,list,special1);
+
+        }
+
+        //分离数据并计算成本
+        for (Bill bill:list) {
+            weightInterval(bill.getWeight());
+            province(bill.getDestination());
+            daily(bill.getSweepTime(),bill.getSerialNumber());
+            //计算每个月份的单量，总重量
+            total+=1;
+            weightOne=weightOne.add(bill.getWeight());
+            if(pricing==1){
+                pri=pri.add(bill.getCost());
+            }
+            if(byId.getPricingStatus()==1){
+                cos=cos.add(bill.getCost());
+            }
+        }
+
+        //根据重量分离数据
+        Map<Integer,BigDecimal> mw=new HashMap<Integer, BigDecimal>();
+        for (Integer integer:weightMap.keySet()) {
+            BigDecimal weight=BigDecimal.ZERO;
+            for (BigDecimal bigDecimal:weightMap.get(integer)){
+                weight=weight.add(bigDecimal);
+            }
+            mw.put(integer,weight);
+        }
+
+        //根据省份分离数据
+        String[] proStr=LevelConstants.PROSTR;
+
+        String mdStr="";
+        for(String str:proStr){
+            mdStr+=destination.get(str).size()+",";
+        }
+        //得到省计字符串
+        mdStr=mdStr.substring(0,mdStr.length()-1);
+
+        //根据时间分离数据
+        String[] dailyOriginal=LevelConstants.DAILY_ORIGINAL;
+        String dyStr="";
+        Integer day=DateUtils.getDays(time);
+        String[] arr=dailyOriginal;
+        switch (day){
+            case 30:arr=daily(dailyOriginal,1);
+                break;
+            case 29:arr=daily(dailyOriginal,2);
+                break;
+            case 28:arr=daily(dailyOriginal,3);
+                break;
+        }
+
+        for(String str:arr){
+            String sss= time+"-"+str;
+            dyStr+=dailyMap.get(sss).size()+",";
+        }
+
+        dyStr=dyStr.substring(0,dyStr.length()-1);
+        threadDto.setCost(pri);
+        threadDto.setOff(cos);
+        threadDto.setDaily(dyStr);
+        threadDto.setDailyTime(time);
+        threadDto.setSendId(userInfo.getId());
+        threadDto.setKey(str1[0]);
+        threadDto.setList(list);
+        threadDto.setMd(mdStr);
+        threadDto.setMw(mw);
+        threadDto.setPath(LevelConstants.OMPPATH);
+        threadDto.setPathHead(LevelConstants.REALPATH);
+        threadDto.setTime(time);
+        threadDto.setTotalNum(total);
+        threadDto.setWeight(weightOne);
+        threadDto.setName(userInfo.getName());
+        threadDto.setCompanyName(userInfo.getCompanyName());
+
         Map m=new HashMap<>();
         m.put("map",map);
         m.put("threadDto",threadDto);
@@ -651,7 +686,7 @@ public class XlsxProcessAbstract {
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(threadDto.getCost());
-                total.setTotalCost(BigDecimal.ZERO);
+                total.setTotalCost(threadDto.getOff());
                 total.setTotalPaid(BigDecimal.ZERO);
                 total.setTotalUrl(replace);
                 total.setTotalState(pricing);
@@ -750,8 +785,13 @@ public class XlsxProcessAbstract {
             if(!rowStrs.toString().equals("|@|")) {
                 String[] cellStrs = endRowStrs.split("\\|@\\|");
                 if(currentRowNumber==0 ){
+
                     if(cellStrs.length==6){
                         pricing=1;
+                        String str="";
+//                        if(){
+//
+//                        }
                     }
                 }else{
                     String nameStr=cellStrs[0];
@@ -776,6 +816,9 @@ public class XlsxProcessAbstract {
         }
 
         public void cell(String cellReference, String cellValue, XSSFComment comment) {
+            if("".equals(cellValue) || cellValue==null){
+                listError.add(minColumns+"行：有数据为空");
+            }
             if (firstCellOfRow) {
                 firstCellOfRow = false;
             } else {
@@ -804,9 +847,7 @@ public class XlsxProcessAbstract {
      * @param weight
      */
     private void weightInterval(BigDecimal weight){
-//        weight=weight.setScale(2,BigDecimal.ROUND_DOWN).add(new BigDecimal(0.01));
         Integer intervalNum=0;
-//        Double[] interval={0.01,0.5,1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0,11.0,12.0,13.0,14.0,15.0,16.0,17.0,18.0,19.0,20.0};
         Double[] interval=LevelConstants.INTERVAL;
 
         //判断重量所在区间

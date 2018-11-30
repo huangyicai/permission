@@ -1,5 +1,6 @@
 package com.mmall.service;
 
+import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2018-09-20
  */
 public interface SysUserInfoService extends IService<SysUserInfo> {
+
+    Result updatePricingStatus();
 
 }

@@ -44,7 +44,7 @@ public class StringToDateUtil {
                 }
             }
         } else {
-            System.out.println("错误的日期格式");
+            System.out.println("错误的日期格式"+dateString+"----------");
             return null;
         }
         String format = sb.toString();

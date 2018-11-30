@@ -1,6 +1,5 @@
 package com.mmall.controller.customer;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.Socket.ExpressWebSocket;
@@ -15,11 +14,8 @@ import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Api(value = "CustomerTotalController", description = "账单")
 @RestController
@@ -33,10 +29,7 @@ public class CustomerTotalController {
     @ApiOperation(value = "获取未付款账单提示",  notes="需要Authorization")
     @GetMapping(value = "/getNotPaying",produces = {"application/json;charest=Utf-8"})
     public Result getNotPaying(){
-        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
-        List<Total> list = totalService.list(new QueryWrapper<Total>()
-                .eq(user.getId() != null, "user_id", user.getId()).select("name").eq("total_state",2));
-        return Result.ok(list);
+        return totalService.getNotPaying();
     }
 
     @ApiOperation(value = "获取账单列表",  notes="需要Authorization")

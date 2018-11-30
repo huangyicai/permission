@@ -1,8 +1,6 @@
 package com.mmall.dto;
 
 import com.mmall.excel.Bill;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -97,6 +95,16 @@ public class ThreadDto {
     private String dailyTime;
 
     private BigDecimal cost;
+
+    private BigDecimal off;
+
+    public BigDecimal getOff() {
+        return off;
+    }
+
+    public void setOff(BigDecimal off) {
+        this.off = off;
+    }
 
     public BigDecimal getCost() {
         return cost;

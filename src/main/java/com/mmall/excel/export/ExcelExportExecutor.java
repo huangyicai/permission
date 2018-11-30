@@ -2,20 +2,17 @@ package com.mmall.excel.export;
 
 import com.mmall.excel.Bill;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.streaming.SXSSFRow;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
-
 /**
  * 导出执行器
+ * 参考文章：https://blog.csdn.net/java_cainiao2016/article/details/78091812
  * @param <T>
  */
 public class ExcelExportExecutor<T> {

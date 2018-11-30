@@ -20,6 +20,7 @@ import com.mmall.service.PricingGroupService;
 import com.mmall.util.LevelUtil;
 import com.mmall.vo.PGVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -276,8 +277,6 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
         //处理读取的数据并判断空值
         for(PGVo pg:list){
 
-            Thread.yield();
-
             //根据省份分离数据
             map.put(pg.getCityId(),pg);
 
@@ -408,8 +407,6 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
         //判断连续的区间是否合法
         for (Integer key:map.keySet()) {
-
-            Thread.yield();
 
             //获取当前省份数据
             List<PGVo> pricingGroups = map.get(key);
@@ -617,6 +614,7 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
      * @return
      */
     public String check(XSSFCell xssfCell,PGVo pg){
+        xssfCell.setCellType(CellType.STRING);
         String s="";
         if(xssfCell!=null){
             s = xssfCell.toString().replaceAll("\u00A0", "");
@@ -631,6 +629,7 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     }
 
     public String check1(XSSFCell xssfCell){
+        xssfCell.setCellType(CellType.STRING);
         String s="";
         if(xssfCell==null){
             s="";

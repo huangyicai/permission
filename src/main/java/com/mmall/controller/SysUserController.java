@@ -7,15 +7,21 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.HandleTypeMapper;
 import com.mmall.dto.SysMenuDto;
+import com.mmall.model.AuthInfo;
+import com.mmall.model.HandleType;
 import com.mmall.model.Response.Result;
-import com.mmall.model.*;
+import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.SysUserParam;
 import com.mmall.model.params.UserPasswordParam;
 import com.mmall.service.ExpressUserService;
+import com.mmall.service.SysUserInfoService;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
 import com.mmall.util.UploadApi;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
@@ -25,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +50,10 @@ public class SysUserController {
     private SysUserService sysUserService;
     @Autowired
     private HandleTypeMapper handleTypeMapper;
+
+    @Autowired
+    private SysUserInfoService sysUserInfoService;
+
     @ApiOperation(value = "获取处理类型",  notes="需要Authorization")
     @GetMapping(value = "/types",produces = {"application/json;charest=Utf-8"})
     public Result<List<HandleType>> getHandleTypes(){
@@ -127,6 +136,12 @@ public class SysUserController {
     public Result getFnContacts(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         return expressUserService.getFnContacts(userInfo);
+    }
+
+    @ApiOperation(value = "是否成本定价的开关",  notes="需要Authorization")
+    @PutMapping(value = "/updatePricingStatus",produces = {"application/json;charest=Utf-8"})
+    public Result updatePricingStatus(){
+        return sysUserInfoService.updatePricingStatus();
     }
 
 }
