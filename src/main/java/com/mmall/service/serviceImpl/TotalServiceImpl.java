@@ -785,7 +785,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pg: first){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().startsWith(pg.getCity())){
+            if(bill.getDestination().startsWith(pg.getCity())||pg.getCity().startsWith("全部")){
 
                 //和区间开始比较
                 int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
@@ -808,7 +808,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pp: Continued){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().startsWith(pp.getCity())){
+            if(bill.getDestination().startsWith(pp.getCity())||pp.getCity().startsWith("全部")){
 
                 //和区间开始比较
                 int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
@@ -879,6 +879,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             map.put("totalName",t.getName());
             map.put("totalTime",t.getTotalTime());
             map.put("money",t.getTotalOffer().subtract(t.getTotalPaid()).toString());
+            map.put("state",t.getTotalState().toString());
             li.add(map);
         }
         return Result.ok(li);
