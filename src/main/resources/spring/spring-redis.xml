@@ -6,7 +6,7 @@
     <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
         <constructor-arg ref="jedisPoolConfig"/>
         <!--<constructor-arg value="118.25.103.48" type="java.lang.String"/>-->
-        <constructor-arg value="106.12.25.214" type="java.lang.String"/>
+        <constructor-arg value="106.13.33.92" type="java.lang.String"/>
         <constructor-arg value="6379" type="int"/>
         <constructor-arg value="2000" type="int"/>
         <constructor-arg value="mypassword" type="java.lang.String"/>
