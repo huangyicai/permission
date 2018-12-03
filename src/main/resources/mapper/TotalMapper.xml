@@ -175,6 +175,7 @@
     <select id="getAllBySendIdAndCreateTimeAndUserIds" resultType="com.mmall.vo.BillDtetailVo">
         select
             t.name as name,
+            t.total_time as totalTime,
             t.total_offer as totalOffer,
             t.total_paid as totalPaid,
             t.total_state as totalState,
@@ -191,7 +192,7 @@
                 and t.total_time BETWEEN #{date} and #{endDate}
             </if>
 
-            <if test="endDate==null and endDate=='' and date!=null and date!=''">
+            <if test="date!=null and date!=''">
                 and t.total_time=#{date}
             </if>
 
@@ -246,6 +247,6 @@
       select distinct s.* from total t
       join sys_user_info s
       on t.send_id=s.id
-      WHERE t.send_id=#{sendId} and t.total_state=3
+      WHERE t.send_id=#{sendId} and  FIND_IN_SET (t.total_state,'3,5')
     </select>
 </mapper>
