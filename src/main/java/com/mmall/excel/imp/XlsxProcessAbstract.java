@@ -535,6 +535,7 @@ public class XlsxProcessAbstract {
         //判断并计算成本
         SysUserInfo byId = sysUserInfoService.getById(userInfo.getId());
         if(byId.getPricingStatus()==1){
+
             //获取成本表
             List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(userInfo.getId());
 
