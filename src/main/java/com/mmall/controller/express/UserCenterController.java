@@ -7,6 +7,7 @@ import com.mmall.model.params.PricingGroupParam;
 import com.mmall.model.params.UserInfoOperateParam;
 import com.mmall.service.ExpressUserService;
 import com.mmall.service.PricingGroupService;
+import com.mmall.service.SysUserInfoService;
 import com.mmall.util.BeanValidator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,9 @@ public class UserCenterController {
     @Autowired
     private PricingGroupService pricingGroupService;
 
+    @Autowired
+    private SysUserInfoService sysUserInfoService;
+
     @ApiOperation(value = "快递公司注册(1=运营号,2=客服)",  notes="需要Authorization")
     @PostMapping(value = "/register/{level}",produces = {"application/json;charest=Utf-8"})
     public Result registerOperate(@RequestBody UserInfoOperateParam user,
@@ -60,5 +64,12 @@ public class UserCenterController {
         return pricingGroupService.savePricingGroup(pricingGroups,userInfo.getId(),cityId);
     }
 
+    @ApiOperation(value = "获取成本定价开关状态",  notes="需要Authorization")
+    @GetMapping(value = "/getPricingStatus",produces = {"application/json;charest=Utf-8"})
+    public Result getPricingStatus(){
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        SysUserInfo byId = sysUserInfoService.getById(userInfo.getId());
+        return Result.ok(byId);
+    }
 
 }
