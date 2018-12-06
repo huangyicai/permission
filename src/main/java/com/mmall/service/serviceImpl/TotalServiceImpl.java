@@ -21,6 +21,7 @@ import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
 import com.mmall.excel.imp.XlsxProcessAbstract;
+import com.mmall.excel.thread.PricingThread;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
@@ -34,6 +35,7 @@ import com.mmall.util.LevelUtil;
 import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * <p>
@@ -56,6 +60,7 @@ import java.util.*;
  * @since 2018-09-25
  */
 @Service
+@Slf4j
 public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements TotalService {
 
     @Autowired
@@ -884,4 +889,37 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
         return Result.ok(li);
     }
+
+    /**
+     * 一键定价
+     * @param totalId
+     * @return
+     */
+    @Override
+    public Result keyPricing(String totalId) throws InterruptedException {
+        if(!"".equals(totalId) && totalId!=null){
+            //创建线程池
+            ExecutorService threadPool = Executors.newFixedThreadPool(3);
+            String[] split = totalId.split(",");
+            for(String id:split){
+                PricingThread pt=new PricingThread(Integer.parseInt(id));
+                threadPool.submit(pt);
+            }
+
+            //判断线程是否执行完毕
+            threadPool.shutdown();
+            while (true){
+                if (threadPool.isTerminated()) {
+                    log.info("线程已执行完毕");
+                    break;
+                }
+                Thread.sleep(200);
+            }
+        }else{
+            return Result.error(InfoEnums.BILL_IS_NULL);
+        }
+
+        return Result.ok();
+    }
+
 }

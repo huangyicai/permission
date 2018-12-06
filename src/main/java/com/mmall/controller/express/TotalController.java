@@ -301,5 +301,14 @@ public class TotalController {
         return totalService.othersBillForward(billIds,userId);
     }
 
+    @ApiOperation(value = "一键定价",  notes="需要Authorization")
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "totalId",value = "账单id",dataType = "string",paramType = "query")
+    )
+    @GetMapping(value = "/keyPricing")
+    public Result keyPricing(@RequestParam(value = "totalId") String totalId) throws InterruptedException {
+        return totalService.keyPricing(totalId);
+    }
+
 }
 

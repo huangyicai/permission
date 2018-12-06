@@ -90,4 +90,6 @@ public interface TotalService extends IService<Total> {
     void additional(Bill bill,List<PricingGroupVo> first,
                            List<PricingGroupVo> Continued,
                            Integer type);
+
+    Result keyPricing(String totalId) throws InterruptedException;
 }
