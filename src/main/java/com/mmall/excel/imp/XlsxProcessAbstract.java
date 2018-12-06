@@ -142,6 +142,7 @@ public class XlsxProcessAbstract {
                 stream = iter.next();
                 parserSheetXml(styles, strings, new SheetToCSV(), stream);
             } catch (Exception e) {
+
             } finally {
                 stream.close();
             }
@@ -854,10 +855,10 @@ public class XlsxProcessAbstract {
         //判断重量所在区间
         for (int i = 0; i < interval.length; i++) {
             int Less= 0;
-            int greater = weight.compareTo(new BigDecimal(interval[i]));
+            int greater = weight.compareTo(new BigDecimal(interval[i].toString()));
 
             if(i < interval.length-1){
-                Less=weight.compareTo(new BigDecimal(interval[i+1]));
+                Less=weight.compareTo(new BigDecimal(interval[i+1].toString()));
             }
 
             if(greater>=0 && Less<=0){

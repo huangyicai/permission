@@ -1,32 +1,21 @@
 package com.mmall.service.serviceImpl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
 import com.mmall.dao.WeightCalculateMapper;
-import com.mmall.dto.DailyTotalDto;
 import com.mmall.dto.WeightCalculateDto;
-import com.mmall.model.DailyTotal;
-import com.mmall.model.Response.InfoEnums;
-import com.mmall.model.Response.Result;
-import com.mmall.model.SysUserInfo;
 import com.mmall.model.Total;
 import com.mmall.model.WeightCalculate;
 import com.mmall.model.params.BillParam;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.service.TotalService;
 import com.mmall.service.WeightCalculateService;
-import com.mmall.util.DateUtils;
-import com.mmall.util.LevelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -99,7 +88,7 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
         try {
             Field.setAccessible(fields, true);
             for (int i = 3; i < value.length; i++) {
-                if(i>14){
+                if(i>15){
                     break;
                 }
                 value[i] = fields[i].get(weightCalculate);
