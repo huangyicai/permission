@@ -32,7 +32,7 @@ public class MybatisPlus {
     private static String authorName="qty";
 
     //table名字
-    private static String table="order";
+    private static String table="message";
 
     //table前缀
     private static String prefix="";
