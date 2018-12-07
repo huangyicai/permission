@@ -32,6 +32,7 @@
                  /public/register = anon
                  /public/403 = anon
                  /fn/** = roles[SUPER]
+                 /express/customerUser/** = roles["ADMIN,OPERATE"]
                  /express/message/** = roles["ADMIN,OPERATE,CUSTOMER"]
                  /express/service/reply/** = roles["ADMIN,OPERATE,SERVICE,CUSTOMER"]
                  /express/dailyTotal/getDailyTotalList = roles["ADMIN,OPERATE,CUSTOMER"]

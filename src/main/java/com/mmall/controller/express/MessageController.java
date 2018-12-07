@@ -3,13 +3,19 @@ package com.mmall.controller.express;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.mmall.config.UserInfoConfig;
-import com.mmall.model.Message;
+import com.mmall.dao.MessageMapper;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
+import com.mmall.model.UserMessage;
 import com.mmall.model.params.MessageParam;
 import com.mmall.service.MessageService;
+import com.mmall.service.UserMessageService;
+import com.mmall.vo.MessVO;
+import com.mmall.vo.MessageVo;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +38,12 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private UserMessageService userMessageService;
+
+    @Autowired
+    private MessageMapper messageMapper;
+
     @ApiOperation(value = "发送信息",  notes="需要Authorization")
     @PostMapping(value = "/addMessage",produces = {"application/json;charest=Utf-8"})
     public Result addMessage(@RequestBody MessageParam messageParam){
@@ -43,19 +55,22 @@ public class MessageController {
     public Result getUserMessage(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         if(userInfo.getPlatformId()==3){
-            List<Message> userId = messageService.list(new QueryWrapper<Message>().eq("user_id", userInfo.getId()));
-            return Result.ok(userId);
+            List<MessageVo> listByIds = messageMapper.ListByIds(userInfo.getId().toString());
+            return Result.ok(listByIds);
         }
         return Result.error(InfoEnums.UNAUTHORIZATION);
     }
 
     @ApiOperation(value = "确认信息收到",  notes="需要Authorization")
-    @PutMapping(value = "/confirmMessage/{messageId}",produces = {"application/json;charest=Utf-8"})
-    public Result confirmMessage(@PathVariable(value = "messageId") Integer messageId){
-        Message message=new Message();
-        message.setId(messageId);
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userMessageId",value = "用户信息关联id",dataType = "long",paramType = "path")
+    })
+    @PutMapping(value = "/confirmMessage/{userMessageId}",produces = {"application/json;charest=Utf-8"})
+    public Result confirmMessage(@PathVariable(value = "userMessageId") Integer userMessageId){
+        UserMessage message=new UserMessage();
         message.setStatus(1);
-        messageService.updateById(message);
+        message.setId(userMessageId);
+        userMessageService.updateById(message);
         return Result.ok();
     }
 
@@ -64,17 +79,25 @@ public class MessageController {
     public Result getSendMessage(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         if(userInfo.getPlatformId()==2){
-            List<Message> userId = messageService.list(new QueryWrapper<Message>().eq("send_id", userInfo.getId()));
-            return Result.ok(userId);
+            List<MessVO> listByIds = messageMapper.getListByIds(userInfo.getId().toString());
+            return Result.ok(listByIds);
         }
         return Result.error(InfoEnums.UNAUTHORIZATION);
     }
 
     @ApiOperation(value = "删除信息",  notes="需要Authorization")
-    @DeleteMapping(value = "/deleteMessage/{messageId}",produces = {"application/json;charest=Utf-8"})
-    public Result deleteMessage(@PathVariable(value = "messageId") Integer messageId){
-       messageService.removeById(messageId);
-        return Result.ok();
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userMessageId",value = "用户信息关联id",dataType = "long",paramType = "path")
+    })
+    @DeleteMapping(value = "/deleteMessage/{userMessageId}",produces = {"application/json;charest=Utf-8"})
+    public Result deleteMessage(@PathVariable(value = "userMessageId") Integer userMessageId){
+        UserMessage byId = userMessageService.getById(userMessageId);
+        List<UserMessage> messageId = userMessageService.list(new QueryWrapper<UserMessage>().eq("message_id", byId.getMessageId()));
+        if(messageId==null || messageId.size()==0){
+            messageMapper.deleteById( byId.getMessageId());
+        }
+        userMessageService.removeById(userMessageId);
+       return Result.ok();
     }
 }
 

@@ -5,11 +5,8 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.mmall.model.Message">
         <id column="id" property="id" />
-        <result column="send_id" property="sendId" />
-        <result column="user_id" property="userId" />
         <result column="title" property="title" />
         <result column="content" property="content" />
-        <result column="status" property="status" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
     </resultMap>
@@ -19,4 +16,21 @@
         id, send_id, user_id, title, content, status, create_time, update_time
     </sql>
 
+    <!--客户获取信息列表-->
+    <select id="ListByIds"  resultType="com.mmall.vo.MessageVo">
+      select message.id,title,content,create_time as createTime,um.id as userMessageId
+      from message
+      join user_message as um
+      on message.id=um.message_id
+      where FIND_IN_SET(um.id,#{idStr})
+    </select>
+
+    <!--快递公司获取信息列表-->
+    <select id="getListByIds"  resultType="com.mmall.vo.MessVO">
+      select message.id,title,content,message.create_time as createTime,um.id as userMessageId,um.status,si.name
+      from message
+      join user_message as um on message.id=um.message_id
+      join sys_user_info si on si.id=um.user_id
+      where FIND_IN_SET(um.id,#{idStr})
+    </select>
 </mapper>

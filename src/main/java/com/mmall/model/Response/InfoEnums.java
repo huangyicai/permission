@@ -17,6 +17,7 @@ public enum InfoEnums {
 	PASSWORD_INCORRECT(10014, "密码不正确！"),
 	DATA_IS_NULL(10010,"没有数据"),
 	USER_IS_NULL(10011,"用户不存在"),
+	USER_EXIST(10012,"该客户已绑定客服"),
 
 	KEY_EXISTENCE(10017,"已有相同关键字定价组！"),
 	PLEASE_ADD_PRICING(10018,"请添加定价！"),

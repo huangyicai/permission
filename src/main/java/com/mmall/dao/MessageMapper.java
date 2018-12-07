@@ -1,7 +1,12 @@
 package com.mmall.dao;
 
-import com.mmall.model.Message;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mmall.model.Message;
+import com.mmall.vo.MessVO;
+import com.mmall.vo.MessageVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +18,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface MessageMapper extends BaseMapper<Message> {
 
+    List<MessageVo> ListByIds(@Param("idStr") String idStr);
+
+    List<MessVO> getListByIds(@Param("idStr") String idStr);
 }
