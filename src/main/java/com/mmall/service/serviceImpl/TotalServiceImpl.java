@@ -931,12 +931,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     @Override
     public Result keyPricing(String totalId) throws InterruptedException {
+
+        List<Result> list=new ArrayList<>();
+
         if(!"".equals(totalId) && totalId!=null){
             //创建线程池
             ExecutorService threadPool = Executors.newFixedThreadPool(3);
             String[] split = totalId.split(",");
             for(String id:split){
-                PricingThread pt=new PricingThread(Integer.parseInt(id));
+                PricingThread pt=new PricingThread(Integer.parseInt(id),list);
                 threadPool.submit(pt);
             }
 
@@ -953,7 +956,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             return Result.error(InfoEnums.BILL_IS_NULL);
         }
 
-        return Result.ok();
+        return Result.ok(list);
     }
 
 }
