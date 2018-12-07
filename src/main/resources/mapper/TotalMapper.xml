@@ -130,10 +130,10 @@
         on m.user_id=ui.parent_id
         <where>
           <if test="userId!=null">
-             and t.user_id =#{userId}
+             and  FIND_IN_SET(t.user_id,#{userId})
           </if>
 
-          <if test="totalTime">
+          <if test="totalTime!='' and totalTime!=null">
               and total_time =#{totalTime}
           </if>
 
@@ -141,14 +141,18 @@
                and total_state>1
            </if>
 
-          <if test="state!=null and state!=0">
+          <if test="state!=null and state!=0 and state!=-10">
               and total_state=#{state}
           </if>
+            <if test="state==-10">
+                and FIND_IN_SET(t.total_state,'-1,1,2,3,5')
+            </if>
 
           <if test="sendId!=null and sendId!=0">
               and send_id = #{sendId}
           </if>
         </where>
+        ORDER BY total_time DESC
     </select>
 
     <!--获取已收和未收数据-->
@@ -188,12 +192,12 @@
           LEFT JOIN sys_user_info u on u.id=t.user_id
         <where>
             t.send_id=#{id} and FIND_IN_SET(t.user_id,#{userId})
-            <if test="endDate!=null and endDate!='' and date!=null and date!=''">
-                and t.total_time BETWEEN #{date} and #{endDate}
+            <if test="endDate!=null and endDate!=''">
+                and t.total_time &lt;= #{endDate}
             </if>
 
             <if test="date!=null and date!=''">
-                and t.total_time=#{date}
+                and t.total_time>=#{date}
             </if>
 
             <if test="status>1">
@@ -216,7 +220,15 @@
           total t
           LEFT JOIN sys_user_info u on u.id=t.user_id
         <where>
-            t.send_id=#{id} and t.total_time=#{date} and  FIND_IN_SET(t.user_id,#{userId})
+            t.send_id=#{id}
+            <if test="endDate!=null and endDate!=''">
+                and t.total_time &lt;= #{endDate}
+            </if>
+
+            <if test="date!=null and date!=''">
+                and t.total_time>=#{date}
+            </if>
+            and  FIND_IN_SET(t.user_id,#{userId})
             <if test="status>1">
                 and t.total_state=#{status}
             </if>

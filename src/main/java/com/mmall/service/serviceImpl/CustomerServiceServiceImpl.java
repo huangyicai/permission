@@ -82,8 +82,9 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
 
     @Override
     public Result getAllCustomerService(Integer status,Integer type, Integer expressId, Page ipage,String waybillNumber,
+                                        String keyName,
                                         String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
-        Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, createTime, endTime,receiveSolt,endSolt);
+        Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, keyName, createTime, endTime,receiveSolt,endSolt);
         return Result.ok(ipage);
     }
 
@@ -192,22 +193,19 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getAllReplys(SysUserInfo user) {
-        return Result.ok(puGetAllReplys(user,"express_id"));
+    public Result getAllReplys(SysUserInfo user,String dateBegin,String dateEnd) {
+        return Result.ok(puGetAllReplys(user,2,dateBegin,dateEnd));
     }
 
-    public ReplyDto puGetAllReplys(SysUserInfo user,String column){
+    public ReplyDto puGetAllReplys(SysUserInfo user,Integer column,String dateBegin,String dateEnd){
         ReplyDto rd = new ReplyDto();
 
         //处理完毕工单数
-        Integer handledNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
-                .eq(column, user.getId()).eq("status",3));
+        Integer handledNum = customerServiceMapper.getCountServiceByHandleId(column,user.getId(),3,dateBegin,dateEnd);
         //处理中的工单数
-        Integer handleingNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
-                .eq(column, user.getId()).eq("status",2));
+        Integer handleingNum = customerServiceMapper.getCountServiceByHandleId(column,user.getId(),2,dateBegin,dateEnd);
         //未处理工单数
-        Integer noHandleNum = customerServiceMapper.selectCount(new QueryWrapper<CustomerService>()
-                .eq(column, user.getId()).eq("status",1));
+        Integer noHandleNum = customerServiceMapper.getCountServiceByHandleId(column,user.getId(),1,dateBegin,dateEnd);
         //总工单
         Integer totalallNum = noHandleNum + handleingNum +  handledNum;
         rd.setTotalallNum(totalallNum);
@@ -222,7 +220,7 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getAllReplysByService(SysUserInfo user) {
+    public Result getAllReplysByService(SysUserInfo user,String dateBegin,String dateEnd) {
         List<ReplyDto> lr = Lists.newArrayList();
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
                 .notIn("status", -1)
@@ -230,7 +228,7 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                 .eq("parent_id", user.getId()));
         sysUserInfos.add(user);
         for(SysUserInfo Info : sysUserInfos){
-            lr.add(puGetAllReplys(Info,"handle_id"));
+            lr.add(puGetAllReplys(Info,1,dateBegin,dateEnd));
         }
         return Result.ok(lr);
     }

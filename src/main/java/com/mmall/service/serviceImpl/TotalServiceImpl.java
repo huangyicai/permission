@@ -138,12 +138,22 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     public IPage<TotalVo> getBill(IPage<TotalVo> page, BillDetailsParam billDetailsParam,Integer type) {
 
+
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
-
-        String nameStr=getUserIdStr();
-
+        String nameStr=null;
         if(!"".equals(billDetailsParam.getUserId()) && billDetailsParam.getUserId()!=null){
-            nameStr=billDetailsParam.getUserId().toString();
+            if(billDetailsParam.getUserId()==-1){
+                nameStr=billDetailsParam.getUserId().toString();
+            }else{
+                SysUserInfo sysUser = sysUserInfoMapper.selectById(billDetailsParam.getUserId());
+                if(sysUser.getPlatformId()==-1){
+                    nameStr = getUserIdStrBatch(sysUser);
+                }else{
+                    nameStr=billDetailsParam.getUserId().toString();
+                }
+            }
+        }else{
+            nameStr = getUserIdStrBatch(userInfo);
         }
         Page<TotalVo> bill=null;
         if(type==2){
@@ -452,6 +462,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
                 .like("level", s)
                 .eq("platform_id", 3)
+                .in("status",0,1)
                 .select("id"));
 
         String nameStr="";
@@ -463,9 +474,32 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         return nameStr;
     }
 
+    public String getUserIdStrBatch(SysUserInfo user){
+        //判断是否是客户
+        if(user.getPlatformId()==3){
+            return user.getId().toString();
+        }
+        String s = LevelUtil.calculateLevel(user.getLevel(), user.getId());
+        List<SysUserInfo> list1 = sysUserInfoService.list(new QueryWrapper<SysUserInfo>()
+                .like("level", s)
+                .eq("platform_id", 3)
+                .in("status",0,1)
+                .select("id"));
+
+        String nameStr="";
+        for(SysUserInfo sysUserInfo: list1){
+            nameStr+=sysUserInfo.getId()+",";
+        }
+
+        nameStr=nameStr.substring(0,nameStr.length()!=0?nameStr.length()-1:0);
+        return nameStr;
+    }
+
+
+
     @Override
     public Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date,String endDate, Page ipage) {
-        Total sumBiLLDetails = totalMapper.getSumBiLLDetails( status,userId, date, userInfo.getId());
+        Total sumBiLLDetails = totalMapper.getSumBiLLDetails( status,userId, date,endDate, userInfo.getId());
         totalMapper.getAllBySendIdAndCreateTimeAndUserIds(ipage,status,userId,date,endDate,userInfo.getId());
         Map<String,Object> map = Maps.newHashMap();
         if(sumBiLLDetails==null){

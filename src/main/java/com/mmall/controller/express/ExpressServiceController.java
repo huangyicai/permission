@@ -40,6 +40,7 @@ public class ExpressServiceController {
     public Result getAllCustomerService(@RequestParam(name="status",required = false,defaultValue = "0") Integer status,
                                         @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
+                                        @RequestParam(name = "keyName",required = false) String keyName,
                                         @RequestParam(name = "createTime",required = false) String createTime,
                                         @RequestParam(name = "endTime",required = false) String endTime,
                                         @RequestParam(name = "receiveSolt",required = false,defaultValue = "-1") Integer receiveSolt,
@@ -48,7 +49,7 @@ public class ExpressServiceController {
                                         @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
-        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime,receiveSolt,endSolt);
+        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,keyName,createTime,endTime,receiveSolt,endSolt);
     }
 
     @ApiOperation(value = "我处理的工单（0=全部，2=处理中，3=处理完毕）",  notes="需要Authorization")
@@ -134,16 +135,18 @@ public class ExpressServiceController {
 
     @ApiOperation(value = "总的工单统计",  notes="需要Authorization")
     @GetMapping(value = "/reply/all",produces = {"application/json;charest=Utf-8"})
-    public Result getAllReplys(){
+    public Result getAllReplys(@RequestParam(name="dateBegin",required = false)String dateBegin,
+                               @RequestParam(name="dateEnd",required = false)String dateEnd){
         SysUserInfo user = UserInfoConfig.getUserInfo();
-        return customerServiceService.getAllReplys(user);
+        return customerServiceService.getAllReplys(user,dateBegin,dateEnd);
     }
 
     @ApiOperation(value = "每个客服工单统计",  notes="需要Authorization")
     @GetMapping(value = "/reply/byService",produces = {"application/json;charest=Utf-8"})
-    public Result getAllReplysByService(){
+    public Result getAllReplysByService(@RequestParam(name="dateBegin",required = false)String dateBegin,
+                                        @RequestParam(name="dateEnd",required = false)String dateEnd){
         SysUserInfo user = UserInfoConfig.getUserInfo();
-        return customerServiceService.getAllReplysByService(user);
+        return customerServiceService.getAllReplysByService(user,dateBegin,dateEnd);
     }
 
     @ApiOperation(value = "获取未处理的工单数",  notes="需要Authorization")

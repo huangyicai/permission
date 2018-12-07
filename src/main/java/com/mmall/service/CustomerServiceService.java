@@ -28,8 +28,8 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param status
      * @return
      */
-    Result getAllCustomerService(Integer status,Integer type, Integer userId, Page ipage,String waybillNumber
-            ,String createTime,String endTime,Integer receiveSolt,Integer endSolt);
+    Result getAllCustomerService(Integer status,Integer type, Integer userId, Page ipage,String waybillNumber,
+                                 String keyName,String createTime,String endTime,Integer receiveSolt,Integer endSolt);
 
     /**
      * 获取客户自己的工单
@@ -78,14 +78,14 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param user
      * @return
      */
-    Result getAllReplys(SysUserInfo user);
+    Result getAllReplys(SysUserInfo user,String dateBegin,String dateEnd);
 
     /**
      * 每个客服工单统计
      * @param user
      * @return
      */
-    Result getAllReplysByService(SysUserInfo user);
+    Result getAllReplysByService(SysUserInfo user,String dateBegin,String dateEnd);
 
     /**
      *

@@ -21,4 +21,15 @@
         on sk.id=special_pricing_group.key_id AND user_id =#{userId}
         ORDER BY first_or_continued,area_end ASC
     </select>
+    <select id="getSpecialPricingGroup" resultType="com.mmall.model.SpecialPricingGroup">
+        SELECT
+        area_begin as areaBegin,
+        area_end as areaEnd,
+        weight_standard as weightStandard,
+        first_weight as firstWeight,
+        first_weight_price as firstWeightPrice,
+        price,
+        first_or_continued as firstOrContinued
+        WHERE key_id = #{keyId}
+    </select>
 </mapper>

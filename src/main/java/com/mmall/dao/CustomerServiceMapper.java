@@ -32,6 +32,7 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                  @Param("type") Integer type,
                                                  @Param("userId")Integer userId,
                                                  @Param("waybillNumber")String waybillNumber,
+                                                 @Param("keyName")String keyName,
                                                  @Param("createTime")String createTime,
                                                  @Param("endTime")String endTime,
                                                  @Param("receiveSolt")Integer receiveSolt,
@@ -62,4 +63,10 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                       @Param("type") Integer type,
                                                       @Param("userId")Integer userId,
                                                       @Param("waybillNumber")String waybillNumber);
+
+    int getCountServiceByHandleId(@Param("type")Integer type,
+                                  @Param("userId")Integer userId,
+                                  @Param("status")Integer status,
+                                  @Param("dateBegin")String dateBegin,
+                                  @Param("dateEnd")String dateEnd);
 }

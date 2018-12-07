@@ -33,7 +33,12 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     void deleteTotal(@Param("totalTime")String totalTime, @Param("sumId")String sumId);
 
-    Page<TotalVo> getBill(IPage page, @Param("totalTime") String totalTime, @Param("userId")String userId, @Param("state")Integer state,@Param("type") Integer type,@Param("sendId") Integer sendId);
+    Page<TotalVo> getBill(IPage page,
+                          @Param("totalTime") String totalTime,
+                          @Param("userId")String userId,
+                          @Param("state")Integer state,
+                          @Param("type") Integer type,
+                          @Param("sendId") Integer sendId);
 
     Total getBillCount(@Param("totalTime") String totalTime, @Param("userId")String userId,@Param("state")String state);
 
@@ -71,6 +76,7 @@ public interface TotalMapper extends BaseMapper<Total> {
     Total getSumBiLLDetails(@Param("status")Integer status,
                             @Param("userId")String userId,
                             @Param("date")String date,
+                            @Param("endDate")String endDate,
                             @Param("id")Integer id);
 
     List<Total> getAllBillByIds(String billIds);

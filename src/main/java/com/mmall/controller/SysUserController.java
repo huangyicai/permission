@@ -121,6 +121,7 @@ public class SysUserController {
     public Map<String ,String> unAuthorized(){
         throw new UnauthorizedException();
     }
+
     @ApiOperation(value = "token过期或未登录")
     @GetMapping(value = "/unAuthenticated",produces = {"application/json;charest=Utf-8"})
     public Map<String ,String> loginUrl(){

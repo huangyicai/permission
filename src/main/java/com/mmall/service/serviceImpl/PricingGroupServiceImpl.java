@@ -9,12 +9,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.mmall.dao.*;
 import com.mmall.excel.thread.ImportPrice;
-import com.mmall.model.City;
-import com.mmall.model.PricingGroup;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SpecialPricingGroup;
-import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.LevelUtil;
@@ -137,14 +134,33 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
     @Override
     @Transactional
-    public Result saveExistingPricingGroups(Integer userId, Integer selfId) {
+    public Result saveExistingPricingGroups(Integer userId, Integer selfId,Integer type) {
         pricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",selfId));
-
         List<PricingGroup> pricingGroupList = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id", userId));
         for(PricingGroup pg:pricingGroupList){
             pg.setUserId(selfId);
             pricingGroupMapper.insert(pg);
         }
+        if(type==1){
+            List<SpecialPricingGroupKey> specialPricingGroupKeyList = specialPricingGroupKeyMapper.selectList(new QueryWrapper<SpecialPricingGroupKey>().eq("user_id", userId));
+
+            for(SpecialPricingGroupKey sp :specialPricingGroupKeyList){
+                SpecialPricingGroupKey gk = new SpecialPricingGroupKey();
+                gk.setStatus(sp.getStatus());
+                gk.setKeyName(sp.getKeyName());
+                gk.setUserId(selfId);
+                specialPricingGroupKeyMapper.insert(gk);
+                List<SpecialPricingGroup> pricingGroups = specialPricingGroupMapper.selectList(new QueryWrapper<SpecialPricingGroup>()
+                        .eq("key_id",sp.getId()));
+                for(SpecialPricingGroup spg : pricingGroups){
+                    spg.setId(null);
+                    spg.setKeyId(gk.getId());
+                    specialPricingGroupMapper.insert(spg);
+                }
+            }
+        }
+
+
         return Result.ok();
     }
 

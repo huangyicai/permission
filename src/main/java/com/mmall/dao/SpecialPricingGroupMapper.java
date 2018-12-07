@@ -18,4 +18,6 @@ import java.util.List;
 public interface SpecialPricingGroupMapper extends BaseMapper<SpecialPricingGroup> {
 
     List<PricingGroupVo> getPricingGroupVo(@Param("userId") Integer UserId);
+
+    List<SpecialPricingGroup> getSpecialPricingGroup(@Param("keyId") Integer keyId);
 }
