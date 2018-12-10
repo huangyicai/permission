@@ -51,7 +51,8 @@ public class CustomerUserController {
             @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "long",paramType = "path")
     })
     @PostMapping(value = "/addCustomerUser/{userId}/{customerUserId}}",produces = {"application/json;charest=Utf-8"})
-    public Result addCustomerUser(@PathVariable Integer userId,@PathVariable Integer customerUserId){
+    public Result addCustomerUser(@PathVariable Integer userId,
+                                  @PathVariable Integer customerUserId){
         CustomerUser one = customerUserService.getOne(new QueryWrapper<CustomerUser>()
                 .eq("user_id", userId));
         if(one!=null){

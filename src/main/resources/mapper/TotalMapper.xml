@@ -258,7 +258,7 @@
     <select id="getCollection" resultType="com.mmall.model.SysUserInfo">
       select distinct s.* from total t
       join sys_user_info s
-      on t.send_id=s.id
+      on t.user_id=s.id
       WHERE t.send_id=#{sendId} and  FIND_IN_SET (t.total_state,'3,5')
     </select>
 </mapper>
