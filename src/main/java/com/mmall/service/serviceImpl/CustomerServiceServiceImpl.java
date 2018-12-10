@@ -3,8 +3,8 @@ package com.mmall.service.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mmall.Socket.ExpressWebSocket;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
@@ -19,17 +19,12 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.WorkReply;
 import com.mmall.model.params.CustomerServiceParam;
 import com.mmall.service.CustomerServiceService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mmall.service.ExpressUserService;
 import com.mmall.util.DateTimeUtil;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -86,6 +81,13 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                                         String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
         Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, keyName, createTime, endTime,receiveSolt,endSolt);
         return Result.ok(ipage);
+    }
+
+    @Override
+    public List<CustomerService> getAllCustomerService(Integer status,Integer type, Integer expressId,String waybillNumber,
+                                        String keyName,
+                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
+        return customerServiceMapper.getAllCustomerServices(status, type, expressId, waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt);
     }
 
     @Override
