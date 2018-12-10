@@ -3,6 +3,7 @@ package com.mmall.controller.express;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.MessageMapper;
 import com.mmall.dao.SysUserInfoMapper;
@@ -23,11 +24,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -44,7 +47,6 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
-
     @Autowired
     private UserMessageService userMessageService;
     @Autowired
@@ -120,5 +122,6 @@ public class MessageController {
         messageMapper.delete(new QueryWrapper<Message>().eq("id",userMessageId));
         return Result.ok();
     }
+
 }
 

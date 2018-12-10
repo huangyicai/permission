@@ -188,7 +188,12 @@
             <if test="waybillNumber!=null and waybillNumber!=''">
                 and waybill_number = #{waybillNumber}
             </if>
-
+            <if test="createTime!=null and createTime!=''">
+                and create_time &gt; #{createTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                and create_time &lt; #{endTime}
+            </if>
             and handle_id =#{userId}
         </where>
         ORDER BY status ASC,type_id ASC,create_time DESC

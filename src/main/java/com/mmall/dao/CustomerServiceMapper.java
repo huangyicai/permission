@@ -62,7 +62,9 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                       @Param("status") Integer status,
                                                       @Param("type") Integer type,
                                                       @Param("userId")Integer userId,
-                                                      @Param("waybillNumber")String waybillNumber);
+                                                      @Param("waybillNumber")String waybillNumber,
+                                                      @Param("createTime")String createTime,
+                                                      @Param("endTime")String endTime);
 
     int getCountServiceByHandleId(@Param("type")Integer type,
                                   @Param("userId")Integer userId,

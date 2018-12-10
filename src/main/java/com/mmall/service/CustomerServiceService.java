@@ -7,6 +7,8 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.CustomerServiceParam;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * <p>
  *  服务类
@@ -56,7 +58,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param waybillNumber
      * @return
      */
-    Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber);
+    Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber,String createTime,String endTime);
 
     /**
      * 回复工单
@@ -100,4 +102,10 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result getUserKeys(SysUserInfo userInfo);
+
+    /**
+     *
+     * @param response
+     */
+    void createExcel(HttpServletResponse response);
 }

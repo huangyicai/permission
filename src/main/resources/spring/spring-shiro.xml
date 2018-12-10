@@ -22,6 +22,7 @@
              <value>
                 <!--/total/** = anon-->
                  /websocket = anon
+                 /express/service/download2 = anon
                  /druid/** = anon
                  /swagger-ui.html = anon
                  /v2/api-docs = anon

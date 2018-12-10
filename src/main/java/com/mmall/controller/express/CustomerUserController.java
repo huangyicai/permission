@@ -2,7 +2,6 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.mmall.dao.CustomerUserMapper;
 import com.mmall.model.CustomerUser;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
@@ -32,9 +31,6 @@ public class CustomerUserController {
     @Autowired
     private CustomerUserService customerUserService;
 
-    @Autowired
-    private CustomerUserMapper customerUserMapper;
-
     @ApiOperation(value = "获取客服下的客户",notes = "需要Authorization")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "long",paramType = "path")
@@ -47,49 +43,42 @@ public class CustomerUserController {
 
     @ApiOperation(value = "客服绑定客户",notes = "需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId",value = "客户id",dataType = "long",paramType = "path"),
+            @ApiImplicitParam(name = "userId",value = "客户id",dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "long",paramType = "path")
     })
-    @PostMapping(value = "/addCustomerUser/{userId}/{customerUserId}}",produces = {"application/json;charest=Utf-8"})
-    public Result addCustomerUser(@PathVariable Integer userId,
+    @PostMapping(value = "/addCustomerUser/{customerUserId}}",produces = {"application/json;charest=Utf-8"})
+    public Result addCustomerUser(String userId,
                                   @PathVariable Integer customerUserId){
-        CustomerUser one = customerUserService.getOne(new QueryWrapper<CustomerUser>()
-                .eq("user_id", userId));
-        if(one!=null){
-            return Result.error(InfoEnums.USER_EXIST);
-        }
-        CustomerUser cu=new CustomerUser();
-        cu.setCustomerId(customerUserId);
-        cu.setUserId(userId);
-        customerUserService.save(cu);
-        return Result.ok();
+        return customerUserService.addCustomerUser(userId,customerUserId);
     }
 
     @ApiOperation(value = "客服解绑客户",notes = "需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "long",paramType = "path")
+            @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "Stirng",paramType = "query")
     })
-    @DeleteMapping(value = "/deleteCustomerUser/{customerUserId}",produces = {"application/json;charest=Utf-8"})
-    public Result deleteCustomerUser(@PathVariable Integer customerUserId){
-        customerUserService.removeById(customerUserId);
+    @DeleteMapping(value = "/deleteCustomerUser",produces = {"application/json;charest=Utf-8"})
+    public Result deleteCustomerUser(String customerUserId){
+        if("".equals(customerUserId) || customerUserId==null){
+            return Result.error(InfoEnums.PARAM_NOT);
+        }
+        String[] split = customerUserId.split(",");
+
+        for(String str:split){
+            customerUserService.removeById(Integer.parseInt(str));
+        }
         return Result.ok();
     }
 
     @ApiOperation(value = "客服修改绑定客户",notes = "需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId",value = "客户id",dataType = "long",paramType = "path"),
+            @ApiImplicitParam(name = "customerId",value = "新客服id",dataType = "long",paramType = "path"),
             @ApiImplicitParam(name = "customerUserId",value = "客服绑定客户id",dataType = "long",paramType = "path")
     })
-    @PutMapping(value = "/updateCustomerUser/{customerUserId}/{userId}",produces = {"application/json;charest=Utf-8"})
-    public Result updateCustomerUser(@PathVariable Integer userId,
+    @PutMapping(value = "/updateCustomerUser/{customerUserId}/{customerId}",produces = {"application/json;charest=Utf-8"})
+    public Result updateCustomerUser(@PathVariable Integer customerId,
                                      @PathVariable Integer customerUserId){
-        CustomerUser one = customerUserService.getOne(new QueryWrapper<CustomerUser>()
-                .eq("user_id", userId));
-        if(one!=null){
-            return Result.error(InfoEnums.USER_EXIST);
-        }
         CustomerUser cu=new CustomerUser();
-        cu.setUserId(userId);
+        cu.setCustomerId(customerId);
         cu.setId(customerUserId);
         customerUserService.updateById(cu);
         return Result.ok();

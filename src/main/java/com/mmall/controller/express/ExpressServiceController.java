@@ -21,6 +21,9 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +60,14 @@ public class ExpressServiceController {
     public Result getCustomerServiceBySelf(@RequestParam(name="status",required = false,defaultValue = "0") Integer status,
                                            @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
+                                           @RequestParam(name = "createTime",required = false) String createTime,
+                                           @RequestParam(name = "endTime",required = false) String endTime,
                                         @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                         @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         //SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         SysUserInfo userInfo = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         Page ipage = new Page(page,size);
-        return customerServiceService.getCustomerServiceBySelf(status,type,userInfo.getId(),ipage,waybillNumber);
+        return customerServiceService.getCustomerServiceBySelf(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime);
     }
 
     @ApiOperation(value = "我来处理工单",  notes="需要Authorization")
@@ -154,6 +159,14 @@ public class ExpressServiceController {
     public Result getAllByNoHandle(){
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return customerServiceService.getAllByNoHandle(user);
+    }
+    @RequestMapping(value = "/download2")
+    @ResponseBody
+    public void download2(HttpServletRequest request,
+                          HttpServletResponse response) throws FileNotFoundException {
+
+        customerServiceService.createExcel(response);
+
     }
 
 }
