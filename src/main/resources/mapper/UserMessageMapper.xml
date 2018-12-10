@@ -6,7 +6,6 @@
     <resultMap id="BaseResultMap" type="com.mmall.model.UserMessage">
         <id column="id" property="id" />
         <result column="message_id" property="messageId" />
-        <result column="send_id" property="sendId" />
         <result column="user_id" property="userId" />
         <result column="status" property="status" />
     </resultMap>
@@ -15,5 +14,16 @@
     <sql id="Base_Column_List">
         id, message_id, send_id, user_id, status
     </sql>
+    <update id="updateMessage">
+        UPDATE
+        user_message
+        set
+        status = 0
+        WHERE
+        FIND_IN_SET(message_id,#{userMessageId})
+        and
+        user_id=#{id}
+
+    </update>
 
 </mapper>

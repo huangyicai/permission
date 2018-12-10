@@ -33,6 +33,13 @@ public class Message implements Serializable {
     private Integer id;
 
     private String title;
+
+    /**
+     * 发送者id
+     */
+    @ApiModelProperty(value = "发送者id")
+    @TableField("send_id")
+    private Integer sendId;
     /**
      * 内容
      */
@@ -53,6 +60,13 @@ public class Message implements Serializable {
     @TableField("update_time")
     private String updateTime;
 
+    public Integer getSendId() {
+        return sendId;
+    }
+
+    public void setSendId(Integer sendId) {
+        this.sendId = sendId;
+    }
 
     public Integer getId() {
         return id;
@@ -106,5 +120,14 @@ public class Message implements Serializable {
     }
 
     public Message() {
+    }
+
+    public Message(Integer id, String title, Integer sendId, String content, String createTime, String updateTime) {
+        this.id = id;
+        this.title = title;
+        this.sendId = sendId;
+        this.content = content;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
     }
 }

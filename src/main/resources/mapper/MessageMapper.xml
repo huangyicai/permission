@@ -6,6 +6,7 @@
     <resultMap id="BaseResultMap" type="com.mmall.model.Message">
         <id column="id" property="id" />
         <result column="title" property="title" />
+        <result column="send_id" property="sendId" />
         <result column="content" property="content" />
         <result column="create_time" property="createTime" />
         <result column="update_time" property="updateTime" />
@@ -17,12 +18,20 @@
     </sql>
 
     <!--客户获取信息列表-->
-    <select id="ListByIds"  resultType="com.mmall.vo.MessageVo">
-      select message.id,title,content,create_time as createTime,um.id as userMessageId
-      from message
+    <select id="ListByIds"  resultType="com.mmall.model.Message">
+      select
+      m.id,
+      m.send_id as sendId,
+      m.title,
+      m.content,
+      m.create_time as createTime
+      from message m
       join user_message as um
-      on message.id=um.message_id
-      where FIND_IN_SET(um.id,#{idStr})
+      on m.id=um.message_id
+      where
+        user_id=#{userId}
+        and
+        um.status = 1
     </select>
 
     <!--快递公司获取信息列表-->

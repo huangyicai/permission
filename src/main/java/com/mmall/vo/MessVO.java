@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Setter
 @Getter
@@ -23,5 +24,5 @@ public class MessVO implements Serializable {
     private String createTime;
 
     @ApiModelProperty(value = "关联表id")
-    private userMessageVo userMessageVo;
+    private List<UserMessageVo> userMessageVos;
 }

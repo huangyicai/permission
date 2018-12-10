@@ -15,6 +15,9 @@ import java.util.List;
  * @since 2018-09-20
  */
 public interface SysUserInfoMapper extends BaseMapper<SysUserInfo> {
+
+    String findUserName(@Param("id")Integer id);
+
     SysUserInfo findUserByusername(String username);
 
     SysUserInfo findUserInfoByid(Integer id);

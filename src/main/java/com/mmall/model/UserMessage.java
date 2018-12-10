@@ -37,12 +37,7 @@ public class UserMessage implements Serializable {
     @ApiModelProperty(value = "信息id")
     @TableField("message_id")
     private Integer messageId;
-    /**
-     * 发送者id
-     */
-    @ApiModelProperty(value = "发送者id")
-    @TableField("send_id")
-    private Integer sendId;
+
     /**
      * 接收者id
      */
@@ -73,13 +68,6 @@ public class UserMessage implements Serializable {
         this.messageId = messageId;
     }
 
-    public Integer getSendId() {
-        return sendId;
-    }
-
-    public void setSendId(Integer sendId) {
-        this.sendId = sendId;
-    }
 
     public Integer getUserId() {
         return userId;
@@ -102,7 +90,6 @@ public class UserMessage implements Serializable {
         return "UserMessage{" +
         ", id=" + id +
         ", messageId=" + messageId +
-        ", sendId=" + sendId +
         ", userId=" + userId +
         ", status=" + status +
         "}";

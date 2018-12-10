@@ -44,15 +44,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
             Message m=new Message();
             m.setTitle(messageParam.getTitle());
             m.setContent(messageParam.getContent());
+            m.setSendId(userInfo.getId());
             this.save(m);
 
             //添加关联表
             for (String id:split){
                 UserMessage um=new UserMessage();
                 um.setMessageId(m.getId());
-                um.setSendId(userInfo.getId());
                 um.setUserId(Integer.parseInt(id));
-                this.save(m);
+                userMessageService.save(um);//hyc改了
             }
 
         }else{

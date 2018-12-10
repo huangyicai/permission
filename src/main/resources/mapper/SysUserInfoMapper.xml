@@ -64,6 +64,14 @@
         WHERE
             i.level like #{level} AND i.platform_id = 3 and i.status=1
     </select>
+    <select id="findUserName" resultType="java.lang.String">
+        SELECT
+        i.name
+        FROM
+            sys_user_info i
+        WHERE
+        i.id=#{id}
+    </select>
 
 
 </mapper>

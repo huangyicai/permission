@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface MessageMapper extends BaseMapper<Message> {
 
-    List<MessageVo> ListByIds(@Param("idStr") String idStr);
+    List<Message> ListByIds(@Param("userId") Integer userId);
 
     List<MessVO> getListByIds(@Param("idStr") String idStr);
 }

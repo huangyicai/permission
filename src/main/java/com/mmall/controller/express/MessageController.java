@@ -2,8 +2,13 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Lists;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.MessageMapper;
+import com.mmall.dao.SysUserInfoMapper;
+import com.mmall.dao.UserMessageMapper;
+import com.mmall.dto.MessageDto;
+import com.mmall.model.Message;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
@@ -13,11 +18,13 @@ import com.mmall.service.MessageService;
 import com.mmall.service.UserMessageService;
 import com.mmall.vo.MessVO;
 import com.mmall.vo.MessageVo;
+import com.mmall.vo.UserMessageVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,9 +47,12 @@ public class MessageController {
 
     @Autowired
     private UserMessageService userMessageService;
-
+    @Autowired
+    private UserMessageMapper userMessageMapper;
     @Autowired
     private MessageMapper messageMapper;
+    @Autowired
+    private SysUserInfoMapper sysUserInfoMapper;
 
     @ApiOperation(value = "发送信息",  notes="需要Authorization")
     @PostMapping(value = "/addMessage",produces = {"application/json;charest=Utf-8"})
@@ -55,7 +65,7 @@ public class MessageController {
     public Result getUserMessage(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         if(userInfo.getPlatformId()==3){
-            List<MessageVo> listByIds = messageMapper.ListByIds(userInfo.getId().toString());
+            List<Message> listByIds = messageMapper.ListByIds(userInfo.getId());
             return Result.ok(listByIds);
         }
         return Result.error(InfoEnums.UNAUTHORIZATION);
@@ -66,11 +76,9 @@ public class MessageController {
             @ApiImplicitParam(name = "userMessageId",value = "用户信息关联id",dataType = "long",paramType = "path")
     })
     @PutMapping(value = "/confirmMessage/{userMessageId}",produces = {"application/json;charest=Utf-8"})
-    public Result confirmMessage(@PathVariable(value = "userMessageId") Integer userMessageId){
-        UserMessage message=new UserMessage();
-        message.setStatus(1);
-        message.setId(userMessageId);
-        userMessageService.updateById(message);
+    public Result confirmMessage(@PathVariable(value = "userMessageId") String userMessageId){
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+        userMessageMapper.updateMessage(userMessageId,userInfo.getId());
         return Result.ok();
     }
 
@@ -79,8 +87,24 @@ public class MessageController {
     public Result getSendMessage(){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         if(userInfo.getPlatformId()==2){
-            List<MessVO> listByIds = messageMapper.getListByIds(userInfo.getId().toString());
-            return Result.ok(listByIds);
+            List<Message> listByIds = messageMapper.selectList(new QueryWrapper<Message>()
+                    .eq("send_id",userInfo.getId()));
+
+            List<MessageDto> messageDtos = Lists.newArrayList();
+
+            for(Message message : listByIds){
+                MessageDto adapt = MessageDto.adapt(message);
+                List<UserMessage> message_id = userMessageMapper.selectList(new QueryWrapper<UserMessage>()
+                        .eq("message_id", message.getId()));
+                for(UserMessage userMessage:message_id){
+                    UserMessageVo uv = new UserMessageVo();
+                    uv.setName(sysUserInfoMapper.findUserName(userMessage.getUserId()));
+                    uv.setState(userMessage.getStatus());
+                    adapt.getUserMessageVo().add(uv);
+                }
+                messageDtos.add(adapt);
+            }
+            return Result.ok(messageDtos);
         }
         return Result.error(InfoEnums.UNAUTHORIZATION);
     }
@@ -90,14 +114,11 @@ public class MessageController {
             @ApiImplicitParam(name = "userMessageId",value = "用户信息关联id",dataType = "long",paramType = "path")
     })
     @DeleteMapping(value = "/deleteMessage/{userMessageId}",produces = {"application/json;charest=Utf-8"})
+    @Transactional
     public Result deleteMessage(@PathVariable(value = "userMessageId") Integer userMessageId){
-        UserMessage byId = userMessageService.getById(userMessageId);
-        List<UserMessage> messageId = userMessageService.list(new QueryWrapper<UserMessage>().eq("message_id", byId.getMessageId()));
-        if(messageId==null || messageId.size()==0){
-            messageMapper.deleteById( byId.getMessageId());
-        }
-        userMessageService.removeById(userMessageId);
-       return Result.ok();
+        userMessageMapper.delete(new QueryWrapper<UserMessage>().eq("message_id",userMessageId));
+        messageMapper.delete(new QueryWrapper<Message>().eq("id",userMessageId));
+        return Result.ok();
     }
 }
 
