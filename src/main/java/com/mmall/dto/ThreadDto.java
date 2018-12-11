@@ -96,6 +96,7 @@ public class ThreadDto {
 
     private BigDecimal cost;
 
+
     private BigDecimal off;
 
     public BigDecimal getOff() {

@@ -386,6 +386,11 @@ public class XlsxProcessAbstract {
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
+
+        if(threadDto.getCost().compareTo(new BigDecimal("0"))==1){
+            strings = new String[]{"商家名称", "扫描时间", "运单编号", "目的地", "快递重量", "报价"};
+        }
+
         DataSheetExecute<Bill> dataSheetExecute = new DataSheetExecute<Bill>() {
 
 //            public void execute(Row row, Bill personUser) {
@@ -556,9 +561,13 @@ public class XlsxProcessAbstract {
             //计算每个月份的单量，总重量
             total+=1;
             weightOne=weightOne.add(bill.getWeight());
+
+            //读取报价
             if(pricing==1){
                 pri=pri.add(bill.getCost());
             }
+
+            //计算成本
             if(byId.getPricingStatus()==1){
                 cos=cos.add(bill.getCost());
             }
