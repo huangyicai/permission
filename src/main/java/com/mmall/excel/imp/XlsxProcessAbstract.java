@@ -387,7 +387,7 @@ public class XlsxProcessAbstract {
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
 
 
-        if(threadDto.getCost().compareTo(new BigDecimal("0"))==1){
+        if(threadDto.getOff().compareTo(new BigDecimal("0"))==1){
             strings = new String[]{"商家名称", "扫描时间", "运单编号", "目的地", "快递重量", "报价"};
         }
 
@@ -564,7 +564,7 @@ public class XlsxProcessAbstract {
 
             //读取报价
             if(pricing==1){
-                pri=pri.add(bill.getCost());
+                pri=pri.add(bill.getOffer());
             }
 
             //计算成本
@@ -613,8 +613,8 @@ public class XlsxProcessAbstract {
         }
 
         dyStr=dyStr.substring(0,dyStr.length()-1);
-        threadDto.setCost(pri);
-        threadDto.setOff(cos);
+        threadDto.setCost(cos);
+        threadDto.setOff(pri);
         threadDto.setDaily(dyStr);
         threadDto.setDailyTime(time);
         threadDto.setSendId(userInfo.getId());
