@@ -451,8 +451,8 @@ public class XlsxProcessAbstract {
                 total.setCdUrl(path);
                 total.setCreateTime(new Date());
                 total.setTotalState(pricing);
-                total.setTotalOffer(threadDto.getCost());
-                total.setTotalCost(threadDto.getOff());
+                total.setTotalOffer(threadDto.getOff());
+                total.setTotalCost(threadDto.getCost());
                 totalMapper.insert(total);
 
                 //添加重量区间数据
@@ -696,8 +696,8 @@ public class XlsxProcessAbstract {
 //                total.setName(threadDto.getKey());
                 total.setTotalNumber(threadDto.getTotalNum());
                 total.setTotalWeight(threadDto.getWeight());
-                total.setTotalOffer(threadDto.getCost());
-                total.setTotalCost(threadDto.getOff());
+                total.setTotalOffer(threadDto.getOff());
+                total.setTotalCost(threadDto.getCost());
                 total.setTotalPaid(BigDecimal.ZERO);
                 total.setTotalUrl(replace);
                 total.setTotalState(pricing);
@@ -817,7 +817,7 @@ public class XlsxProcessAbstract {
                     bill.setWeight(new BigDecimal(cellStrs[4]));
 
                     if(pricing==1){
-                        bill.setCost(new BigDecimal(cellStrs[5]));
+                        bill.setOffer(new BigDecimal(cellStrs[5]));
                     }
 
                     //todo 后续分表按照名字+时间，可实现按用户和时间的分表
