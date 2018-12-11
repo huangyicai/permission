@@ -3,8 +3,8 @@ package com.mmall.service.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mmall.Socket.ExpressWebSocket;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.constants.LevelConstants;
@@ -19,8 +19,6 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.WorkReply;
 import com.mmall.model.params.CustomerServiceParam;
 import com.mmall.service.CustomerServiceService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mmall.service.ExpressUserService;
 import com.mmall.util.DateTimeUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -37,7 +35,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>
@@ -94,6 +91,13 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                                         String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
         Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, keyName, createTime, endTime,receiveSolt,endSolt);
         return Result.ok(ipage);
+    }
+
+    @Override
+    public List<CustomerService> getAllCustomerService(Integer status,Integer type, Integer expressId,String waybillNumber,
+                                        String keyName,
+                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
+        return customerServiceMapper.getAllCustomerServices(status, type, expressId, waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt);
     }
 
     @Override
@@ -254,35 +258,5 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
         List<BillKeyword> userKeys = billKeywordMapper.selectList(new QueryWrapper<BillKeyword>()
                 .eq("user_id", userInfo.getId()).eq("status",1));
         return Result.ok(userKeys);
-    }
-
-    @Override
-    public void createExcel(HttpServletResponse response) {
-        //创建workbook
-        HSSFWorkbook workbook = new HSSFWorkbook();
-        //添加Worksheet（不添加sheet时生成的xls文件打开时会报错)
-        Sheet sheet1 = workbook.createSheet("sheet1");
-        OutputStream out = null;
-        try {
-            out = response.getOutputStream();
-            String fileName = "test.xls";// 文件名
-            response.setContentType("application/x-msdownload");
-            response.setHeader("Content-Disposition", "attachment; filename="
-                    + URLEncoder.encode(fileName, "UTF-8"));
-            Row row = workbook.getSheet("sheet1").createRow(0);    //创建第一行
-            for(int i = 0;i < 10;i++){
-                Cell cell = row.createCell(i);
-                cell.setCellValue(i);
-            }
-            workbook.write(out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

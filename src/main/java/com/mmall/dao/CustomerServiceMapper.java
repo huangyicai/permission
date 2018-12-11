@@ -1,9 +1,9 @@
 package com.mmall.dao;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.dto.ReplynumServiceDto;
 import com.mmall.model.CustomerService;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -29,6 +29,25 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
      */
     Page<CustomerService> getAllCustomerServices(Page ipage,
                                                  @Param("status") Integer status,
+                                                 @Param("type") Integer type,
+                                                 @Param("userId")Integer userId,
+                                                 @Param("waybillNumber")String waybillNumber,
+                                                 @Param("keyName")String keyName,
+                                                 @Param("createTime")String createTime,
+                                                 @Param("endTime")String endTime,
+                                                 @Param("receiveSolt")Integer receiveSolt,
+                                                 @Param("endSolt")Integer endSolt);
+
+    /**
+     * 获取快递公司所有工单--导出
+     * @param status
+     * @param userId
+     * @param waybillNumber
+     * @param createTime
+     * @param endTime
+     * @return
+     */
+    List<CustomerService> getAllCustomerServices(@Param("status") Integer status,
                                                  @Param("type") Integer type,
                                                  @Param("userId")Integer userId,
                                                  @Param("waybillNumber")String waybillNumber,

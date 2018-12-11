@@ -8,6 +8,7 @@ import com.mmall.model.SysUserInfo;
 import com.mmall.model.params.CustomerServiceParam;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * <p>
@@ -32,6 +33,14 @@ public interface CustomerServiceService extends IService<CustomerService> {
      */
     Result getAllCustomerService(Integer status,Integer type, Integer userId, Page ipage,String waybillNumber,
                                  String keyName,String createTime,String endTime,Integer receiveSolt,Integer endSolt);
+
+    /**
+     * 获取快递公司所有工单---导出
+     * @param status
+     * @return
+     */
+    List<CustomerService> getAllCustomerService(Integer status, Integer type, Integer userId, String waybillNumber,
+                               String keyName, String createTime, String endTime, Integer receiveSolt, Integer endSolt);
 
     /**
      * 获取客户自己的工单
@@ -103,9 +112,4 @@ public interface CustomerServiceService extends IService<CustomerService> {
      */
     Result getUserKeys(SysUserInfo userInfo);
 
-    /**
-     *
-     * @param response
-     */
-    void createExcel(HttpServletResponse response);
 }

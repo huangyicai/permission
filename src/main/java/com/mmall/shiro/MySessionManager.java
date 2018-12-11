@@ -71,6 +71,12 @@ public class MySessionManager extends DefaultWebSessionManager {
      */
     private Serializable getReferencedSessionId(ServletRequest request, ServletResponse response) {
         String id = this.getSessionIdCookieValue(request, response);
+        HttpServletRequest req = (HttpServletRequest)request;
+        String requestURI = req.getRequestURI();
+        if("/express/service/ExportOrder".equals(requestURI)){
+            id = req.getParameter("token");
+        }
+        //if(){}
         if (id != null) {
             request.setAttribute(ShiroHttpServletRequest.REFERENCED_SESSION_ID_SOURCE, "cookie");
         } else {
@@ -78,9 +84,11 @@ public class MySessionManager extends DefaultWebSessionManager {
             if (id == null) {
                 // 获取请求头中的session
                 id = WebUtils.toHttp(request).getHeader(this.authorization);
+
                 if (id == null) {
                     String name = this.getSessionIdName();
                     id = request.getParameter(name);
+
                     if (id == null) {
                         id = request.getParameter(name.toLowerCase());
                     }
