@@ -2,7 +2,6 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.common.collect.Lists;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.CityMapper;
@@ -12,19 +11,21 @@ import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.params.PricingGroupParam;
 import com.mmall.model.params.keyNameParam;
+import com.mmall.service.PrepaidService;
 import com.mmall.service.PricingGroupService;
 import com.mmall.util.BeanValidator;
 import com.mmall.vo.CityVo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.Api;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -41,12 +42,19 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/express/pricingGroup")
 public class PricingGroupController {
+
     @Autowired
     private PricingGroupService pricingGroupService;
+
     @Autowired
     private CityMapper cityMapper;
+
     @Autowired
     private SpecialPricingGroupKeyMapper specialPricingGroupKeyMapper;
+
+    @Autowired
+    private PrepaidService prepaidService;
+
     @ApiOperation(value = "获取省份",  notes="需要Authorization")
     @GetMapping(value = "/cityList/{userId}",produces = {"application/json;charest=Utf-8"})
     public Result<List<CityVo>> getCusmotersInfo(@PathVariable("userId") Integer userId) throws InvocationTargetException, IllegalAccessException {
@@ -217,6 +225,44 @@ public class PricingGroupController {
     public Result importPrice(@RequestParam(value = "file") MultipartFile file,
                               @PathVariable("userId")Integer userId) throws IOException, ExecutionException, InterruptedException {
         return pricingGroupService.importPrice(file,userId);
+    }
+
+    @ApiOperation(value = "输入预付金额/每单",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "money",value = "预付金额/每单",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "query")
+    })
+    @PostMapping(value = "/savePrepaid",produces = {"application/json;charest=Utf-8"})
+    public Result savePrepaid(@RequestParam(value = "money") String money,@RequestParam(value = "userId")Integer userId){
+        Prepaid p=new Prepaid();
+        p.setMoney(new BigDecimal(money));
+        p.setUserId(userId);
+        prepaidService.save(p);
+        return Result.ok();
+    }
+
+    @ApiOperation(value = "获取客户预付金额/每单",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "query")
+    })
+    @GetMapping(value = "/getPrepaid",produces = {"application/json;charest=Utf-8"})
+    public Result getPrepaid(@RequestParam(value = "userId")Integer userId){
+        Prepaid one = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id", userId));
+        return Result.ok(one);
+    }
+
+    @ApiOperation(value = "修改预付金额/每单",  notes="需要Authorization")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "money",value = "预付金额/每单",dataType = "String",paramType = "query"),
+            @ApiImplicitParam(name = "prepaidId",value = "主键",dataType = "long",paramType = "query")
+    })
+    @PutMapping(value = "/updatePrepaid",produces = {"application/json;charest=Utf-8"})
+    public Result updatePrepaid(@RequestParam(value = "money") String money,@RequestParam(value = "prepaidId")Integer prepaidId){
+        Prepaid p=new Prepaid();
+        p.setId(prepaidId);
+        p.setMoney(new BigDecimal(money));
+        prepaidService.updateById(p);
+        return Result.ok();
     }
 }
 
