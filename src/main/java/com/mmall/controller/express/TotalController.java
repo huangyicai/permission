@@ -283,7 +283,7 @@ public class TotalController {
 
     @ApiOperation(value = "获取账单详情",  notes="需要Authorization")
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
-    public Result getBillDetails(@RequestParam(name = "userId") String userId,
+    public Result getBillDetails(@RequestParam(name = "userId",required = false) String userId,
                                  @RequestParam(name = "date") String date,
                                  @RequestParam(name = "endDate") String endDate,
                                  @PathVariable("status")Integer status,

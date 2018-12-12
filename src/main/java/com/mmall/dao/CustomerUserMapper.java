@@ -16,5 +16,6 @@ import java.util.List;
  * @since 2018-12-07
  */
 public interface CustomerUserMapper extends BaseMapper<CustomerUser> {
-    List<SysUserInfo> getCustomerUserList(@Param("customerUserId") String customerUserId);
+    List<SysUserInfo> getCustomerUserList(@Param("customerUserId") Integer customerUserId);
+
 }

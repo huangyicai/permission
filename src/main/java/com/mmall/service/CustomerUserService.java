@@ -3,6 +3,9 @@ package com.mmall.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.model.CustomerUser;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SysUserInfo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -18,4 +21,10 @@ public interface CustomerUserService extends IService<CustomerUser> {
 
     Result getCustomerUserList(Integer customerUserId);
 
+    /**
+     * 获取分支下未绑定的客户
+     * @param id
+     * @return
+     */
+    Result<List<SysUserInfo>> getBranchCusmotersUserNotbinding(Integer id);
 }

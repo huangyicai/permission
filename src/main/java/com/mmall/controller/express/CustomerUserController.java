@@ -2,9 +2,11 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.mmall.config.UserInfoConfig;
 import com.mmall.model.CustomerUser;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
+import com.mmall.model.SysUserInfo;
 import com.mmall.service.CustomerUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,18 +39,21 @@ public class CustomerUserController {
     })
     @GetMapping(value = "/getCustomerUserList/{customerUserId}",produces = {"application/json;charest=Utf-8"})
     public Result getCustomerUserList(@PathVariable Integer customerUserId){
-        List<CustomerUser> customerId = customerUserService.list(new QueryWrapper<CustomerUser>().eq("customer_id", customerUserId));
-        return Result.ok(customerId);
+        return customerUserService.getCustomerUserList(customerUserId);
     }
-
+    @ApiOperation(value = "获取分支下未绑定的客户", notes="需要Authorization")
+    @GetMapping(value = "/branchUsers/{id}",produces = {"application/json;charest=Utf-8"})
+    public Result<List<SysUserInfo>> getBranchCusmotersUser(@PathVariable("id")Integer id){
+        return customerUserService.getBranchCusmotersUserNotbinding(id);
+    }
     @ApiOperation(value = "客服绑定客户",notes = "需要Authorization")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId",value = "客户id",dataType = "String",paramType = "query"),
             @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "long",paramType = "path")
     })
-    @PostMapping(value = "/addCustomerUser/{customerUserId}}",produces = {"application/json;charest=Utf-8"})
-    public Result addCustomerUser(String userId,
-                                  @PathVariable Integer customerUserId){
+    @PostMapping(value = "/addCustomerUser/{userId}/{customerUserId}",produces = {"application/json;charest=Utf-8"})
+    public Result addCustomerUser( @PathVariable("userId")  String userId,
+                                  @PathVariable("customerUserId") Integer customerUserId){
         return customerUserService.addCustomerUser(userId,customerUserId);
     }
 
@@ -56,16 +61,10 @@ public class CustomerUserController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "customerUserId",value = "客服id",dataType = "Stirng",paramType = "query")
     })
-    @DeleteMapping(value = "/deleteCustomerUser",produces = {"application/json;charest=Utf-8"})
-    public Result deleteCustomerUser(String customerUserId){
-        if("".equals(customerUserId) || customerUserId==null){
-            return Result.error(InfoEnums.PARAM_NOT);
-        }
-        String[] split = customerUserId.split(",");
+    @DeleteMapping(value = "/deleteCustomerUser/{customerUserId}",produces = {"application/json;charest=Utf-8"})
+    public Result deleteCustomerUser(@PathVariable("customerUserId")Integer customerUserId){
 
-        for(String str:split){
-            customerUserService.removeById(Integer.parseInt(str));
-        }
+        customerUserService.remove(new QueryWrapper<CustomerUser>().eq("user_id",customerUserId));
         return Result.ok();
     }
 

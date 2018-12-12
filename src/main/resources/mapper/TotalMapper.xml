@@ -228,7 +228,9 @@
             <if test="date!=null and date!=''">
                 and t.total_time>=#{date}
             </if>
+            <if test="userId!=null and userId!=''">
             and  FIND_IN_SET(t.user_id,#{userId})
+            </if>
             <if test="status>1">
                 and t.total_state=#{status}
             </if>

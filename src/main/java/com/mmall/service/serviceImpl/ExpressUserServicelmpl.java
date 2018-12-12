@@ -105,7 +105,7 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         Integer id = user.getId();
         //List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
         List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
-                .like("level","%"+id+"%")
+                .like("level","%,"+id+",%")
                 .in("status",1,0)
                 .in("platform_id",LevelConstants.BRANCH,LevelConstants.SERVICE));
         String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
