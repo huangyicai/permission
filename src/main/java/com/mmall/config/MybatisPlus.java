@@ -32,7 +32,7 @@ public class MybatisPlus {
     private static String authorName="qty";
 
     //table名字
-    private static String table="user_message";
+    private static String table="prepaid";
 
     //table前缀
     private static String prefix="";

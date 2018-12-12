@@ -90,6 +90,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     @Autowired
     private SysUserInfoMapper sysUserInfoMapper;
 
+    @Autowired
+    private PrepaidService prepaidService;
+
 
     /**
      * 获取客户月计统计
@@ -418,10 +421,18 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         File file=new File(total.getCdUrl());
         String upload = UploadApi.upload(file, str[str.length-1], total.getTotalTime()+"/"+total.getName()+"/");
 
+        //计算预付
+        Prepaid by = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id",total.getUserId()));
+        BigDecimal money=BigDecimal.ZERO;
+        if(by!=null && by.getMoney().compareTo(new BigDecimal("0"))>0){
+            money=by.getMoney().multiply(new BigDecimal(list.size()+""));
+        }
+
         Total total1=new Total();
         total1.setTotalId(totalId);
         total1.setTotalCost(totalCost);
         total1.setTotalOffer(totalOffer);
+        total1.setTotalPaid(money);
         total1.setTotalState(1);
         total1.setTotalUrl(upload);
         total1.setUpdateTime(new Date());

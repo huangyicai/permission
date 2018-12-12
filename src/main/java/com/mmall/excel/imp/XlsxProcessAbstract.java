@@ -15,6 +15,7 @@ import com.mmall.excel.thread.ThreadImport;
 import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
+import com.mmall.service.PrepaidService;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.service.TotalService;
 import com.mmall.util.DateUtils;
@@ -83,6 +84,8 @@ public class XlsxProcessAbstract {
 
     private SpecialPricingGroupMapper specialPricingGroupMapper;
 
+    private PrepaidService prepaidService;
+
     private final Logger logger = LoggerFactory.getLogger(XlsxProcessAbstract.class);
 
     //开始读取行数从第0行开始计算
@@ -121,6 +124,7 @@ public class XlsxProcessAbstract {
         this.pricingGroupMapper = ApplicationContextHelper.getBeanClass(PricingGroupMapper.class);
         this.specialPricingGroupMapper = ApplicationContextHelper.getBeanClass(SpecialPricingGroupMapper.class);
         this.totalService1 = ApplicationContextHelper.getBeanClass(TotalService.class);
+        this.prepaidService = ApplicationContextHelper.getBeanClass(PrepaidService.class);
     }
 
 
@@ -439,6 +443,13 @@ public class XlsxProcessAbstract {
                 ProvincialMeter provincialMeter=new ProvincialMeter();
                 DailyTotal dailyTotal=new DailyTotal();
 
+                //计算预付
+                Prepaid byId = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id",userId));
+                BigDecimal money=BigDecimal.ZERO;
+                if(byId!=null && byId.getMoney().compareTo(new BigDecimal("0"))>0){
+                    money=byId.getMoney().multiply(new BigDecimal(threadDto.getTotalNum().toString()));
+                }
+
                 //添加账单表数据
                 total.setName(threadDto.getKey());
                 total.setUserId(userId);
@@ -453,6 +464,7 @@ public class XlsxProcessAbstract {
                 total.setTotalState(pricing);
                 total.setTotalOffer(threadDto.getOff());
                 total.setTotalCost(threadDto.getCost());
+                total.setTotalPaid(money);
                 totalMapper.insert(total);
 
                 //添加重量区间数据
@@ -691,6 +703,13 @@ public class XlsxProcessAbstract {
                 ProvincialMeter provincialMeter=new ProvincialMeter();
                 DailyTotal dailyTotal=new DailyTotal();
 
+                //计算预付
+                Prepaid byId = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id",(total.getUserId())));
+                BigDecimal money=BigDecimal.ZERO;
+                if(byId!=null && byId.getMoney().compareTo(new BigDecimal("0"))>0){
+                    money=byId.getMoney().multiply(new BigDecimal(threadDto.getTotalNum().toString()));
+                }
+
                 //修改账单表数据
                 total.setTotalId(total.getTotalId());
 //                total.setName(threadDto.getKey());
@@ -698,7 +717,7 @@ public class XlsxProcessAbstract {
                 total.setTotalWeight(threadDto.getWeight());
                 total.setTotalOffer(threadDto.getOff());
                 total.setTotalCost(threadDto.getCost());
-                total.setTotalPaid(BigDecimal.ZERO);
+                total.setTotalPaid(money);
                 total.setTotalUrl(replace);
                 total.setTotalState(pricing);
                 totalMapper.updateById(total);
