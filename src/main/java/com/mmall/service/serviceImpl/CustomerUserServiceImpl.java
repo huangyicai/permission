@@ -8,7 +8,6 @@ import com.mmall.dao.SysUserInfoMapper;
 import com.mmall.model.CustomerUser;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUser;
 import com.mmall.model.SysUserInfo;
 import com.mmall.service.CustomerUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +25,13 @@ import java.util.List;
  */
 @Service
 public class CustomerUserServiceImpl extends ServiceImpl<CustomerUserMapper, CustomerUser> implements CustomerUserService {
+
     @Autowired
     private CustomerUserMapper customerUserMapper;
+
     @Autowired
     private SysUserInfoMapper sysUserInfoMapper;
+
     /**
      * 批量添加客户
      * @param userId

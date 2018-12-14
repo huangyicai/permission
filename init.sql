@@ -796,3 +796,18 @@ CREATE TABLE `user_message` (
 -- Records of user_message
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for `user_message`
+-- ----------------------------
+DROP TABLE IF EXISTS `prepaid`;
+CREATE TABLE `prepaid` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) DEFAULT '0' COMMENT '用户详情id',
+  `money` decimal(10,3) DEFAULT '0.000' COMMENT '预付金额/每单',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='预付表';
+
+-- ----------------------------
+-- Records of user_message
+-- ----------------------------
+

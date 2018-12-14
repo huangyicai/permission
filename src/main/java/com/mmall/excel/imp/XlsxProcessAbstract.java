@@ -264,8 +264,8 @@ public class XlsxProcessAbstract {
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
                 province(bill.getDestination());
-                daily(bill.getSweepTime(),bill.getSerialNumber());
-
+                String daily = daily(bill.getSweepTime(), bill.getSerialNumber());
+                bill.setSweepTime(daily);
                 //计算每个月份的单量，总重量
                 total+=1;
                 weightOne=weightOne.add(bill.getWeight());
@@ -569,7 +569,9 @@ public class XlsxProcessAbstract {
         for (Bill bill:list) {
             weightInterval(bill.getWeight());
             province(bill.getDestination());
-            daily(bill.getSweepTime(),bill.getSerialNumber());
+            String daily = daily(bill.getSweepTime(), bill.getSerialNumber());
+            bill.setSweepTime(daily);
+
             //计算每个月份的单量，总重量
             total+=1;
             weightOne=weightOne.add(bill.getWeight());
@@ -920,7 +922,7 @@ public class XlsxProcessAbstract {
     /**
      * 根据每日数据进行分离
      */
-    private void daily(String sweepTime,String num){
+    private String daily(String sweepTime,String num){
 
         if (sweepTime!=null) {
             Pattern p = Pattern.compile("\t|\r|\n");
@@ -940,6 +942,7 @@ public class XlsxProcessAbstract {
             days=num;
         }
         dailyMap.put(format,days);
+        return format;
     }
 
     /**
