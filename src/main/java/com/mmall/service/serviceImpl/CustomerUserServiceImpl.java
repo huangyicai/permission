@@ -56,7 +56,6 @@ public class CustomerUserServiceImpl extends ServiceImpl<CustomerUserMapper, Cus
      */
     @Override
     public Result getCustomerUserList(Integer customerUserId) {
-
         return null;
     }
 }
