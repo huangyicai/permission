@@ -2,9 +2,7 @@ package com.mmall.controller.express;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.mmall.config.UserInfoConfig;
 import com.mmall.model.CustomerUser;
-import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
 import com.mmall.model.SysUserInfo;
 import com.mmall.service.CustomerUserService;
