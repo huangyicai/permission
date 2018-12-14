@@ -90,4 +90,8 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                   @Param("status")Integer status,
                                   @Param("dateBegin")String dateBegin,
                                   @Param("dateEnd")String dateEnd);
+
+    int updateCustomerService(@Param("userId")Integer userId,
+                               @Param("handleId")String handleId,
+                               @Param("name")String name);
 }

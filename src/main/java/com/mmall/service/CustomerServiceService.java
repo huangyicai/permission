@@ -112,4 +112,10 @@ public interface CustomerServiceService extends IService<CustomerService> {
      */
     Result getUserKeys(SysUserInfo userInfo);
 
+    /**转至其他客服处理
+     * @param userId
+     * @param handleId
+     * @return
+     */
+    Result updateCustomerService(Integer userId, String handleId);
 }

@@ -11,29 +11,16 @@ import com.mmall.constants.LevelConstants;
 import com.mmall.dao.*;
 import com.mmall.dto.ReplyDto;
 import com.mmall.dto.ReplynumServiceDto;
-import com.mmall.model.BillKeyword;
-import com.mmall.model.CustomerService;
+import com.mmall.model.*;
 import com.mmall.model.Response.InfoEnums;
 import com.mmall.model.Response.Result;
-import com.mmall.model.SysUserInfo;
-import com.mmall.model.WorkReply;
 import com.mmall.model.params.CustomerServiceParam;
 import com.mmall.service.CustomerServiceService;
 import com.mmall.util.DateTimeUtil;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -56,9 +43,19 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     private SysUserInfoMapper sysUserInfoMapper;
     @Autowired
     private BillKeywordMapper billKeywordMapper;
+    @Autowired
+    private CustomerUserMapper customerUserMapper;
     @Override
     public Result saveCustomerService(SysUserInfo userInfo, CustomerServiceParam customerServiceParam) {
         String level = userInfo.getLevel().split("\\.")[2];
+
+        CustomerUser customerUser = customerUserMapper.selectOne(new QueryWrapper<CustomerUser>()
+                .eq("user_id", userInfo.getId()));
+        SysUserInfo sysUser = null;
+        if(customerUser!=null){
+            sysUser = sysUserInfoMapper.selectById(customerUser.getCustomerId());
+        }
+
         CustomerService customerService = CustomerService.builder()
                 .waybillNumber(customerServiceParam.getWaybillNumber())
                 .userKey(customerServiceParam.getUserKey())
@@ -69,19 +66,27 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
                 .receiveTime(customerServiceParam.getTimeSlot())
                 .typeId(customerServiceParam.getTypeId())
                 .userId(userInfo.getId())
+                .handleId(customerUser==null?0:customerUser.getCustomerId())
+                .handleName(customerUser==null?"":sysUser.getName())
+                .status(customerUser==null?1:2)
                 .expressId(Integer.parseInt(level))
                 .typeName(handleTypeMapper.selectById(customerServiceParam.getTypeId()).getTypeName())
                 .build();
-        customerServiceMapper.insert(customerService);
-        SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(customerService.getExpressId());
-        String content = "运单号:"+ customerService.getWaybillNumber();
 
-        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
-                .eq("parent_id", sysUserInfo.getId())
-                .eq("platform_id", LevelConstants.EXPRESS)
-                .in("status",1,0));
-        sysUserInfos.add(sysUserInfo);
-        ExpressWebSocket.sendMsgAddServicesLists(sysUserInfos,content,"",4);
+        customerServiceMapper.insert(customerService);
+
+        String content = "运单号:"+ customerService.getWaybillNumber();
+        if(customerUser==null){
+            SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(customerService.getExpressId());
+            List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                    .eq("parent_id", sysUserInfo.getId())
+                    .eq("platform_id", LevelConstants.EXPRESS)
+                    .in("status",1,0));
+            sysUserInfos.add(sysUserInfo);
+            ExpressWebSocket.sendMsgAddServicesLists(sysUserInfos,content,"",4);
+        }else{
+            ExpressWebSocket.sendMsgAddServices( sysUser,content,"",4);
+        }
         return Result.ok(customerService);
     }
 
@@ -118,6 +123,7 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     public Result handleService(Integer handleId, SysUserInfo userInfo) {
         //当前时间
         long currentTime = System.currentTimeMillis();
+
         CustomerService customerService = customerServiceMapper.selectById(handleId);
 
         if(customerService.getStatus()==2){
@@ -168,12 +174,22 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
         CustomerService customerService = customerServiceMapper.selectById(handleId);
         SysUserInfo sysUserInfo = null;
         if(customerService.getHandleId()==userId||customerService.getHandleId().equals(userId)){
+            if(customerService.getReceiveTimeSolt()==0){
+                //当前时间
+                long currentTime = System.currentTimeMillis();
+                customerService.setReceiveTime(DateTimeUtil.numToDate(currentTime,"yyyy-MM-dd HH:mm:ss"));
+                //工单创建时间
+                long createT = DateTimeUtil.DateToNum(customerService.getCreateTime());
+                customerService.setReceiveTimeSolt((currentTime-createT)/(1000*60));
+                customerServiceMapper.updateById(customerService);
+            }
             sysUserInfo = sysUserInfoMapper.selectById(customerService.getUserId());
         }else {
             sysUserInfo = sysUserInfoMapper.selectById(customerService.getHandleId());
         }
+
         ExpressWebSocket.sendMsgAddServices(sysUserInfo,"回复："+content,"运单号:"+ customerService.getWaybillNumber(),5);
-        return Result.ok(workReply);
+        return Result.ok(customerService);
     }
 
     @Override
@@ -258,5 +274,12 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
         List<BillKeyword> userKeys = billKeywordMapper.selectList(new QueryWrapper<BillKeyword>()
                 .eq("user_id", userInfo.getId()).eq("status",1));
         return Result.ok(userKeys);
+    }
+
+    @Override
+    public Result updateCustomerService(Integer userId, String handleId) {
+        SysUserInfo userInfo = sysUserInfoMapper.selectById(userId);
+        customerServiceMapper.updateCustomerService(userId,handleId,userInfo.getName());
+        return Result.ok();
     }
 }

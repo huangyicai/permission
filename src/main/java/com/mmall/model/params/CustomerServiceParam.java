@@ -22,7 +22,6 @@ public class CustomerServiceParam {
     private String content;
 
     @ApiModelProperty(value = "商户名")
-    @NotBlank(message = "商户名不可以为空")
     private String userKey;
 
     @ApiModelProperty(value = "联络人")

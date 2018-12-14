@@ -309,6 +309,5 @@ public class TotalController {
     public Result keyPricing(@RequestParam(value = "totalId") String totalId) throws InterruptedException {
         return totalService.keyPricing(totalId);
     }
-
 }
 

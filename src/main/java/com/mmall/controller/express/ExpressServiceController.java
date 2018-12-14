@@ -76,14 +76,9 @@ public class ExpressServiceController {
     }
     @ApiOperation(value = "转至其他客服处理",  notes="需要Authorization")
     @PostMapping(value = "/forward/{handleId}/{userId}",produces = {"application/json;charest=Utf-8"})
-    public Result forwardhandleService(@PathVariable("handleId") Integer handleId,
+    public Result forwardhandleService(@PathVariable("handleId") String handleId,
                                        @PathVariable("userId") Integer userId){
-        CustomerService byId = customerServiceService.getById(handleId);
-        byId.setHandleId(userId);
-        SysUserInfo userInfo = sysUserInfoMapper.selectById(userId);
-        byId.setHandleName(userInfo.getName());
-        customerServiceService.saveOrUpdate(byId);
-        return Result.ok();
+        return customerServiceService.updateCustomerService(userId,handleId);
     }
 
     @ApiOperation(value = "获取其他客服",  notes="需要Authorization")
@@ -116,7 +111,7 @@ public class ExpressServiceController {
 
         SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(byId.getUserId());
         ExpressWebSocket.sendMsgAddServices(sysUserInfo,"已处理完毕，请查看","运单号:"+ byId.getWaybillNumber(),5);
-        return Result.ok();
+        return Result.ok(byId);
     }
 
     @ApiOperation(value = "回复工单",  notes="需要Authorization")

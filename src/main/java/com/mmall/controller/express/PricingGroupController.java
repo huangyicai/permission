@@ -229,24 +229,31 @@ public class PricingGroupController {
 
     @ApiOperation(value = "输入预付金额/每单",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "money",value = "预付金额/每单",dataType = "String",paramType = "query"),
-            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "query")
+            @ApiImplicitParam(name = "money",value = "预付金额/每单",dataType = "String",paramType = "path"),
+            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "path")
     })
-    @PostMapping(value = "/savePrepaid",produces = {"application/json;charest=Utf-8"})
-    public Result savePrepaid(@RequestParam(value = "money") String money,@RequestParam(value = "userId")Integer userId){
-        Prepaid p=new Prepaid();
-        p.setMoney(new BigDecimal(money));
-        p.setUserId(userId);
-        prepaidService.save(p);
+    @PostMapping(value = "/savePrepaid/{money}/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result savePrepaid(@PathVariable("money") String money,@PathVariable("userId")Integer userId){
+        Prepaid one = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id", userId));
+        if(one==null){
+            Prepaid p=new Prepaid();
+            p.setMoney(new BigDecimal(money));
+            p.setUserId(userId);
+            prepaidService.save(p);
+        }
+        else{
+            one.setMoney(new BigDecimal(money));
+            prepaidService.updateById(one);
+        }
         return Result.ok();
     }
 
     @ApiOperation(value = "获取客户预付金额/每单",  notes="需要Authorization")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "query")
+            @ApiImplicitParam(name = "userId",value = "快递公司对应客户的用户id",dataType = "long",paramType = "path")
     })
-    @GetMapping(value = "/getPrepaid",produces = {"application/json;charest=Utf-8"})
-    public Result getPrepaid(@RequestParam(value = "userId")Integer userId){
+    @GetMapping(value = "/getPrepaid/{userId}",produces = {"application/json;charest=Utf-8"})
+    public Result getPrepaid(@PathVariable("userId")Integer userId){
         Prepaid one = prepaidService.getOne(new QueryWrapper<Prepaid>().eq("user_id", userId));
         return Result.ok(one);
     }

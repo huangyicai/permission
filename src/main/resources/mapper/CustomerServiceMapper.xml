@@ -61,6 +61,10 @@
     <sql id="View">
         id,  handle_name as handleName, waybill_number as waybillNumber, content, contacts, phone, enclosure, time_slot as timeSlot, type_name as typeName, status, remarks, create_time as createTime
     </sql>
+    <update id="updateCustomerService">
+        UPDATE customer_service SET handle_name=#{name},handle_id=#{userId},status=2
+        where FIND_IN_SET(id,#{handleId}) and status=1
+    </update>
 
     <select id="getAllCustomerServices" resultMap="BaseResultMap">
         select
