@@ -1,7 +1,7 @@
 package com.mmall.excel.export;
 
 import com.mmall.excel.Bill;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.io.OutputStream;
@@ -18,6 +18,7 @@ public abstract class DataSheetExecute<T> {
      * @param row 当前row对象
      * @param personUser   泛型T对象
      */
+
     void execute(Row row, Bill personUser, SXSSFWorkbook workbook) {
         row.createCell(0).setCellValue(personUser.getBillName());
         row.createCell(1).setCellValue(personUser.getSweepTime());
