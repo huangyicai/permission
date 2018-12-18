@@ -110,7 +110,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             userInfo.setId(0);
         }
 
-        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4");
+        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
 
         if(one==null){
             return new BillDto();
