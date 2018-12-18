@@ -42,6 +42,7 @@ public class ExpressServiceController {
                                         @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                                         @RequestParam(name = "keyName",required = false) String keyName,
+                                        @RequestParam(name = "accountUserList",required = false) String handleIds,
                                         @RequestParam(name = "createTime",required = false) String createTime,
                                         @RequestParam(name = "endTime",required = false) String endTime,
                                         @RequestParam(name = "receiveSolt",required = false,defaultValue = "-1") Integer receiveSolt,
@@ -50,13 +51,14 @@ public class ExpressServiceController {
                                         @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
-        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,keyName,createTime,endTime,receiveSolt,endSolt);
+        return customerServiceService.getAllCustomerService(status,type,userInfo.getId(),ipage,waybillNumber,keyName,createTime,endTime,receiveSolt,endSolt,handleIds);
     }
 
     @ApiOperation(value = "我处理的工单（0=全部，2=处理中，3=处理完毕）",  notes="需要Authorization")
     @GetMapping(value = "/self/list",produces = {"application/json;charest=Utf-8"})
     public Result getCustomerServiceBySelf(@RequestParam(name="status",required = false,defaultValue = "0") Integer status,
                                            @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
+                                           @RequestParam(name = "keyName",required = false) String keyName,
                                         @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                                            @RequestParam(name = "createTime",required = false) String createTime,
                                            @RequestParam(name = "endTime",required = false) String endTime,
@@ -65,7 +67,7 @@ public class ExpressServiceController {
         //SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         SysUserInfo userInfo = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
         Page ipage = new Page(page,size);
-        return customerServiceService.getCustomerServiceBySelf(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime);
+        return customerServiceService.getCustomerServiceBySelf(status,type,userInfo.getId(),ipage,waybillNumber,createTime,endTime,keyName);
     }
 
     @ApiOperation(value = "我来处理工单",  notes="需要Authorization")
@@ -146,6 +148,14 @@ public class ExpressServiceController {
         SysUserInfo user = UserInfoConfig.getUserInfo();
         return customerServiceService.getAllReplysByService(user,dateBegin,dateEnd);
     }
+
+    @ApiOperation(value = "获取该快递公司所有快递账号",  notes="需要Authorization")
+    @GetMapping(value = "/getAccounts",produces = {"application/json;charest=Utf-8"})
+    public Result getAccounts(){
+        SysUserInfo user = UserInfoConfig.getUserInfo();
+        return customerServiceService.getAccounts(user);
+    }
+
     @ApiOperation(value = "获取未处理的工单数",  notes="需要Authorization")
     @GetMapping(value = "/noHandle",produces = {"application/json;charest=Utf-8"})
     public Result getAllByNoHandle(){
@@ -160,13 +170,14 @@ public class ExpressServiceController {
                               @RequestParam(name = "type",required = false,defaultValue = "0") Integer type,
                               @RequestParam(name = "waybillNumber",required = false) String waybillNumber,
                               @RequestParam(name = "keyName",required = false) String keyName,
+                            @RequestParam(name = "accountUserList",required = false) String handleIds,
                               @RequestParam(name = "createTime",required = false) String createTime,
                               @RequestParam(name = "endTime",required = false) String endTime,
                               @RequestParam(name = "receiveSolt",required = false,defaultValue = "-1") Integer receiveSolt,
                               @RequestParam(name = "endSolt",required = false,defaultValue = "-1") Integer endSolt,
                             HttpServletResponse response) throws IOException {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
-        List<CustomerService> allCustomerService = customerServiceService.getAllCustomerService(status, type, userInfo.getId(), waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt);
+        List<CustomerService> allCustomerService = customerServiceService.getAllCustomerService(status, type, userInfo.getId(), waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt,handleIds);
         ImportExcel ie=new ImportExcel();
         ie.WriteExcel(allCustomerService, response);
     }

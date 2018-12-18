@@ -285,10 +285,11 @@ public class TotalController {
     @GetMapping(value = "/list/{status}",produces = {"application/json;charest=Utf-8"})
     public Result getBillDetails(@RequestParam(name = "userId",required = false) String userId,
                                  @RequestParam(name = "date") String date,
-                                 @RequestParam(name = "endDate") String endDate,
+                                 @RequestParam(name = "endDate" , required = false , defaultValue = "") String endDate,
                                  @PathVariable("status")Integer status,
                                  @RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
                                  @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
+
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
         Page ipage = new Page(page,size);
         return totalService.getBillDetails( status,userInfo,userId,date,endDate,ipage);

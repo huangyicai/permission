@@ -97,6 +97,9 @@
             <if test="waybillNumber!=null and waybillNumber!=''">
                 and waybill_number = #{waybillNumber}
             </if>
+            <if test="handles!=null and handles!=''">
+                and FIND_IN_SET(handle_id,#{handles})
+            </if>
             <if test="keyName!=null and keyName!=''">
                 and user_key = #{keyName}
             </if>
@@ -188,6 +191,9 @@
             </if>
             <if test="type!=0">
                 and type_id = #{type}
+            </if>
+            <if test="keyName!=null and keyName!=''">
+                and user_key = #{keyName}
             </if>
             <if test="waybillNumber!=null and waybillNumber!=''">
                 and waybill_number = #{waybillNumber}

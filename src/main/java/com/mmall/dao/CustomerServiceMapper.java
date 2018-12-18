@@ -36,7 +36,8 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                  @Param("createTime")String createTime,
                                                  @Param("endTime")String endTime,
                                                  @Param("receiveSolt")Integer receiveSolt,
-                                                 @Param("endSolt")Integer endSolt);
+                                                 @Param("endSolt")Integer endSolt,
+                                                 @Param("handles")String handles);
 
     /**
      * 获取快递公司所有工单--导出
@@ -55,7 +56,8 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                  @Param("createTime")String createTime,
                                                  @Param("endTime")String endTime,
                                                  @Param("receiveSolt")Integer receiveSolt,
-                                                 @Param("endSolt")Integer endSolt);
+                                                 @Param("endSolt")Integer endSolt,
+                                                 @Param("handles")String handles);
 
     /**
      * 客户获取自己的工单
@@ -83,7 +85,8 @@ public interface CustomerServiceMapper extends BaseMapper<CustomerService> {
                                                       @Param("userId")Integer userId,
                                                       @Param("waybillNumber")String waybillNumber,
                                                       @Param("createTime")String createTime,
-                                                      @Param("endTime")String endTime);
+                                                      @Param("endTime")String endTime,
+                                                      @Param("keyName")String keyName);
 
     int getCountServiceByHandleId(@Param("type")Integer type,
                                   @Param("userId")Integer userId,

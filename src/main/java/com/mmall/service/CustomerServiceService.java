@@ -32,7 +32,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result getAllCustomerService(Integer status,Integer type, Integer userId, Page ipage,String waybillNumber,
-                                 String keyName,String createTime,String endTime,Integer receiveSolt,Integer endSolt);
+                                 String keyName,String createTime,String endTime,Integer receiveSolt,Integer endSolt,String handleIds);
 
     /**
      * 获取快递公司所有工单---导出
@@ -40,7 +40,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     List<CustomerService> getAllCustomerService(Integer status, Integer type, Integer userId, String waybillNumber,
-                               String keyName, String createTime, String endTime, Integer receiveSolt, Integer endSolt);
+                               String keyName, String createTime, String endTime, Integer receiveSolt, Integer endSolt,String handleIds);
 
     /**
      * 获取客户自己的工单
@@ -67,7 +67,7 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @param waybillNumber
      * @return
      */
-    Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber,String createTime,String endTime);
+    Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber,String createTime,String endTime,String keyName);
 
     /**
      * 回复工单
@@ -118,4 +118,11 @@ public interface CustomerServiceService extends IService<CustomerService> {
      * @return
      */
     Result updateCustomerService(Integer userId, String handleId);
+
+    /**
+     * 获取该快递公司所有快递账号
+     * @param user
+     * @return
+     */
+    Result getAccounts(SysUserInfo user);
 }

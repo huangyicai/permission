@@ -1,9 +1,12 @@
 package com.mmall.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Lists;
 import com.mmall.config.UserInfoConfig;
 import com.mmall.dao.HandleTypeMapper;
 import com.mmall.dto.SysMenuDto;
@@ -17,6 +20,7 @@ import com.mmall.service.ExpressUserService;
 import com.mmall.service.SysUserInfoService;
 import com.mmall.service.SysUserService;
 import com.mmall.util.BeanValidator;
+import com.mmall.util.HttpUtil;
 import com.mmall.util.UploadApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -32,6 +36,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -145,5 +152,19 @@ public class SysUserController {
         return sysUserInfoService.updatePricingStatus();
     }
 
+    @ApiOperation(value = "物流单号快递公司查询",  notes="需要Authorization")
+    @PostMapping(value = "/express/autonumber/{text}",produces = {"application/json;charest=Utf-8"})
+    public Result autonumber(@PathVariable("text") String text){
+        return Result.ok(HttpUtil.post("http://www.kuaidi100.com/autonumber/autoComNum",
+                "resultv2=1&text="+text));
+    }
+
+    @ApiOperation(value = "物流信息查询",  notes="需要Authorization")
+    @PostMapping(value = "/express/query/{type}/{postid}",produces = {"application/json;charest=Utf-8"})
+    public Result query(@PathVariable("type") String type,
+                             @PathVariable("postid") String postid) throws UnsupportedEncodingException {
+
+        return Result.ok(HttpUtil.get("http://www.kuaidi100.com/query", "type="+type+"&postid="+postid));
+    }
 }
 

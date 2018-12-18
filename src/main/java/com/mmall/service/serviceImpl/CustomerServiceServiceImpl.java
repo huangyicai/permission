@@ -93,16 +93,16 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     @Override
     public Result getAllCustomerService(Integer status,Integer type, Integer expressId, Page ipage,String waybillNumber,
                                         String keyName,
-                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
-        Page<CustomerService> allCustomerServices = customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, keyName, createTime, endTime,receiveSolt,endSolt);
+                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt,String handleIds) {
+        customerServiceMapper.getAllCustomerServices(ipage, status, type, expressId, waybillNumber, keyName, createTime, endTime,receiveSolt,endSolt,handleIds);
         return Result.ok(ipage);
     }
 
     @Override
     public List<CustomerService> getAllCustomerService(Integer status,Integer type, Integer expressId,String waybillNumber,
                                         String keyName,
-                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt) {
-        return customerServiceMapper.getAllCustomerServices(status, type, expressId, waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt);
+                                        String createTime,String endTime,Integer receiveSolt,Integer endSolt,String handleIds) {
+        return customerServiceMapper.getAllCustomerServices(status, type, expressId, waybillNumber, keyName, createTime, endTime, receiveSolt, endSolt,handleIds);
     }
 
     @Override
@@ -150,8 +150,8 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber,String createTime,String endTime) {
-        Page<ReplynumServiceDto> customerServiceBySelf = customerServiceMapper.getCustomerServiceBySelf(ipage, status, type, id, waybillNumber,createTime,endTime);
+    public Result getCustomerServiceBySelf(Integer status,Integer type, Integer id, Page ipage, String waybillNumber,String createTime,String endTime,String keyName) {
+        Page<ReplynumServiceDto> customerServiceBySelf = customerServiceMapper.getCustomerServiceBySelf(ipage, status, type, id, waybillNumber,createTime,endTime,keyName);
         for(ReplynumServiceDto cs : customerServiceBySelf.getRecords()){
             if(cs.getStatus()==2){
                 Integer replyNum = workReplyMapper.selectCount(new QueryWrapper<WorkReply>()
@@ -281,5 +281,15 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
         SysUserInfo userInfo = sysUserInfoMapper.selectById(userId);
         customerServiceMapper.updateCustomerService(userId,handleId,userInfo.getName());
         return Result.ok();
+    }
+
+    @Override
+    public Result getAccounts(SysUserInfo user) {
+        List<SysUserInfo> sysUserInfos = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>()
+                .notIn("status", -1)
+                .eq("platform_id", 2)
+                .eq("parent_id", user.getId()));
+        sysUserInfos.add(user);
+        return Result.ok(sysUserInfos);
     }
 }

@@ -514,7 +514,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
 
     @Override
-    public Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,String date,String endDate, Page ipage) {
+    public Result getBillDetails(Integer status,SysUserInfo userInfo, String userId,
+                                 String date,String endDate, Page ipage) {
         Total sumBiLLDetails = totalMapper.getSumBiLLDetails( status,userId, date,endDate, userInfo.getId());
         totalMapper.getAllBySendIdAndCreateTimeAndUserIds(ipage,status,userId,date,endDate,userInfo.getId());
         Map<String,Object> map = Maps.newHashMap();
