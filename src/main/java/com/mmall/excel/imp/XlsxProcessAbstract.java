@@ -134,7 +134,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-     public ArrayListMultimap<String, Bill> processAllSheet(String filename) throws Exception {
+    public ArrayListMultimap<String, Bill> processAllSheet(String filename) throws Exception {
         OPCPackage pkg = OPCPackage.open(filename, PackageAccess.READ);
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
@@ -162,7 +162,7 @@ public class XlsxProcessAbstract {
      * @return
      * @throws Exception
      */
-    public void processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
+    public Result processAllSheet(MultipartFile xlsxFile,String time,Integer type,String sunTotalId) throws Exception {
 
         //替换
         if(type==2){
@@ -227,6 +227,10 @@ public class XlsxProcessAbstract {
             }
         }
 
+        if(listError.size()!=0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
+
         //创建线程池
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
@@ -263,7 +267,7 @@ public class XlsxProcessAbstract {
             //分离数据
             for (Bill bill:map.get(key)) {
                 weightInterval(bill.getWeight());
-                province(bill.getDestination());
+                province(bill.getDestination(), bill.getSerialNumber());
                 String daily = daily(bill.getSweepTime(), bill.getSerialNumber());
                 bill.setSweepTime(daily);
                 //计算每个月份的单量，总重量
@@ -295,7 +299,7 @@ public class XlsxProcessAbstract {
             //根据时间分离数据
             String[] dailyOriginal=LevelConstants.DAILY_ORIGINAL;
             String dyStr="";
-                Integer day=DateUtils.getDays(time);
+            Integer day=DateUtils.getDays(time);
             String[] arr=dailyOriginal;
             switch (day){
                 case 30:arr=daily(dailyOriginal,1);
@@ -347,6 +351,7 @@ public class XlsxProcessAbstract {
             Thread.sleep(200);
         }
         map.clear();
+        return Result.ok();
     }
 
     /**
@@ -359,6 +364,11 @@ public class XlsxProcessAbstract {
     public Result againSet(MultipartFile xlsxFile, Integer totalId) throws Exception {
         Total total = totalService.selectById(totalId);
         Map threadDto1 = getThreadDto(xlsxFile,total.getTotalTime());
+
+        if(listError.size()!=0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
+
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
         Result result = updateTatal(threadDto, total);
@@ -378,14 +388,18 @@ public class XlsxProcessAbstract {
      * @throws Exception
      */
     @Transactional
-    public void additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
+    public Result additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
         SysUserInfo user = sysUserInfoService.getById( userId);
         Map threadDto1 = getThreadDto(xlsxFile,date);
+
+        if(listError.size()!=0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
+
         ThreadDto threadDto = (ThreadDto) threadDto1.get("threadDto");
         ArrayListMultimap<String, Bill> map= (ArrayListMultimap<String, Bill>) threadDto1.get("map");
 
         threadDto.setTime(date);
-
         final Total total = new Total();
 
         String[] strings = {"商家名称", "扫描时间", "运单编号", "目的地", "快递重量"};
@@ -504,6 +518,8 @@ public class XlsxProcessAbstract {
         weightMap.clear();
         dailyMap.clear();
         pricing=-1;
+
+        return Result.ok();
     }
 
     /**
@@ -568,7 +584,7 @@ public class XlsxProcessAbstract {
         //分离数据并计算成本
         for (Bill bill:list) {
             weightInterval(bill.getWeight());
-            province(bill.getDestination());
+            province(bill.getDestination(), bill.getSerialNumber());
             String daily = daily(bill.getSweepTime(), bill.getSerialNumber());
             bill.setSweepTime(daily);
 
@@ -783,7 +799,7 @@ public class XlsxProcessAbstract {
     /**
      * 读取excel行、列值（这里可以分成其他页面）
      */
-     public class SheetToCSV implements SheetContentsHandler {
+    public class SheetToCSV implements SheetContentsHandler {
         private boolean firstCellOfRow = false;
         private int currentRowNumber = -1;
         private int currentColNumber = -1;
@@ -818,40 +834,39 @@ public class XlsxProcessAbstract {
             if(!rowStrs.toString().equals("|@|")) {
                 String[] cellStrs = endRowStrs.split("\\|@\\|");
                 if(currentRowNumber==0 ){
-
                     if(cellStrs.length==6){
                         pricing=1;
-                        String str="";
-//                        if(){
-//
-//                        }
                     }
                 }else{
-                    String nameStr=cellStrs[0];
-
-                    //分表--为相应表格添加数据
-                    Bill bill=new Bill();
-                    bill.setBillName(cellStrs[0].replaceAll("\\s{2,}", ""));
-                    bill.setSweepTime(cellStrs[1]);
-                    bill.setSerialNumber(cellStrs[2]);
-                    bill.setDestination(cellStrs[3]);
-                    bill.setWeight(new BigDecimal(cellStrs[4]));
-
-                    if(pricing==1){
-                        bill.setOffer(new BigDecimal(cellStrs[5]));
+                    if(endRowStrs.indexOf("|@||@|")!=-1){
+                        listError.add(rowNum+"行：有数据为空");
                     }
+                    try{
+                        String nameStr=cellStrs[0].replaceAll("\u00A0", "");
 
-                    //todo 后续分表按照名字+时间，可实现按用户和时间的分表
-                    map.put(nameStr,bill);
+                        //分表--为相应表格添加数据
+                        Bill bill=new Bill();
+                        bill.setBillName(nameStr);
+                        bill.setSweepTime(cellStrs[1]);
+                        bill.setSerialNumber(cellStrs[2]);
+                        bill.setDestination(cellStrs[3]);
+                        bill.setWeight(new BigDecimal(cellStrs[4]));
+
+                        if(pricing==1){
+                            bill.setOffer(new BigDecimal(cellStrs[5]));
+                        }
+                        //todo 后续分表按照名字+时间，可实现按用户和时间的分表
+                        map.put(nameStr,bill);
+
+                    }catch (Exception e){
+                        listError.add(rowNum+"行：有数据为空");
+                    }
                 }
             }
             rowStrs.delete(0, rowStrs.length());// 清空buffer
         }
 
         public void cell(String cellReference, String cellValue, XSSFComment comment) {
-            if("".equals(cellValue) || cellValue==null){
-                listError.add(minColumns+"行：有数据为空");
-            }
             if (firstCellOfRow) {
                 firstCellOfRow = false;
             } else {
@@ -902,10 +917,10 @@ public class XlsxProcessAbstract {
     }
 
     /**
-     * 获取城市单件：http://www.tcmap.com.cn/list/jiancheng_list.html
+     * 获取城市单件
      * @param province
      */
-    private boolean province(String province){
+    private boolean province(String province,String num){
 
         String[] proStr=LevelConstants.PROSTR;
 
@@ -915,7 +930,7 @@ public class XlsxProcessAbstract {
                 return true;
             }
         }
-
+//        listError.add("单号："+num+"城市无法识别");
         return false;
     }
 
@@ -938,8 +953,8 @@ public class XlsxProcessAbstract {
             format = sdf.format(date);
             days = DateUtils.getDays(format)+"";
         }catch (Exception e){
-            format="未识别时间单号";
-            days=num;
+//            listError.add("单号："+num+"时间格式无法识别");
+            return format;
         }
         dailyMap.put(format,days);
         return format;

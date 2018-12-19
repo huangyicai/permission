@@ -168,8 +168,7 @@ public class TotalController {
     @PostMapping(value = "/additional/{time}",produces = {"application/json;charest=Utf-8"})
     public Result additional(MultipartFile file,@PathVariable("time")String time) throws Exception {
         XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
-        xlsxProcessAbstract.processAllSheet(file,time,1,null);
-        return Result.ok();
+        return xlsxProcessAbstract.processAllSheet(file,time,1,null);
     }
 
     @ApiOperation(value = "上传账单---替换",  notes="需要Authorization")
@@ -182,8 +181,7 @@ public class TotalController {
                           @PathVariable("time")String time,
                           @PathVariable("sumId") String sumId) throws Exception {
         XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
-        xlsxProcessAbstract.processAllSheet(file,time,2,sumId);
-        return Result.ok();
+        return xlsxProcessAbstract.processAllSheet(file,time,2,sumId);
     }
 
     @ApiOperation(value = "替换账单--检测是否有已经发送的订单",  notes="需要Authorization")
@@ -204,8 +202,7 @@ public class TotalController {
                                 @PathVariable("time") String time,
                                 @PathVariable("userId") Integer userId) throws Exception {
         XlsxProcessAbstract xlsxProcessAbstract=new XlsxProcessAbstract();
-        xlsxProcessAbstract.additionalSet(file,userId,time);
-        return Result.ok();
+        return xlsxProcessAbstract.additionalSet(file,userId,time);
     }
 
     @ApiOperation(value = "获取该月总账单",  notes="需要Authorization")
