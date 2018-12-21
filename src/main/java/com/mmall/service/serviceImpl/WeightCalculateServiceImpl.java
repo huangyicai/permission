@@ -69,7 +69,16 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
 
         //空值处理
         if(list==null || list.size()<=0){
-            return weightCalculateDto;
+            List<WeightCalculateDto> weightCalculateDto11 = weightCalculateDto.subList(0, 6);
+            WeightCalculateDto wd=new WeightCalculateDto();
+            WeightCalculateDto wd1=new WeightCalculateDto();
+            wd.setInterval("5.0到10.0");
+            wd.setWeight(0.0);
+            wd1.setInterval("10以上");
+            wd1.setWeight(0.0);
+            weightCalculateDto11.add(wd);
+            weightCalculateDto11.add(wd1);
+            return weightCalculateDto11;
         }
 
         String totalIdStr="";
