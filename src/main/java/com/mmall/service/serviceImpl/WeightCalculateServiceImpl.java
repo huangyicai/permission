@@ -101,12 +101,31 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
                     w.setWeight(Double.valueOf(value[i].toString()));
                 }
             }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return weightCalculateDto;
+        int id=0;
+        WeightCalculateDto w=new WeightCalculateDto();
+        w.setInterval("5.0到10.0");
+        w.setWeight(0D);
+        for (int i = 0; i <weightCalculateDto.size() ; i++) {
+            if(weightCalculateDto.get(i).getInterval().startsWith("5.0")){
+                id=i;
+//                weightCalculateDto.remove(id);
+            }
+
+            if(id!=0 && i<weightCalculateDto.size()-1){
+                w.setWeight(w.getWeight()+weightCalculateDto.get(i).getWeight());
+//                weightCalculateDto.remove(id);
+            }
+        }
+
+        //todo 原来的list无论删除还是截取，操作之后之前相加得到的5-10的数据都会消失，
+        //todo 所以另外新建list做处理。或者更改上面的计算规则（会重新设计表）
+        List<WeightCalculateDto> weightCalculateDtos = weightCalculateDto.subList(0, 6);
+        weightCalculateDtos.add(w);
+        weightCalculateDtos.add(weightCalculateDto.get(weightCalculateDto.size()-1));
+        return weightCalculateDtos;
     }
 }
