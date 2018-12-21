@@ -51,10 +51,10 @@ public class ExpressUserServicelmpl implements ExpressUserService {
         if(id!=0) parent= sysUserInfoMapper.selectById(id);
         if(level==1){
             BeanValidator.check(user);
-            PaymentMethod paymentMethod = paymentMethodMapper.selectOne(new QueryWrapper<PaymentMethod>().eq("user_id", parent.getId()));
+            /*PaymentMethod paymentMethod = paymentMethodMapper.selectOne(new QueryWrapper<PaymentMethod>().eq("user_id", parent.getId()));
             if(paymentMethod==null){
                 return Result.error(InfoEnums.ADD_PAYMENT_INSTITUTION);
-            }
+            }*/
             return sysUserService.register(user,parent, LevelConstants.SERVICE,5);
         }
         SysUserInfo userInfo = SysUserInfo.builder()
@@ -66,12 +66,14 @@ public class ExpressUserServicelmpl implements ExpressUserService {
                 .platformId(-1)
                 .build();
         sysUserInfoMapper.insert(userInfo);
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .userId(userInfo.getId())
-                .payee(user.getPayee())
-                .paymentAccount(user.getPaymentAccount())
-                .typeName(user.getTypeName()).build();
-        paymentMethodMapper.insert(paymentMethod);
+        if(user.getPaymentAccount()!=null&&user.getPaymentAccount()!=""){
+            PaymentMethod paymentMethod = PaymentMethod.builder()
+                    .userId(userInfo.getId())
+                    .payee(user.getPayee())
+                    .paymentAccount(user.getPaymentAccount())
+                    .typeName(user.getTypeName()).build();
+            paymentMethodMapper.insert(paymentMethod);
+        }
         return Result.ok();
     }
 

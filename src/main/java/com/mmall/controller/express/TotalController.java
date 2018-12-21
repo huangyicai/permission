@@ -124,7 +124,7 @@ public class TotalController {
 
     @ApiOperation(value = "删除订单",  notes="需要Authorization")
     @DeleteMapping(value = "/deleteTotal/{totalId}")
-    public Result deleteTotal(@PathVariable(value = "totalId") Integer totalId){
+    public Result deleteTotal(@PathVariable(value = "totalId") String totalId){
         return totalService.deleteTotal(totalId);
     }
 
@@ -247,7 +247,7 @@ public class TotalController {
     @ApiOperation(value = "定价",  notes="需要Authorization")
 
     @GetMapping(value = "/getPricing/{totalId}")
-    public Result<String> getPricing(@PathVariable("totalId")Integer totalId){
+    public Result getPricing(@PathVariable("totalId")Integer totalId){
         return  totalService.getPricing(totalId);
     }
 
