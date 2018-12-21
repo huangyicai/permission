@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class WeightCalculateDto implements Serializable {
+
     @ApiModelProperty(value = "区间")
     private String interval;
 
