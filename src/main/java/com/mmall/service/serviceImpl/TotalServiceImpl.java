@@ -315,7 +315,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @return
      */
     @Transactional
-    public Result<String> getPricing(Integer totalId) {
+    public Result getPricing(Integer totalId) {
 
         //成本
         BigDecimal totalCost=BigDecimal.ZERO;
@@ -428,8 +428,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             money=by.getMoney().multiply(new BigDecimal(list.size()+""));
         }
 
-        Total total1=new Total();
-        total1.setTotalId(totalId);
+        Total total1=totalMapper.selectById(totalId);
         total1.setTotalCost(totalCost);
         total1.setTotalOffer(totalOffer);
         total1.setTotalPaid(money);
@@ -439,7 +438,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         totalMapper.updateById(total1);
         map.clear();
-        return Result.ok(upload);
+        return Result.ok(total1);
     }
 
     @Override
@@ -547,12 +546,14 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      */
     @Override
     @Transactional
-    public Result deleteTotal(Integer totalId) {
-        boolean totalId1 = totalService.remove(new UpdateWrapper<Total>().eq("total_id", totalId));
+    public Result deleteTotal(String totalId) {
+        String[] i = totalId.split(",");
+        boolean totalId1 = totalService.removeByIds(Arrays.asList(i));
+         //= totalService.remove(new UpdateWrapper<Total>().eq("total_id", totalId));
         if(totalId1){
-            weightCalculateService.remove(new UpdateWrapper<WeightCalculate>().eq("total_id", totalId));
-            provinceCalculateService.remove(new UpdateWrapper<ProvinceCalculate>().eq("total_id", totalId));
-            dailyTotalService.remove(new UpdateWrapper<DailyTotal>().eq("total_id", totalId));
+            weightCalculateService.removeByIds(Arrays.asList(i));
+            provinceCalculateService.removeByIds(Arrays.asList(i));
+            dailyTotalService.removeByIds(Arrays.asList(i));
         }
         return Result.ok();
     }

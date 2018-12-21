@@ -48,7 +48,7 @@ public interface TotalService extends IService<Total> {
     Result polling(String time, Integer id,String fileName);
 
 
-    Result<String> getPricing(Integer totalId);
+    Result getPricing(Integer totalId);
 
     String getUserIdStr();
 
@@ -68,7 +68,7 @@ public interface TotalService extends IService<Total> {
      */
     Result othersBillForward(String billIds, Integer userId);
 
-    Result deleteTotal(Integer totalId);
+    Result deleteTotal(String totalId);
 
     List<SysUserInfo> getCollection();
 
