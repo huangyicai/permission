@@ -117,7 +117,7 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
         int id=0;
         WeightCalculateDto w=new WeightCalculateDto();
         w.setInterval("5.0到10.0");
-        w.setWeight(0D);
+        w.setWeight(0.0);
         for (int i = 0; i <weightCalculateDto.size() ; i++) {
             if(weightCalculateDto.get(i).getInterval().startsWith("5.0")){
                 id=i;
