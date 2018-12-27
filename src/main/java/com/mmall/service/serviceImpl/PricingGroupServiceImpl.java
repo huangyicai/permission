@@ -286,8 +286,9 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
         //初始化数据
         ArrayListMultimap<Integer, PGVo> map = ArrayListMultimap.create();
-        List<String> listError = new ArrayList<String>();
-        List<PGVo> list = getList(file, userId);
+        Map<String, List> map1 = getList(file, userId);
+        List<PGVo> list = map1.get("list");
+        List<String> listError = map1.get("listError");
         ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
         //处理读取的数据并判断空值
@@ -535,12 +536,14 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
      * @return
      * @throws IOException
      */
-    public List<PGVo> getList(MultipartFile file, Integer userId) throws IOException {
+    public Map<String,List> getList(MultipartFile file, Integer userId) throws IOException {
         InputStream inputStream = file.getInputStream();
         XSSFWorkbook xssfWorkbook = new XSSFWorkbook(inputStream);
 
         //初始化数据
+        List<String> listError = new ArrayList<String>();
         List<PGVo> list = new ArrayList<PGVo>();
+        Map<String,List> map=new HashMap<>();
         Integer CityId=0;
         Integer CityNum=0;
 
@@ -557,72 +560,78 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
                 XSSFRow xssfRow = xssfSheet.getRow(rowNum);
 
                 //获取省份
-                String check = check1(xssfRow.getCell(0));
-                String check3 = check1(xssfRow.getCell(4));
-                String check44 = check1(xssfRow.getCell(1));
-                if("".equals(check) &&"".equals(check3) && "".equals(check44)){
-                    break;
-                }
+                try {
+                    String check = check1(xssfRow.getCell(0));
+                    String check3 = check1(xssfRow.getCell(4));
+                    String check44 = check1(xssfRow.getCell(1));
+                    if ("".equals(check) && "".equals(check3) && "".equals(check44)) {
+                        break;
+                    }
 
-                if(!"".equals(check) && check!=null){
-                    Integer CityIdTwo=CityId;
-                    for(City c:cities){
-                        if(check.startsWith(c.getProvinceName())){
-                            CityId=c.getId();
-                            break;
+                    if (!"".equals(check) && check != null) {
+                        Integer CityIdTwo = CityId;
+                        for (City c : cities) {
+                            if (check.startsWith(c.getProvinceName())) {
+                                CityId = c.getId();
+                                break;
+                            }
                         }
-                    }
-                    if(CityIdTwo==CityId){
-                        CityId=0;
-                    }
-                    CityNum=0;
-                }
-
-                //添加首重
-                if(!"".equals(check44)){
-                    PGVo pg=new PGVo();
-                    if(CityId==0 && CityNum==0){
-                        CityNum++;
-                        pg.setRowNo(true);
-                    }else{
-                        pg.setRowNo(false);
-                    }
-                    pg.setRow(rowNum+1);
-                    pg.setCityId(CityId);
-                    pg.setUserId(userId);
-                    pg.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(1),pg)));
-                    pg.setAreaEnd(Double.parseDouble(check(xssfRow.getCell(2),pg)));
-                    pg.setPrice(Double.parseDouble(check(xssfRow.getCell(3),pg)));
-                    pg.setFirstOrContinued(1);
-                    list.add(pg);
-                }
-
-                //添加续重
-                String check1 = check1(xssfRow.getCell(4));
-                if(!"".equals(check1) && check!=null && !"0".equals(check1)){
-                    PGVo pg1=new PGVo();
-                    pg1.setCityId(CityId);
-                    pg1.setUserId(userId);
-                    pg1.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(4),pg1)));
-
-                    //判断是否是“~”
-                    String check2 = check(xssfRow.getCell(5),pg1);
-                    if("~".equals(check2)){
-                        pg1.setAreaEnd(Double.parseDouble("1000000"));
-                    }else{
-                        pg1.setAreaEnd(Double.parseDouble(check2));
+                        if (CityIdTwo == CityId) {
+                            CityId = 0;
+                        }
+                        CityNum = 0;
                     }
 
-                    pg1.setFirstWeight(Double.parseDouble(check(xssfRow.getCell(6),pg1)));
-                    pg1.setFirstWeightPrice(Double.parseDouble(check(xssfRow.getCell(7),pg1)));
-                    pg1.setWeightStandard(Double.parseDouble(check(xssfRow.getCell(8),pg1)));
-                    pg1.setPrice(Double.parseDouble(check(xssfRow.getCell(9),pg1)));
-                    pg1.setFirstOrContinued(2);
-                    list.add(pg1);
+                    //添加首重
+                    if (!"".equals(check44)) {
+                        PGVo pg = new PGVo();
+                        if (CityId == 0 && CityNum == 0) {
+                            CityNum++;
+                            pg.setRowNo(true);
+                        } else {
+                            pg.setRowNo(false);
+                        }
+                        pg.setRow(rowNum + 1);
+                        pg.setCityId(CityId);
+                        pg.setUserId(userId);
+                        pg.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(1), pg)));
+                        pg.setAreaEnd(Double.parseDouble(check(xssfRow.getCell(2), pg)));
+                        pg.setPrice(Double.parseDouble(check(xssfRow.getCell(3), pg)));
+                        pg.setFirstOrContinued(1);
+                        list.add(pg);
+                    }
+
+                    //添加续重
+                    String check1 = check1(xssfRow.getCell(4));
+                    if (!"".equals(check1)) {
+                        PGVo pg1 = new PGVo();
+                        pg1.setCityId(CityId);
+                        pg1.setUserId(userId);
+                        pg1.setAreaBegin(Double.parseDouble(check(xssfRow.getCell(4), pg1)));
+
+                        //判断是否是“~”
+                        String check2 = check(xssfRow.getCell(5), pg1);
+                        if ("~".equals(check2)) {
+                            pg1.setAreaEnd(Double.parseDouble("1000000"));
+                        } else {
+                            pg1.setAreaEnd(Double.parseDouble(check2));
+                        }
+
+                        pg1.setFirstWeight(Double.parseDouble(check(xssfRow.getCell(6), pg1)));
+                        pg1.setFirstWeightPrice(Double.parseDouble(check(xssfRow.getCell(7), pg1)));
+                        pg1.setWeightStandard(Double.parseDouble(check(xssfRow.getCell(8), pg1)));
+                        pg1.setPrice(Double.parseDouble(check(xssfRow.getCell(9), pg1)));
+                        pg1.setFirstOrContinued(2);
+                        list.add(pg1);
+                    }
+                }catch (Exception e){
+                    listError.add("第"+(rowNum+1)+"行：有无法识别的数据，请检查是否存在特殊字符或者汉字");
                 }
             }
         }
-        return list;
+        map.put("list",list);
+        map.put("listError",listError);
+        return map;
     }
 
     /**
