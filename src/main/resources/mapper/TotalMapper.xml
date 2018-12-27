@@ -230,8 +230,11 @@
                 and t.total_time &lt;= #{endDate}
             </if>
 
-            <if test="date!=null and date!=''">
+            <if test="date!=null and date!='' and endDate!=null and endDate!=''">
                 and t.total_time>=#{date}
+            </if>
+            <if test="endDate==null or endDate==''">
+                and t.total_time=#{date}
             </if>
             <if test="userId!=null and userId!=''">
             and  FIND_IN_SET(t.user_id,#{userId})
