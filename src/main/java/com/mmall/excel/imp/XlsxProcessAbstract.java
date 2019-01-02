@@ -839,7 +839,7 @@ public class XlsxProcessAbstract {
                     }
                 }else{
                     if(endRowStrs.indexOf("|@||@|")!=-1){
-                        listError.add("第"+(rowNum+1)+"行：有数据为空");
+                        listError.add("第"+(rowNum+1)+"行：有数据为空，或无法识别");
                     }
                     try{
                         String nameStr=cellStrs[0].replaceAll("\u00A0", "");
@@ -859,7 +859,7 @@ public class XlsxProcessAbstract {
                         map.put(nameStr,bill);
 
                     }catch (Exception e){
-                        listError.add("第"+(rowNum+1)+"行：有数据为空");
+                        listError.add("第"+(rowNum+1)+"行：有数据为空，或无法识别");
                     }
                 }
             }
