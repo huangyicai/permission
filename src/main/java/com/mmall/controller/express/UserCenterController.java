@@ -53,6 +53,13 @@ public class UserCenterController {
         return expressUserService.getAllOperate(userInfo);
     }
 
+    @ApiOperation(value = "修改快递公司运营号/客服号信息)",  notes="需要Authorization")
+    @PutMapping(value = "/info",produces = {"application/json;charest=Utf-8"})
+    public Result updataUserSubmitForm(@RequestBody SysUserInfo sysUserInfo){
+        sysUserInfoService.updateById(sysUserInfo);
+        return Result.ok();
+    }
+
     @ApiOperation(value = "添加/修改成本定价",  notes="需要Authorization")
     @PostMapping(value = "/{cityId}",produces = {"application/json;charest=Utf-8"})
     public Result savePricingGroup(@RequestBody List<PricingGroupParam> pricingGroups,

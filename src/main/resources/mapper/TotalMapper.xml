@@ -145,14 +145,14 @@
               and total_state=#{state}
           </if>
             <if test="state==-10">
-                and FIND_IN_SET(t.total_state,'-1,1,2,3,5')
+                and FIND_IN_SET(t.total_state,'2,3,5')
             </if>
 
           <if test="sendId!=null and sendId!=0">
               and send_id = #{sendId}
           </if>
         </where>
-        ORDER BY total_time DESC
+        ORDER BY total_time DESC , t.create_time DESC
     </select>
 
     <!--获取已收和未收数据-->
@@ -230,8 +230,11 @@
                 and t.total_time &lt;= #{endDate}
             </if>
 
-            <if test="date!=null and date!=''">
+            <if test="date!=null and date!='' and endDate!=null and endDate!=''">
                 and t.total_time>=#{date}
+            </if>
+            <if test="endDate==null or endDate==''">
+                and t.total_time=#{date}
             </if>
             <if test="userId!=null and userId!=''">
             and  FIND_IN_SET(t.user_id,#{userId})
