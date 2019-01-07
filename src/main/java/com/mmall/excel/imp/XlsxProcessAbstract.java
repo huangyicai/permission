@@ -790,7 +790,6 @@ public class XlsxProcessAbstract {
             ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings, sheetHandler, formatter, false);
             sheetParser.setContentHandler(handler);
             sheetParser.parse(sheetSource);
-            int i = strings.getCount();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("SAX parser appears to be broken - " + e);
         }

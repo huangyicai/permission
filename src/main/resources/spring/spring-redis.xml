@@ -3,19 +3,19 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-   <!-- <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
+   <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
         <constructor-arg ref="jedisPoolConfig"/>
         <constructor-arg value="106.13.33.92" type="java.lang.String"/>
         <constructor-arg value="6379" type="int"/>
         <constructor-arg value="2000" type="int"/>
         <constructor-arg value="mypassword" type="java.lang.String"/>
-    </bean>-->
-    <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
-        <constructor-arg ref="jedisPoolConfig"/>
-        <constructor-arg value="r-bp1fe43975477074.redis.rds.aliyuncs.com" type="java.lang.String"/>
-        <constructor-arg value="6379" type="int"/>
-        <constructor-arg value="1000000" type="int"/>
-        <constructor-arg value="Abc$123456789" type="java.lang.String"/>
     </bean>
+    <!--<bean class="redis.clients.jedis.JedisPool" id="jedisPool">-->
+        <!--<constructor-arg ref="jedisPoolConfig"/>-->
+        <!--<constructor-arg value="r-bp1fe43975477074.redis.rds.aliyuncs.com" type="java.lang.String"/>-->
+        <!--<constructor-arg value="6379" type="int"/>-->
+        <!--<constructor-arg value="1000000" type="int"/>-->
+        <!--<constructor-arg value="Abc$123456789" type="java.lang.String"/>-->
+    <!--</bean>-->
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig"/>
 </beans>
