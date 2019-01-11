@@ -71,11 +71,10 @@ public interface CustomerServiceService extends IService<CustomerService> {
 
     /**
      * 回复工单
-     * @param handleId
      * @param content
      * @return
      */
-    Result reply(Integer userId,Integer handleId, String content);
+    Result reply(Integer userId,CustomerService byId, String content);
 
     /**
      * 获取工单回复记录

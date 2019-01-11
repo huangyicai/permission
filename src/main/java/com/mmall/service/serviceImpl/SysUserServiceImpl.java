@@ -3,6 +3,8 @@ package com.mmall.service.serviceImpl;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
@@ -187,7 +189,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             } catch (Exception e) {
                 e.printStackTrace();
             }
-           return Result.ok(authInfo);
+            //更新登陆时间
+            SysUserInfo sysUserInfoUpdate = sysUserInfoMapper.selectById(sysUserInfo.getId());
+            sysUserInfoUpdate.setLoginTime(DateTimeUtil.numToDate(System.currentTimeMillis(),"yyyy/MM/dd HH:mm"));
+            sysUserInfoMapper.updateById(sysUserInfoUpdate);
+            return Result.ok(authInfo);
         };
         return Result.error(InfoEnums.AUTHORIZATION);
     }
@@ -275,11 +281,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return Result.ok(userInfo);
     }
 
-    public Result<List<SysUserInfo>> getCompanys(SysUserInfo user) {
+    @Autowired
+    private SumTatalMapper sumTatalMapper;
+    public Result getCompanys(SysUserInfo user,Page ipage) {
 
         Integer id = user.getId();
 
-        List<SysUserInfo> sysUserInfos2 = sysUserInfoMapper.selectList(new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status",-1));
+        IPage<SysUserInfo> sysUserInfoList = sysUserInfoMapper.selectPage(ipage,
+                new QueryWrapper<SysUserInfo>().eq("parent_id", id).notIn("status", -1));
+        for(SysUserInfo sys:sysUserInfoList.getRecords()){
+            Integer sum = sumTatalMapper.selectCount(new QueryWrapper<SumTatal>().eq("User_id", sys.getId()));
+            Integer sysSum = sysUserInfoMapper.selectCount(new QueryWrapper<SysUserInfo>()
+                    .like("level", "%" + sys.getId() + "%")
+                    .in("status", 1, 0)
+                    .eq("platform_id", LevelConstants.SERVICE));
+            sys.setPlatformId(sum);
+            sys.setParentId(sysSum);
+        }
+
         /*List<SysUserInfo> sysUserInfos = sysUserInfoMapper.findUserByid("%"+id+"%");
         String nextLevel = LevelUtil.calculateLevel(user.getLevel(), id);
         List<SysUserInfoDto> dtoList = Lists.newArrayList();
@@ -300,7 +319,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         }
         transformUserInfoTree(rootList, nextLevel, levelMap);*/
-        return Result.ok(sysUserInfos2);
+        return Result.ok(sysUserInfoList);
     }
 
     public Result frozen(Integer id) {

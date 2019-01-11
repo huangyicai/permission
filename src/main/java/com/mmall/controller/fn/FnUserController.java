@@ -1,6 +1,7 @@
 package com.mmall.controller.fn;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mmall.dao.CourierCompanyMapper;
 import com.mmall.dao.FnContactsMapper;
 import com.mmall.model.CourierCompany;
@@ -81,9 +82,11 @@ public class FnUserController {
 
     @ApiOperation(value = "获取快递公司列表",  notes="需要Authorization")
     @GetMapping(value = "/companys",produces = {"application/json;charest=Utf-8"})
-    public Result<List<SysUserInfo>> getCompanys(){
+    public Result<List<SysUserInfo>> getCompanys(@RequestParam(name = "page",required = false,defaultValue = "1")Integer page,
+                                                 @RequestParam(name = "size",required = false,defaultValue = "10")Integer size){
         SysUserInfo user = (SysUserInfo)SecurityUtils.getSubject().getSession().getAttribute("user");
-        return sysUserService.getCompanys(user);
+        Page ipage = new Page(page,size);
+        return sysUserService.getCompanys(user,ipage);
     }
 
     @ApiOperation(value = "获取弗恩客服",  notes="需要Authorization")

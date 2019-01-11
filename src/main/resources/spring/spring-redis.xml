@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-   <!-- <bean class="redis.clients.jedis.JedisPool" id="jedisPool">
+    <!--<bean class="redis.clients.jedis.JedisPool" id="jedisPool">
         <constructor-arg ref="jedisPoolConfig"/>
         <constructor-arg value="106.13.33.92" type="java.lang.String"/>
         <constructor-arg value="6379" type="int"/>

@@ -164,14 +164,16 @@ public class CustomerServiceServiceImpl extends ServiceImpl<CustomerServiceMappe
     }
 
     @Override
-    public Result reply(Integer userId,Integer handleId, String content) {
+    public Result reply(Integer userId,CustomerService customerService, String content) {
         WorkReply workReply = WorkReply.builder()
                 .content(content)
-                .serviceId(handleId)
+                .serviceId(customerService.getId())
                 .userId(userId)
                 .build();
         workReplyMapper.insert(workReply);
-        CustomerService customerService = customerServiceMapper.selectById(handleId);
+        if(customerService.getStatus()!=2&&!customerService.getStatus().equals(2)){
+            return Result.ok();
+        }
         SysUserInfo sysUserInfo = null;
         if(customerService.getHandleId()==userId||customerService.getHandleId().equals(userId)){
             if(customerService.getReceiveTimeSolt()==0){

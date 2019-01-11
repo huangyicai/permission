@@ -1,6 +1,7 @@
 package com.mmall.service;
 
 import com.aliyuncs.exceptions.ClientException;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mmall.dto.SysMenuDto;
 import com.mmall.dto.SysUserInfoDto;
@@ -49,7 +50,7 @@ public interface SysUserService extends IService<SysUser> {
      * @param user
      * @return
      */
-    Result<List<SysUserInfo>> getCompanys(SysUserInfo user);
+    Result getCompanys(SysUserInfo user,Page ipage);
 
     /**
      * 冻结

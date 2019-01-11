@@ -116,13 +116,56 @@ public class ExpressServiceController {
         return Result.ok(byId);
     }
 
+    @ApiOperation(value = "批量完结",  notes="需要Authorization")
+    @GetMapping(value = "/batch/finish",produces = {"application/json;charest=Utf-8"})
+    public Result batchHandleFinish(@RequestParam("handleId") String  handleId){
+        for(String s : handleId.split(",")){
+
+            CustomerService byId = customerServiceService.getById(Integer.parseInt(s));
+            if(byId.getStatus()!=2&&!byId.getStatus().equals(2)){
+                continue;
+            }
+            //当前时间
+            long currentTime = System.currentTimeMillis();
+            byId.setRemarks("已完结");
+            byId.setEndTime(DateTimeUtil.numToDate(currentTime,"yyyy-MM-dd HH:mm:ss"));
+            byId.setStatus(3);
+            //工单创建时间
+            long createT = DateTimeUtil.DateToNum(byId.getCreateTime());
+            byId.setEndTimeSolt((currentTime-createT)/(1000*60));
+            customerServiceService.saveOrUpdate(byId);
+
+            SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(byId.getUserId());
+            ExpressWebSocket.sendMsgAddServices(sysUserInfo,"已处理完毕，请查看","运单号:"+ byId.getWaybillNumber(),5);
+        }
+        return Result.ok();
+    }
+
+
+
     @ApiOperation(value = "回复工单",  notes="需要Authorization")
     @PostMapping(value = "/reply/{handleId}",produces = {"application/json;charest=Utf-8"})
     public Result saveReply(@PathVariable("handleId") Integer handleId,
                         @RequestBody WorkReplyParam workReplyParam){
         BeanValidator.check(workReplyParam);
         SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
-        return customerServiceService.reply(user.getId(),handleId,workReplyParam.getContent());
+        CustomerService byId = customerServiceService.getById(handleId);
+        return customerServiceService.reply(user.getId(),byId,workReplyParam.getContent());
+    }
+
+    @ApiOperation(value = "批量回复工单",  notes="需要Authorization")
+    @PostMapping(value = "/batch/reply",produces = {"application/json;charest=Utf-8"})
+    public Result saveBatchReply(@RequestBody WorkReplyParam workReplyParam){
+        BeanValidator.check(workReplyParam);
+        SysUserInfo user = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        for (String s: workReplyParam.getHandleId().split(",")) {
+            CustomerService byId = customerServiceService.getById(Integer.parseInt(s));
+            if(byId.getStatus()!=2&&!byId.getStatus().equals(2)){
+                continue;
+            }
+            customerServiceService.reply(user.getId(),byId,workReplyParam.getContent());
+        }
+        return Result.ok();
     }
 
     @ApiOperation(value = "获取工单回复记录",  notes="需要Authorization")

@@ -13,7 +13,8 @@ import org.hibernate.validator.constraints.NotBlank;
 @Setter
 @Getter
 public class WorkReplyParam {
-
+    @ApiModelProperty(value = "工单Id 逗号隔开")
+    private String handleId;
     @ApiModelProperty(value = "回复内容")
     @NotBlank(message = "回复内容不可以为空")
     private String content;
