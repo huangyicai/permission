@@ -29,6 +29,8 @@ public interface TotalMapper extends BaseMapper<Total> {
 
     List<Total> listToal(@Param("totalTime")String totalTime, @Param("userId")String userId);
 
+    Total getTime(@Param("userId")String userId);
+
     List<Total> listTotal(@Param("totalTime")String totalTime, @Param("sumId")String sumId,@Param("state")Integer state);
 
     void deleteTotal(@Param("totalTime")String totalTime, @Param("sumId")String sumId);
