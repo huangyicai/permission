@@ -20,6 +20,7 @@ import com.mmall.excel.imp.XlsxProcessAbstract;
 import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.service.TotalService;
+import com.mmall.util.DateHelp;
 import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -306,6 +307,25 @@ public class TotalController {
     @GetMapping(value = "/keyPricing")
     public Result keyPricing(@RequestParam(value = "totalId") String totalId) throws InterruptedException {
         return totalService.keyPricing(totalId);
+    }
+
+    @ApiOperation(value = "获取最近有数据的账单",  notes="需要Authorization")
+    @ApiImplicitParams(
+            @ApiImplicitParam(name = "userId",value = "用户id",dataType = "string",paramType = "query")
+    )
+    @GetMapping(value = "/getTime")
+    public Result getTime(String userId){
+        if("".equals(userId) || userId==null){
+            userId = totalService.getUserIdStr();
+        }
+        Total time = totalMapper.getTime(userId);
+
+        if(time==null){
+            time=new Total();
+            Date date = DateHelp.addDateMonths(new Date(), -1);
+            time.setTotalTime(DateHelp.format(date,"yyyy-MM"));
+        }
+        return Result.ok(time.getTotalTime());
     }
 }
 

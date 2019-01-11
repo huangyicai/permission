@@ -76,6 +76,12 @@
       from total where FIND_IN_SET(user_id,#{userId}) and total_time=#{totalTime} and total_state &gt;=2
     </select>
 
+    <!-- 获取最近又是数据的月份 -->
+    <select id="getTime" resultType="com.mmall.model.Total">
+      select total_time as totalTime
+      from total where FIND_IN_SET(user_id,#{userId}) and total_state &gt;=2 order by total_time desc  LIMIT 0,1
+    </select>
+
     <!--根据总账单id获取账单-->
     <select id="listTotal" resultType="com.mmall.model.Total">
       select
