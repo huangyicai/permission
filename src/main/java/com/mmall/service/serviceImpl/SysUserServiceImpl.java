@@ -4,6 +4,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -104,7 +105,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         for (SysMenu sysMenu : sysMenus) {
             dtoList.add(SysMenuDto.adapt(sysMenu));
         }
-        /*if (CollectionUtils.isEmpty(dtoList)) {
+        if (CollectionUtils.isEmpty(dtoList)) {
             return Result.ok(dtoList);
         }
         // level -> [aclmodule1, aclmodule2, ...] Map<String, List<Object>>
@@ -118,7 +119,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
         }
         Collections.sort(rootList, menusSeqComparator);
-        transformMenuTree(rootList, LevelUtil.ROOT, levelAclModuleMap);*/
+        transformMenuTree(rootList, LevelUtil.ROOT, levelAclModuleMap);
         return Result.ok(dtoList);
     }
     public void transformMenuTree(List<SysMenuDto> dtoList, String level, Multimap<String, SysMenuDto> levelAclModuleMap) {

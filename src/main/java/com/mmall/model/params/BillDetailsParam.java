@@ -18,7 +18,7 @@ public class BillDetailsParam {
     private Integer size;
 
     @ApiModelProperty(value = "时间")
-    @NotBlank(message = "时间不能为空")
+    //@NotBlank(message = "时间不能为空")
     private String date;
 
     @ApiModelProperty(value = "状态：-1-未定价，1-未发送，2-待确认，3-已付款（未确认，这里不做展示），4-已收款，5-未结清")

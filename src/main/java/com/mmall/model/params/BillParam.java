@@ -15,4 +15,7 @@ public class BillParam {
     @ApiModelProperty(value = "时间")
     @NotBlank(message = "时间不可以为空")
     private String date;
+
+    @ApiModelProperty(value = "结束时间")
+    private String endDate;
 }

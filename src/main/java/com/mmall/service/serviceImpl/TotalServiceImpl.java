@@ -110,7 +110,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             userInfo.setId(0);
         }
 
-        Total one = totalMapper.getToal(billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
+        Total one = totalMapper.getToal(billParam.getDate(),billParam.getEndDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
 
         if(one==null){
             return new BillDto();
@@ -209,10 +209,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
 
         //应收数据
-        Total Offer = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
+        Total Offer = totalMapper.getToal( billParam.getDate(),billParam.getEndDate(), billParam.getUserId(),userInfo.getId(),"2,3,4,5");
 
         //实收数据
-        Total Paid = totalMapper.getToal( billParam.getDate(), billParam.getUserId(),userInfo.getId(),"4");
+        Total Paid = totalMapper.getToal( billParam.getDate(),billParam.getEndDate(), billParam.getUserId(),userInfo.getId(),"4");
         if(Offer==null){
             Offer = check(new Total());
         }if(Paid==null){

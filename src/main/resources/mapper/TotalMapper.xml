@@ -49,7 +49,14 @@
               and FIND_IN_SET(total_state,#{totalState})
           </if>
 
-          <if test="totalTime!=null and totalTime!=''">
+          <if test="endDate!=null and endDate!=''">
+              and total_time &lt;= #{endDate}
+          </if>
+
+          <if test="totalTime!=null and totalTime!='' and endDate!=null and endDate!=''">
+              and total_time>=#{totalTime}
+          </if>
+          <if test="endDate==null or endDate=='' and totalTime!=null">
               and total_time=#{totalTime}
           </if>
 
@@ -233,7 +240,7 @@
             <if test="date!=null and date!='' and endDate!=null and endDate!=''">
                 and t.total_time>=#{date}
             </if>
-            <if test="endDate==null or endDate==''">
+            <if test="endDate==null or endDate=='' and date!=null">
                 and t.total_time=#{date}
             </if>
             <if test="userId!=null and userId!=''">

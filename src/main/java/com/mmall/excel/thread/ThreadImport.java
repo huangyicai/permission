@@ -1,21 +1,25 @@
 package com.mmall.excel.thread;
 
 import com.mmall.component.ApplicationContextHelper;
-import com.mmall.dao.*;
+import com.mmall.dao.DailyTotalMapper;
+import com.mmall.dao.ProvincialMeterMapper;
+import com.mmall.dao.TotalMapper;
+import com.mmall.dao.WeightCalculateMapper;
 import com.mmall.dto.ThreadDto;
 import com.mmall.excel.Bill;
 import com.mmall.excel.export.DataSheetExecute;
 import com.mmall.excel.export.ExcelExportExecutor;
-import com.mmall.model.*;
+import com.mmall.model.DailyTotal;
+import com.mmall.model.ProvincialMeter;
+import com.mmall.model.Total;
+import com.mmall.model.WeightCalculate;
 import com.mmall.util.RandomHelper;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.Date;
-import java.util.concurrent.Callable;
 
 
 public class ThreadImport extends Thread {
@@ -46,6 +50,7 @@ public class ThreadImport extends Thread {
 //            }
 
             public void writeExcel(SXSSFWorkbook workbook, OutputStream outputStream) throws Exception {
+
                 //生成随机码
                 String time = new Date().getTime()+"";
                 String keyId=time.substring(9,time.length())+ RandomHelper.getRandNum(3);
