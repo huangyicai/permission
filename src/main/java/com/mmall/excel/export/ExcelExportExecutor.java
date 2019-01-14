@@ -12,7 +12,6 @@ import java.util.List;
 
 /**
  * 导出执行器
- * 参考文章：https://blog.csdn.net/java_cainiao2016/article/details/78091812
  * @param <T>
  */
 public class ExcelExportExecutor<T> {
@@ -143,23 +142,19 @@ public class ExcelExportExecutor<T> {
             Row tmpRow;
             for (int i = 0; i < size; i++) {
                 tmpRow = sheet.createRow(this.dataRowStart + i);
-                Cell cell=tmpRow.createCell(i);
-//                cell.setCellStyle(style);
                 this.executorListener.execute(tmpRow, data.get(i),wb);
             }
+
 //            data.clear();
         } else if (pageSize > 0 && size >= pageSize) {
-            /*
-             * 数据总条数
-             */
+
+            //数据总条数
             int listSize = data.size();
-            /*
-             * 分批次导入数据次数
-             */
+
+            //分批次导入数据次数
             int batchSize = listSize / pageSize;
-            /*
-             * 分批次后，剩余的记录条数
-             */
+
+            //分批次后，剩余的记录条数
             int remain = listSize % pageSize;
             List<Bill> tmp;
 
@@ -174,23 +169,18 @@ public class ExcelExportExecutor<T> {
                  * 将原始list数据按照pageSize分批截取
                  */
                 tmp = data.subList(0, pageSize);
+
                 int len = tmp.size();
                 Row tmpRow;
                 for (int j = 0; j < len; j++) {
-                    /*
-                     * 记录当前执行到哪一行了
-                     */
+
+                    //记录当前执行到哪一行了
                     currentRow = i * pageSize + j + 1;
-                    /*
-                     * 创建一个row
-                     */
+
+                    //创建一个row
                     tmpRow = sheet.createRow(currentRow);
-//                    if (watcherRowStatus && executorListener != null) {
-//                        executorListener.listen(tmpRow, currentRow);
-//                    }
-                    /*
-                     * 将list中的数据对象设置到指定的row中
-                     */
+
+                    //将list中的数据对象设置到指定的row中
                     this.executorListener.execute(tmpRow, tmp.get(j),wb);
                 }
                 /**
@@ -212,6 +202,7 @@ public class ExcelExportExecutor<T> {
 //                tmp.clear();
             }
         }
+
         OutputStream outputStream = null;
 
         try {
@@ -219,9 +210,8 @@ public class ExcelExportExecutor<T> {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            /*
-             * 确保自定义保存后忘记调用dispose
-             */
+
+            //确保自定义保存后忘记调用dispose
             if (this.wb != null) {
                 this.wb.dispose();
             }

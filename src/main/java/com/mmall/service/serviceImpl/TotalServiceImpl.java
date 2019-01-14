@@ -53,6 +53,8 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static java.math.BigDecimal.ROUND_HALF_UP;
+
 /**
  * <p>
  * 月计表(客户账单) 服务实现类
@@ -761,10 +763,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
-                        bill.setCost(new BigDecimal(pg.getPrice().toString()));
+                        bill.setCost(new BigDecimal(pg.getPrice().toString()).setScale(2));
                         return true;
                     }else{
-                        bill.setOffer(new BigDecimal(pg.getPrice().toString()));
+                        bill.setOffer(new BigDecimal(pg.getPrice().toString()).setScale(2));
                         return true;
                     }
                 }
@@ -778,21 +780,21 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().contains(pp.getCity())){
 
                 //和区间开始比较
-                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
+                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()).setScale(2));
 
                 //和区间结束大小比较
-                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()));
+                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()).setScale(2));
 
-                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()));
+                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()).setScale(2));
 
                 if(greaterContinue>=0 && lessContinue<=0){
 
                     if(firstOne<=0){
                         if(type==1){
-                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2));
                             return true;
                         }else{
-                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()));
+                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2));
                             return true;
                         }
                     }
@@ -818,10 +820,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
 
                     if(type==1){
-                        bill.setCost(fist.add(two));
+                        bill.setCost(fist.add(two).setScale(2));
                         return true;
                     }else{
-                        bill.setOffer(fist.add(two));
+                        bill.setOffer(fist.add(two).setScale(2,ROUND_HALF_UP));
                         return true;
                     }
                 }
@@ -847,17 +849,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().contains(pg.getCity())||pg.getCity().startsWith("全部")){
 
                 //和区间开始比较
-                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
+                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()).setScale(2,ROUND_HALF_UP));
 
                 //和区间结束大小比较
-                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()));
+                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()).setScale(2,ROUND_HALF_UP));
 
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
-                        bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())));
+                        bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
                     }else{
-                        bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())));
+                        bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
                     }
                 }
             }
@@ -881,9 +883,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(firstOne<=0){
                         if(type==1){
-                            bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())));
+                            bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
                         }else{
-                            bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())));
+                            bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
                         }
                     }
 
@@ -908,9 +910,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
 
                     if(type==1){
-                        bill.setCost(bill.getCost().add(fist.add(two)));
+                        bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
                     }else{
-                        bill.setOffer(bill.getOffer().add(fist.add(two)));
+                        bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
                     }
                 }
             }
