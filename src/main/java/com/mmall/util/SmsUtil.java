@@ -35,6 +35,67 @@ public class SmsUtil {
     static final String accessKeyId = "LTAIKUD6G9dChBet";
     static final String accessKeySecret = "GAHME0xpODyBuARYpQW2U0bwaEzgzo";
 
+
+    public static SendSmsResponse sendSmsBill(String phone,
+                                              String username,
+                                              String company,
+                                              String billName,
+                                              String name,
+                                              String phoneServer,
+                                              String time) throws ClientException {
+
+        //可自助调整超时时间
+        System.setProperty("sun.net.client.defaultConnectTimeout", "60000");
+        System.setProperty("sun.net.client.defaultReadTimeout", "60000");
+
+        //初始化acsClient,暂不支持region化
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
+        IAcsClient acsClient = new DefaultAcsClient(profile);
+
+        //组装请求对象-具体描述见控制台-文档部分内容
+        SendSmsRequest request = new SendSmsRequest();
+        //必填:待发送手机号
+        request.setPhoneNumbers(phone);
+        //必填:短信签名-可在短信控制台中找到
+        request.setSignName("弗恩");
+        //必填:短信模板-可在短信控制台中找到
+        request.setTemplateCode("SMS_155356736");
+        //可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为
+       /* 尊敬的${username}用户，
+        感谢您对${company}的支持，
+        您的${bill_name}账单已经发送至百里百里系统，
+        请登录网址：http://www.funwl.com或下载百里百里APP查看。
+        // 有任何疑问请联系我司财务，联系人：${name},电话：${phone}。
+        // 本次账单付款截止日期${time},请尽快处理。*/
+        request.setTemplateParam(
+                "{'username':'"+username
+                +"','company':'"+company
+                +"','bill_name':'"+billName
+                +"','name':'"+name
+                +"','time':'"+time
+                +"','phone':'"+phoneServer+"'}");
+
+        //选填-上行短信扩展码(无特殊需求用户请忽略此字段)
+        //request.setSmsUpExtendCode("90997");
+
+        //可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
+        request.setOutId("yourOutId");
+
+        //hint 此处可能会抛出异常，注意catch
+        SendSmsResponse sendSmsResponse = acsClient.getAcsResponse(request);
+
+        return sendSmsResponse;
+    }
+
+    public static void main(String[] args) throws ClientException {
+        sendSmsBill("18069148561","小黄同学",
+                "耳东","12月",
+                "哈哈","17725167021",
+                "2018-10-10");
+    }
+
+
     public static SendSmsResponse sendSms(String phone,String smsCode) throws ClientException {
 
         //可自助调整超时时间

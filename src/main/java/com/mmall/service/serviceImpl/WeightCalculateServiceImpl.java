@@ -131,7 +131,7 @@ public class WeightCalculateServiceImpl extends ServiceImpl<WeightCalculateMappe
         }
 
         //todo 原来的list无论删除还是截取，操作之后之前相加得到的5-10的数据都会消失，
-        //todo 所以另外新建list做处理。或者更改上面的计算规则（会重新设计表）
+        //todo 所以另外新建list做处理。或者更改上面的计算规则
         List<WeightCalculateDto> weightCalculateDtos = weightCalculateDto.subList(0, 6);
         weightCalculateDtos.add(w);
         weightCalculateDtos.add(weightCalculateDto.get(weightCalculateDto.size()-1));

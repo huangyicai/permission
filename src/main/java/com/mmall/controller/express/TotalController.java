@@ -21,12 +21,14 @@ import com.mmall.model.Response.Result;
 import com.mmall.model.Total;
 import com.mmall.service.TotalService;
 import com.mmall.util.DateHelp;
+import com.mmall.util.SmsUtil;
 import com.mmall.vo.TotalVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -140,6 +142,7 @@ public class TotalController {
 
     @ApiOperation(value = "发送账单",notes = "需要Authorization")
     @PostMapping(value = "/send",produces = {"application/json;charest=Utf-8"})
+    @Transactional
     public Result send(@RequestBody TotalParam totalParam){
         Total byId = totalService.getById(totalParam.getTotalId());
 
@@ -147,6 +150,7 @@ public class TotalController {
             totalMapper.updateByTotalId(totalParam.getTotalId(),totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
             SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(byId.getUserId());
             ExpressWebSocket.sendMsg(sysUserInfo,byId,1);
+            totalService.sendSms(totalParam);
             return Result.ok();
         }else {
             return Result.error(InfoEnums.SEND_FAILURE);

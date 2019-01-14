@@ -282,6 +282,7 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
     }
 
     @Override
+    @Transactional
     public Result importPrice(MultipartFile file, Integer userId) throws IOException, InterruptedException{
 
         //初始化数据
@@ -296,6 +297,11 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
             //根据省份分离数据
             map.put(pg.getCityId(),pg);
+
+            //判断首重区间是否为0
+            if(pg.getFirstOrContinued()==1 && pg.getAreaBegin()==0 && pg.getAreaEnd()==0){
+                continue;
+            }
 
             //判断并处理空值
             if(pg.getFirstOrContinued()==1){
@@ -411,7 +417,7 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
             BigDecimal begin=new BigDecimal(pricingGroupsTwo.get(0).getAreaBegin().toString());
             BigDecimal end =new BigDecimal(pricingGroupsOne.get(0).getAreaEnd().toString());
             boolean b = begin.subtract(end).compareTo(new BigDecimal("0.01"))==0;
-            if(!b){
+            if(!b && end.compareTo(new BigDecimal("0"))!=0){
                 City city = cityMapper.selectOne(new QueryWrapper<City>().eq("id", key));
                 listError.add(city.getProvinceName()+"：最大首重的值和最小续重的值大小差距只能为0.01");
             }
