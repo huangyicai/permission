@@ -92,4 +92,6 @@ public interface TotalService extends IService<Total> {
                            Integer type);
 
     Result keyPricing(String totalId) throws InterruptedException;
+
+    void sendSms(TotalParam totalParam);
 }

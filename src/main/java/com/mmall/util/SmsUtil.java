@@ -89,9 +89,9 @@ public class SmsUtil {
     }
 
     public static void main(String[] args) throws ClientException {
-        sendSmsBill("18069000780","小黄同学",
+        sendSmsBill("18069148561","小黄同学",
                 "耳东","12月",
-                "哈哈","18069000780",
+                "哈哈","17725167021",
                 "2018-10-10");
     }
 

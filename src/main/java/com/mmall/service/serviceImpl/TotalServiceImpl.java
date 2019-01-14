@@ -1,5 +1,6 @@
 package com.mmall.service.serviceImpl;
 
+import com.aliyuncs.exceptions.ClientException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -32,6 +33,7 @@ import com.mmall.model.params.TotalParam;
 import com.mmall.service.*;
 import com.mmall.util.DateUtils;
 import com.mmall.util.LevelUtil;
+import com.mmall.util.SmsUtil;
 import com.mmall.util.UploadApi;
 import com.mmall.vo.PricingGroupVo;
 import com.mmall.vo.TotalVo;
@@ -616,6 +618,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @return
      */
     @Override
+    @Transactional
     public Result sendAll(TotalParam totalParam) {
         String totalId = totalParam.getTotalId();
         List<Total> allBillByIds = totalMapper.getAllBillByIds(totalId);
@@ -623,6 +626,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(tt.getTotalState()!=1){
                 return Result.error(InfoEnums.SEND_FAILURE,"单号："+tt.getOrderNo()+"，请检查是否定价，或者已经发送");
             }
+            TotalParam totalParam1=new TotalParam();
+            totalParam1.setTotalId(tt.getTotalId().toString());
+            totalParam1.setDate(totalParam.getDate());
+            this.sendSms(totalParam1);
         }
         totalMapper.updateByTotalId(totalId,totalParam.getTotalRemark(),totalParam.getDate(),new BigDecimal(totalParam.getTotalAdditional()));
         SysUserInfo sysUserInfo = sysUserInfoMapper.selectById(allBillByIds.get(0).getUserId());
@@ -970,6 +977,55 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         return Result.ok(list);
+    }
+
+    /**
+     * 发送短信
+     */
+    public void sendSms(TotalParam totalParam){
+
+        //用户名
+        String username="";
+
+        //用户手机
+        String phone="";
+
+        //发送人公司
+        String company="";
+
+        //账单名字
+        String billName="";
+
+        //联系人
+        String name="";
+
+        //截止时间
+        String time="";
+
+        //联系人电话
+        String phoneServer="";
+
+        //获取账单信息
+        Total one = totalService.getById(totalParam.getTotalId());
+        billName=one.getName();
+        time=totalParam.getDate();
+
+        //获取客户信息
+        SysUserInfo user = sysUserInfoService.getById(one.getUserId());
+        username=user.getName();
+        phone=user.getTelephone();
+
+        //获取发送者信息
+        SysUserInfo user1 = (SysUserInfo) SecurityUtils.getSubject().getSession().getAttribute("user");
+        name= user1.getPersonInCharge();
+        phoneServer=user1.getTelephone();
+        company=user1.getCompanyName();
+
+        try {
+            SmsUtil.sendSmsBill(phone,username,company,billName,name,phoneServer,time);
+        } catch (ClientException e) {
+            e.printStackTrace();
+        }
     }
 
 }
