@@ -29,51 +29,6 @@ public abstract class DataSheetExecute<T> {
         if(i!=0){
             row.createCell(5).setCellValue(personUser.getOffer().doubleValue());
         }
-
-//        // 内容字体样式
-//        Font contFont =  workbook.createFont();
-//        // 加粗
-//        contFont.setBold(false);
-//        // 字体名称
-//        contFont.setFontName("楷体");
-//        // 字体大小
-//        contFont.setFontHeight((short) 11);
-//        // 内容样式
-//        CellStyle contentStyle = workbook.createCellStyle();
-//        // 设置字体css
-//        contentStyle.setFont(contFont);
-//        // 竖向居中
-//        contentStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-//        // 横向居中
-//        contentStyle.setAlignment(HorizontalAlignment.CENTER);
-//        // 边框
-//        contentStyle.setBorderBottom(BorderStyle.THIN);
-//        contentStyle.setBorderLeft(BorderStyle.THIN);
-//        contentStyle.setBorderRight(BorderStyle.THIN);
-//        contentStyle.setBorderTop(BorderStyle.THIN);
-//
-//        // 自动换行
-//        contentStyle.setWrapText(false);
-//
-//        Cell cell0 = row.createCell(0);
-//        cell0.setCellStyle(contentStyle);
-//        cell0.setCellValue(personUser.getBillName());
-//
-//        Cell cell1 = row.createCell(1);
-//        cell1.setCellStyle(contentStyle);
-//        cell1.setCellValue(personUser.getSweepTime());
-//
-//        Cell cell2 = row.createCell(2);
-//        cell2.setCellStyle(contentStyle);
-//        cell2.setCellValue(personUser.getSerialNumber());
-//
-//        Cell cell3 = row.createCell(3);
-//        cell3.setCellStyle(contentStyle);
-//        cell3.setCellValue(personUser.getDestination());
-//
-//        Cell cell4 = row.createCell(4);
-//        cell4.setCellStyle(contentStyle);
-//        cell4.setCellValue(personUser.getWeight().toString());
     }
 
 

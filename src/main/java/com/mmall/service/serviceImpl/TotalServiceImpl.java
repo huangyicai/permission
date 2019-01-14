@@ -716,7 +716,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
             Boolean traverse=false;
 
-            //遍历特殊定价组
+            //遍历取代定价组
             if(specialFirst.size()>0){
                 traverse = traverse(bill,specialFirst, specialContinued, type);
             }
@@ -750,7 +750,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pg: first){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().indexOf(pg.getCity())>=0){
+            if(bill.getDestination().contains(pg.getCity())){
 
                 //和区间开始比较
                 int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
@@ -775,7 +775,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pp: Continued){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().startsWith(pp.getCity())){
+            if(bill.getDestination().contains(pp.getCity())){
 
                 //和区间开始比较
                 int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
@@ -844,7 +844,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pg: first){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().startsWith(pg.getCity())||pg.getCity().startsWith("全部")){
+            if(bill.getDestination().contains(pg.getCity())||pg.getCity().startsWith("全部")){
 
                 //和区间开始比较
                 int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
@@ -867,7 +867,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for(PricingGroupVo pp: Continued){
 
             //根据城市锁定价格计算规则
-            if(bill.getDestination().startsWith(pp.getCity())||pp.getCity().startsWith("全部")){
+            if(bill.getDestination().contains(pp.getCity())||pp.getCity().startsWith("全部")){
 
                 //和区间开始比较
                 int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
