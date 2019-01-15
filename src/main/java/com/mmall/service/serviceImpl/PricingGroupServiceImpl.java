@@ -134,16 +134,43 @@ public class PricingGroupServiceImpl extends ServiceImpl<PricingGroupMapper, Pri
 
     @Override
     @Transactional
-    public Result saveExistingPricingGroups(Integer userId, Integer selfId,Integer type) {
+    public Result saveExistingPricingGroups(Integer userId, Integer selfId,Integer type,Integer typeCope) {
         pricingGroupMapper.delete(new QueryWrapper<PricingGroup>().eq("user_id",selfId));
         List<PricingGroup> pricingGroupList = pricingGroupMapper.selectList(new QueryWrapper<PricingGroup>().eq("user_id", userId));
         for(PricingGroup pg:pricingGroupList){
             pg.setUserId(selfId);
             pricingGroupMapper.insert(pg);
         }
-        if(type==1){
+        if(type.equals(1)&&typeCope.equals(2)){
             List<SpecialPricingGroupKey> specialPricingGroupKeyList = specialPricingGroupKeyMapper.selectList(new QueryWrapper<SpecialPricingGroupKey>().eq("user_id", userId));
 
+            for(SpecialPricingGroupKey sp :specialPricingGroupKeyList){
+                SpecialPricingGroupKey gk = new SpecialPricingGroupKey();
+                gk.setStatus(sp.getStatus());
+                gk.setKeyName(sp.getKeyName());
+                gk.setUserId(selfId);
+                specialPricingGroupKeyMapper.insert(gk);
+                List<SpecialPricingGroup> pricingGroups = specialPricingGroupMapper.selectList(new QueryWrapper<SpecialPricingGroup>()
+                        .eq("key_id",sp.getId()));
+                for(SpecialPricingGroup spg : pricingGroups){
+                    spg.setId(null);
+                    spg.setKeyId(gk.getId());
+                    specialPricingGroupMapper.insert(spg);
+                }
+            }
+        }
+
+        if(type.equals(1)&&typeCope.equals(1)){
+            List<SpecialPricingGroupKey> specialPricingGroupKeyListSelf = specialPricingGroupKeyMapper.selectList(new QueryWrapper<SpecialPricingGroupKey>().eq("user_id", selfId));
+            for (SpecialPricingGroupKey spgk: specialPricingGroupKeyListSelf) {
+                List<SpecialPricingGroup> pricingGroupsSlef = specialPricingGroupMapper.selectList(new QueryWrapper<SpecialPricingGroup>()
+                        .eq("key_id",spgk.getId()));
+                for(SpecialPricingGroup spg:pricingGroupsSlef){
+                    specialPricingGroupMapper.deleteById(spg.getId());
+                }
+                specialPricingGroupKeyMapper.deleteById(spgk.getId());
+            }
+            List<SpecialPricingGroupKey> specialPricingGroupKeyList = specialPricingGroupKeyMapper.selectList(new QueryWrapper<SpecialPricingGroupKey>().eq("user_id", userId));
             for(SpecialPricingGroupKey sp :specialPricingGroupKeyList){
                 SpecialPricingGroupKey gk = new SpecialPricingGroupKey();
                 gk.setStatus(sp.getStatus());

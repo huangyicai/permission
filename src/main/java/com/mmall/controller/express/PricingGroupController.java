@@ -210,11 +210,12 @@ public class PricingGroupController {
     }
 
     @ApiOperation(value = "添加客户相同定价组",  notes="需要Authorization")
-    @PostMapping(value = "/customer/type/{selfId}/{userId}/{type}",produces = {"application/json;charest=Utf-8"})
+    @PostMapping(value = "/customer/type/{selfId}/{userId}/{type}/{typeCope}",produces = {"application/json;charest=Utf-8"})
     public Result saveExistingPricingGroups(@PathVariable("userId")Integer userId,
                                             @PathVariable("selfId")Integer selfId,
-                                            @PathVariable("type")Integer type){
-        return pricingGroupService.saveExistingPricingGroups(userId,selfId,type);
+                                            @PathVariable("type")Integer type,
+                                            @PathVariable("typeCope")Integer typeCope){
+        return pricingGroupService.saveExistingPricingGroups(userId,selfId,type,typeCope);
     }
 
     @ApiOperation(value = "导入省份定价",  notes="需要Authorization")

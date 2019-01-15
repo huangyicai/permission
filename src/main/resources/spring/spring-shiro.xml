@@ -34,6 +34,7 @@
                  /public/403 = anon
                  /public/express/** = anon
                  /fn/** = roles[SUPER]
+                 /express/total/getTime = anon
                  /express/customerUser/** = roles["ADMIN,OPERATE"]
                  /express/message/** = roles["ADMIN,OPERATE,CUSTOMER"]
                  /express/service/reply/** = roles["ADMIN,OPERATE,SERVICE,CUSTOMER"]
