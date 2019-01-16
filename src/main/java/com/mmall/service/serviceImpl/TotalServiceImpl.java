@@ -580,6 +580,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     @Override
     public Result<List<Bill>> getBudget(Double weight,Integer userId) {
 
+        SysUserInfo userInfo = UserInfoConfig.getUserInfo();
+
         //獲取报价表
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(userId);
 
@@ -587,10 +589,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(userId);
 
         //获取成本表
-        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(userId);
+        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(userInfo.getId());
 
         //获取特殊成本表
-        List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(userId);
+        List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(userInfo.getId());
 
         String[] str= LevelConstants.PROSTR;
 
