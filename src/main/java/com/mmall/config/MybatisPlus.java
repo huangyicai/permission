@@ -32,7 +32,7 @@ public class MybatisPlus {
     private static String authorName="qty";
 
     //table名字
-    private static String table="prepaid";
+    private static String table="total_template";
 
     //table前缀
     private static String prefix="";
@@ -40,7 +40,7 @@ public class MybatisPlus {
     private static File file = new File(packageName);
 //        private static String path = "D:\\java\\manage\\permission";
     //private static String path = "E:\\project\\permission";//--qyy
-    private static String path = "C:\\project\\permission";//--qyy
+    private static String path = "C:\\project\\bailibaili\\permission";//--qyy
     private static String pathTwo = "\\src\\main\\java\\com\\mmall";
     public static void main(String[] args) {
         // 自定义需要填充的字段

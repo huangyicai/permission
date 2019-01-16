@@ -250,7 +250,6 @@ public class TotalController {
     }
 
     @ApiOperation(value = "定价",  notes="需要Authorization")
-
     @GetMapping(value = "/getPricing/{totalId}")
     public Result getPricing(@PathVariable("totalId")Integer totalId){
         return  totalService.getPricing(totalId);

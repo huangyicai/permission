@@ -209,8 +209,13 @@ public class XlsxProcessAbstract {
 
         //獲取姓名集合
         List<BillKeyword> list = billKeywordMapper.getBillKeyword(nameStr);
-
-        OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
+        OPCPackage pkg=null;
+        try {
+            pkg = OPCPackage.open(xlsxFile.getInputStream());
+        }catch (Exception e){
+            listError.add("请创建2007版本或者以上的xlsx格式文件");
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
         StylesTable styles = xssfReader.getStylesTable();

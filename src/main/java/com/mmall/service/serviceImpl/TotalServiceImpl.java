@@ -586,13 +586,11 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //获取特殊报价表
         List<PricingGroupVo> special = specialPricingGroupMapper.getPricingGroupVo(userId);
 
-//        //定价表是否数据存在
-//        List<Integer> allPricingGroups = pricingGroupMapper.getAllPricingGroups(userId);
+        //获取成本表
+        List<PricingGroupVo> pricingOffer = pricingGroupMapper.ListPricingGroup(userId);
 
-        //判断定价组参数是否完善
-        /*if(allPricingGroups.size()!=34){
-            return Result.error(InfoEnums.PROCING_IS_NULL);
-        }*/
+        //获取特殊成本表
+        List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(userId);
 
         String[] str= LevelConstants.PROSTR;
 
@@ -607,6 +605,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             b.setWeight(bd);
             list.add(b);
         }
+
+        //计算成本
+        list= getCalculate(pricingOffer,1,list,special1);
 
         //计算报价
         list=getCalculate(pricingGroup,2,list,special);

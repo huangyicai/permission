@@ -811,3 +811,21 @@ CREATE TABLE `prepaid` (
 -- Records of user_message
 -- ----------------------------
 
+DROP TABLE IF EXISTS `prepaid`;
+CREATE TABLE `prepaid` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int(11) DEFAULT '0' COMMENT '用户详情id',
+  `money` decimal(10,3) DEFAULT '0.000' COMMENT '预付金额/每单',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COMMENT='预付表';
+
+
+DROP TABLE IF EXISTS `total_template`;
+create table total_template(
+	template_id int primary key AUTO_INCREMENT,
+	id int DEFAULT 0 COMMENT '用户id',
+	template_head varchar(200) DEFAULT '' COMMENT '模板字段',
+	template_num varchar(30) DEFAULT '1,2,3,4,5' DEFAULT '对应列数：淘宝店铺,扫描时间,运单编号,目的地,计费重量',
+	create_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+) COMMENT '账单模板表';
+
