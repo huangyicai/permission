@@ -56,7 +56,7 @@ public interface PricingGroupService extends IService<PricingGroup> {
      * @param selfId
      * @return
      */
-    Result saveExistingPricingGroups(Integer userId, Integer selfId,Integer type);
+    Result saveExistingPricingGroups(Integer userId, Integer selfId,Integer type,Integer typeCope);
 
     /**
      * 获取用户特殊定价
