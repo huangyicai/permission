@@ -54,6 +54,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
+import static java.math.BigDecimal.ROUND_UP;
 
 /**
  * <p>
@@ -750,7 +751,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 additional=additional(bill,firstHeavy,additionalHeavy,type);
             }
 
-            if(traverse==false && additional==false){
+            if(!traverse && !additional){
                 listError.add("单号："+bill.getSerialNumber()+"的地址“"+bill.getDestination()+"”无法识别");
             }
         }
@@ -784,10 +785,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
-                        bill.setCost(new BigDecimal(pg.getPrice().toString()).setScale(2,ROUND_HALF_UP));
+                        bill.setCost(new BigDecimal(pg.getPrice().toString()).setScale(2,ROUND_UP));
                         return true;
                     }else{
-                        bill.setOffer(new BigDecimal(pg.getPrice().toString()).setScale(2,ROUND_HALF_UP));
+                        bill.setOffer(new BigDecimal(pg.getPrice().toString()).setScale(2,ROUND_UP));
                         return true;
                     }
                 }
@@ -801,21 +802,21 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().contains(pp.getCity())){
 
                 //和区间开始比较
-                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()).setScale(2,ROUND_HALF_UP));
+                int greaterContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaBegin().toString()));
 
                 //和区间结束大小比较
-                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()).setScale(2,ROUND_HALF_UP));
+                int lessContinue=bill.getWeight().compareTo(new BigDecimal(pp.getAreaEnd().toString()));
 
-                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()).setScale(2,ROUND_HALF_UP));
+                int firstOne=bill.getWeight().compareTo(new BigDecimal(pp.getFirstWeight().toString()));
 
                 if(greaterContinue>=0 && lessContinue<=0){
 
                     if(firstOne<=0){
                         if(type==1){
-                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2,ROUND_HALF_UP));
+                            bill.setCost(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2,ROUND_UP));
                             return true;
                         }else{
-                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2,ROUND_HALF_UP));
+                            bill.setOffer(new BigDecimal(pp.getFirstWeightPrice().toString()).setScale(2,ROUND_UP));
                             return true;
                         }
                     }
@@ -823,7 +824,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     //获取计算的单位个数
                     BigDecimal bd=bill.getWeight()
                             .subtract(new BigDecimal(pp.getFirstWeight().toString()))
-                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_HALF_UP)
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_UP)
                             .multiply(new BigDecimal(1000));
 
                     Integer num=bd.intValue();
@@ -841,10 +842,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
 
                     if(type==1){
-                        bill.setCost(fist.add(two).setScale(2,ROUND_HALF_UP));
+                        bill.setCost(fist.add(two).setScale(2,ROUND_UP));
                         return true;
                     }else{
-                        bill.setOffer(fist.add(two).setScale(2,ROUND_HALF_UP));
+                        bill.setOffer(fist.add(two).setScale(2,ROUND_UP));
                         return true;
                     }
                 }
@@ -870,18 +871,18 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             if(bill.getDestination().contains(pg.getCity())||pg.getCity().startsWith("全部")){
 
                 //和区间开始比较
-                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()).setScale(2,ROUND_HALF_UP));
+                int greater=bill.getWeight().compareTo(new BigDecimal(pg.getAreaBegin().toString()));
 
                 //和区间结束大小比较
-                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()).setScale(2,ROUND_HALF_UP));
+                int less=bill.getWeight().compareTo(new BigDecimal(pg.getAreaEnd().toString()));
 
                 //在区间，计算首重
                 if(greater>=0 && less<=0){
                     if(type==1){
-                        bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                        bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
                         return true;
                     }else{
-                        bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                        bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
                         return true;
                     }
                 }
@@ -906,10 +907,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(firstOne<=0){
                         if(type==1){
-                            bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                            bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
                             return true;
                         }else{
-                            bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                            bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
                             return true;
                         }
                     }
@@ -917,7 +918,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     //获取计算的单位个数
                     BigDecimal bd=bill.getWeight()
                             .subtract(new BigDecimal(pp.getFirstWeight().toString()))
-                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_HALF_UP)
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_UP)
                             .multiply(new BigDecimal(1000));
 
                     Integer num=bd.intValue();
@@ -935,10 +936,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     BigDecimal two=new BigDecimal(pp.getPrice().toString()).multiply(new BigDecimal(num));
 
                     if(type==1){
-                        bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
+                        bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_UP));
                         return true;
                     }else{
-                        bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
+                        bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_UP));
                         return true;
                     }
                 }
