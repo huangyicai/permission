@@ -330,6 +330,9 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         //获取账单信息
         Total total = totalMapper.selectById(totalId);
 
+        //获取异常信息集合
+        List<String> listError = new ArrayList<String>();
+
         if(total==null){
             return  Result.error(InfoEnums.BILL_IS_NULL);
         }
@@ -385,12 +388,19 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
             List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(total.getSendId());
 
             //计算成本
-            list= getCalculate(pricingOffer,1,list,special1);
+            list= getCalculate(listError,pricingOffer,1,list,special1);
 
+            if(listError.size()>0){
+                return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+            }
         }
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special);
+        list=getCalculate(listError,pricingGroup,2,list,special);
+
+        if(listError.size()>0){
+            return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
+        }
 
         //计算价格
         for(Bill b:list){
@@ -582,6 +592,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
 
+        List<String> listError = new ArrayList<String>();
+
         //獲取报价表
         List<PricingGroupVo> pricingGroup = pricingGroupMapper.ListPricingGroup(userId);
 
@@ -609,10 +621,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         }
 
         //计算成本
-        list= getCalculate(pricingOffer,1,list,special1);
+        list= getCalculate(listError,pricingOffer,1,list,special1);
 
         //计算报价
-        list=getCalculate(pricingGroup,2,list,special);
+        list=getCalculate(listError,pricingGroup,2,list,special);
 
         return Result.ok(list);
     }
@@ -652,7 +664,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @return
      */
     @Transactional
-    public List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
+    public List<Bill> getCalculate(List<String> listError,
+                                   List<PricingGroupVo> pricingGroupVo,
                                    Integer type,
                                    List<Bill> list,
                                    List<PricingGroupVo> special){
@@ -720,6 +733,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
         for (Bill bill:list) {
 
             Boolean traverse=false;
+            Boolean additional=false;
 
             //遍历取代定价组
             if(specialFirst.size()>0){
@@ -728,12 +742,16 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
             //遍历定价组
             if(!traverse){
-                traverse(bill,first,Continued,type);
+                traverse=traverse(bill,first,Continued,type);
             }
 
             //遍历追加的城市
             if(firstHeavy.size()>0 || additionalHeavy.size()>0){
-                additional(bill,firstHeavy,additionalHeavy,type);
+                additional=additional(bill,firstHeavy,additionalHeavy,type);
+            }
+
+            if(traverse==false && additional==false){
+                listError.add("单号："+bill.getSerialNumber()+"的地址“"+bill.getDestination()+"”无法识别");
             }
         }
 
@@ -805,7 +823,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     //获取计算的单位个数
                     BigDecimal bd=bill.getWeight()
                             .subtract(new BigDecimal(pp.getFirstWeight().toString()))
-                            .divide(new BigDecimal(pp.getWeightStandard().toString()))
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_HALF_UP)
                             .multiply(new BigDecimal(1000));
 
                     Integer num=bd.intValue();
@@ -842,7 +860,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
      * @param Continued
      * @return
      */
-    public void additional(Bill bill,List<PricingGroupVo> first,
+    public boolean additional(Bill bill,List<PricingGroupVo> first,
                            List<PricingGroupVo> Continued,
                            Integer type){
         //遍历首重
@@ -861,8 +879,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                        return true;
                     }else{
                         bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                        return true;
                     }
                 }
             }
@@ -887,15 +907,17 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(firstOne<=0){
                         if(type==1){
                             bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                            return true;
                         }else{
                             bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_HALF_UP));
+                            return true;
                         }
                     }
 
                     //获取计算的单位个数
                     BigDecimal bd=bill.getWeight()
                             .subtract(new BigDecimal(pp.getFirstWeight().toString()))
-                            .divide(new BigDecimal(pp.getWeightStandard().toString()))
+                            .divide(new BigDecimal(pp.getWeightStandard().toString()),2,ROUND_HALF_UP)
                             .multiply(new BigDecimal(1000));
 
                     Integer num=bd.intValue();
@@ -914,12 +936,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(type==1){
                         bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
+                        return true;
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_HALF_UP));
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     /**

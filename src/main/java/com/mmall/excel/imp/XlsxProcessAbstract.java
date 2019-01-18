@@ -582,8 +582,11 @@ public class XlsxProcessAbstract {
             List<PricingGroupVo> special1 = specialPricingGroupMapper.getPricingGroupVo(userInfo.getId());
 
             //计算成本
-            list= totalService1.getCalculate(pricingOffer,1,list,special1);
+            list= totalService1.getCalculate(listError,pricingOffer,1,list,special1);
 
+            if(listError.size()>0){
+                return null;
+            }
         }
 
         //分离数据并计算成本
@@ -842,9 +845,6 @@ public class XlsxProcessAbstract {
                         pricing=1;
                     }
                 }else{
-                    if(endRowStrs.indexOf("|@||@|")!=-1){
-                        listError.add("第"+(rowNum+1)+"行：有数据为空，或无法识别");
-                    }
                     try{
                         String nameStr=cellStrs[0].replaceAll("\u00A0", "");
 
@@ -853,7 +853,7 @@ public class XlsxProcessAbstract {
                         bill.setBillName(nameStr);
                         bill.setSweepTime(cellStrs[1]);
                         bill.setSerialNumber(cellStrs[2]);
-                        bill.setDestination(cellStrs[3]);
+                        bill.setDestination(check(cellStrs[3],rowNum+1));
                         bill.setWeight(new BigDecimal(cellStrs[4]));
 
                         if(pricing==1){
@@ -921,6 +921,24 @@ public class XlsxProcessAbstract {
     }
 
     /**
+     * 校验城市
+     * @param province
+     */
+    private String check(String province,Integer num){
+
+        String[] proStr=LevelConstants.PROSTR;
+
+        for (String str:proStr){
+            if(province.startsWith(str)){
+                destination.put(str,province);
+                return province;
+            }
+        }
+        listError.add("第"+num+"行：城市“"+province+"”无法识别");
+        return province;
+    }
+
+    /**
      * 获取城市单件
      * @param province
      */
@@ -934,9 +952,10 @@ public class XlsxProcessAbstract {
                 return true;
             }
         }
-//        listError.add("单号："+num+"城市无法识别");
+        listError.add("单号："+num+"城市无法识别");
         return false;
     }
+
 
     /**
      * 根据每日数据进行分离

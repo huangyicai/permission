@@ -78,7 +78,7 @@ public interface TotalService extends IService<Total> {
 
     Result getNotPaying();
 
-    List<Bill> getCalculate(List<PricingGroupVo> pricingGroupVo,
+    List<Bill> getCalculate(List<String> listError,List<PricingGroupVo> pricingGroupVo,
                                    Integer type,
                                    List<Bill> list,
                                    List<PricingGroupVo> special);
@@ -87,7 +87,7 @@ public interface TotalService extends IService<Total> {
                             List<PricingGroupVo> Continued,
                             Integer type);
 
-    void additional(Bill bill,List<PricingGroupVo> first,
+    boolean additional(Bill bill,List<PricingGroupVo> first,
                            List<PricingGroupVo> Continued,
                            Integer type);
 
