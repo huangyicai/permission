@@ -552,6 +552,10 @@ public class XlsxProcessAbstract {
             }
         }
 
+        if(listError.size()>0){
+            return null;
+        }
+
         //获取上传的文件名字
         String fName = xlsxFile.getOriginalFilename();
         String[] str1= fName.split("\\.");
