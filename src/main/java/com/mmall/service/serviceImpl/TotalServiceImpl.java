@@ -880,10 +880,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
-                        return true;
                     }else{
                         bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
-                        return true;
                     }
                 }
             }
@@ -908,10 +906,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(firstOne<=0){
                         if(type==1){
                             bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
-                            return true;
                         }else{
                             bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
-                            return true;
                         }
                     }
 
@@ -937,10 +933,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(type==1){
                         bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_UP));
-                        return true;
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_UP));
-                        return true;
                     }
                 }
             }
