@@ -232,6 +232,10 @@ public class XlsxProcessAbstract {
             }
         }
 
+        if(stream==null){
+            listError.add("请上传xlsx格式的文件");
+        }
+
         if(listError.size()!=0){
             return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
         }
@@ -535,7 +539,13 @@ public class XlsxProcessAbstract {
     @Transactional
     public Map getThreadDto(MultipartFile xlsxFile,String time) throws Exception {
         SysUserInfo userInfo = UserInfoConfig.getUserInfo();
-        OPCPackage pkg = OPCPackage.open(xlsxFile.getInputStream());
+        OPCPackage pkg=null;
+        try {
+            pkg = OPCPackage.open(xlsxFile.getInputStream());
+        }catch (Exception e){
+            listError.add("请创建2007版本或者以上的xlsx格式文件");
+            return null;
+        }
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
         XSSFReader xssfReader = new XSSFReader(pkg);
         StylesTable styles = xssfReader.getStylesTable();
@@ -550,6 +560,10 @@ public class XlsxProcessAbstract {
             } finally {
                 stream.close();
             }
+        }
+
+        if(stream==null){
+            listError.add("请上传xlsx格式的文件");
         }
 
         if(listError.size()>0){
