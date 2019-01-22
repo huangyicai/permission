@@ -633,7 +633,7 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     /**
      * 批量发送订单
      * @param totalParam
-     * @return
+     * @return2
      */
     @Override
     @Transactional
@@ -864,6 +864,8 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
     public boolean additional(Bill bill,List<PricingGroupVo> first,
                            List<PricingGroupVo> Continued,
                            Integer type){
+        boolean bl=false;
+
         //遍历首重
         for(PricingGroupVo pg: first){
 
@@ -880,8 +882,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                 if(greater>=0 && less<=0){
                     if(type==1){
                         bill.setCost(bill.getCost().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
+                        bl=true;
                     }else{
                         bill.setOffer(bill.getOffer().add(new BigDecimal(pg.getPrice().toString())).setScale(2,ROUND_UP));
+                        bl=true;
                     }
                 }
             }
@@ -906,8 +910,10 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
                     if(firstOne<=0){
                         if(type==1){
                             bill.setCost(bill.getCost().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
+                            bl=true;
                         }else{
                             bill.setOffer(bill.getOffer().add(new BigDecimal(pp.getPrice().toString())).setScale(2,ROUND_UP));
+                            bl=true;
                         }
                     }
 
@@ -933,13 +939,15 @@ public class TotalServiceImpl extends ServiceImpl<TotalMapper, Total> implements
 
                     if(type==1){
                         bill.setCost(bill.getCost().add(fist.add(two)).setScale(2,ROUND_UP));
+                        bl=true;
                     }else{
                         bill.setOffer(bill.getOffer().add(fist.add(two)).setScale(2,ROUND_UP));
+                        bl=true;
                     }
                 }
             }
         }
-        return false;
+        return bl;
     }
 
     /**
