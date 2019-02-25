@@ -399,8 +399,8 @@ public class XlsxProcessAbstract {
     @Transactional
     public Result additionalSet(MultipartFile xlsxFile,Integer userId,String date) throws Exception {
         SysUserInfo user = sysUserInfoService.getById( userId);
-        Map threadDto1 = getThreadDto(xlsxFile,date);
 
+        Map threadDto1 = getThreadDto(xlsxFile,date);
         if(listError.size()!=0){
             return Result.error(InfoEnums.TABLE_FORMAT_ERROR,listError);
         }
@@ -561,7 +561,6 @@ public class XlsxProcessAbstract {
                 stream.close();
             }
         }
-
         if(stream==null){
             listError.add("请上传xlsx格式的文件");
         }
@@ -607,6 +606,7 @@ public class XlsxProcessAbstract {
             }
         }
 
+        System.out.println(destination);
         //分离数据并计算成本
         for (Bill bill:list) {
             weightInterval(bill.getWeight());
@@ -948,7 +948,6 @@ public class XlsxProcessAbstract {
 
         for (String str:proStr){
             if(province.startsWith(str)){
-                destination.put(str,province);
                 return province;
             }
         }
